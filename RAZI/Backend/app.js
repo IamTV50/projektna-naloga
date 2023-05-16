@@ -3,12 +3,21 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+require('dotenv').config();
+
+var username = process.env.USERNAME;
+var password = process.env.PASSWORD;
+var database = process.env.DATABASE;
 
 // Vključimo mongoose in ga povežemo z MongoDB
 // TODO - poveži z dejansko bazo na cloud-u
 var mongoose = require('mongoose');
-var mongoDB = "mongodb://127.0.0.1/projektna_naloga";
-mongoose.connect(mongoDB);
+var mongoDB = `mongodb+srv://${username}:${password}@cluster0.gqinagj.mongodb.net/${database}?retryWrites=true&w=majority`;
+
+mongoose.connect(mongoDB)
+    .then(()=> {
+      console.log("Connected to MongoDB.")
+    });
 mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
