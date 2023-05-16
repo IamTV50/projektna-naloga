@@ -18,7 +18,7 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         binding.showTxt.text = "test"
 
         binding.callAPIBtn.setOnClickListener {
-            //binding.showTxt.text = "calll api click"
+            //binding.showTxt.text = "call api click"
 
             //daj v .env
             val apiUrl = "https://api-d4me-stage.direct4.me/sandbox/v1/Access/openbox"
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    suspend fun sendPostRequest(apiUrl: String, jsonBody: String): String {
+    private suspend fun sendPostRequest(apiUrl: String, jsonBody: String): String {
         val mediaType = "application/json".toMediaType()
         val requestBody = jsonBody.toRequestBody(mediaType)
         val request = Request.Builder()
