@@ -10,7 +10,6 @@ var password = process.env.PASSWORD;
 var database = process.env.DATABASE;
 
 // Vključimo mongoose in ga povežemo z MongoDB
-// TODO - poveži z dejansko bazo na cloud-u
 var mongoose = require('mongoose');
 var mongoDB = `mongodb+srv://${username}:${password}@cluster0.gqinagj.mongodb.net/${database}?retryWrites=true&w=majority`;
 
@@ -29,7 +28,7 @@ var packagesRouter = require('./routes/packageRoutes');
 
 var app = express();
 
-// Spremeni dovoljene dostope
+// TODO: Spremeni dovoljene dostope
 var cors = require('cors');
 var allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
 app.use(cors({

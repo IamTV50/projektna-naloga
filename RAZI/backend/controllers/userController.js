@@ -1,6 +1,8 @@
 var UserModel = require('../models/userModel.js');
 
 module.exports = {
+
+    // prikaz podatkov povezanih z uporabniki
     list: function (req, res) {
         UserModel.find(function (err, users) {
             if (err) {
@@ -35,6 +37,24 @@ module.exports = {
         });
     },
 
+    profile: function(req, res, next){
+        UserModel.findById(req.session.userId)
+            .exec(function(error, user){
+                if(error){
+                    return next(error);
+                } else{
+                    if(user===null){
+                        const err = new Error('Not authorized, go back!');
+                        err.status = 400;
+                        return next(err);
+                    } else{
+                        return res.json(user);
+                    }
+                }
+            });
+    },
+
+    // Avtorizacija uporabnika
     create: function (req, res) {
         var user = new UserModel({
 			username : req.body.username,
@@ -53,6 +73,37 @@ module.exports = {
 
             return res.status(201).json(user);
         });
+    },
+
+    login: function(req, res, next){
+        console.log("on login " + req.body.username + " " + req.body.password)
+        UserModel.authenticate(req.body.username, req.body.password, function(err, user){
+            if(err || !user){
+                console.log("on error " + err)
+                console.log("on error " + user)
+                var err = new Error('Wrong username or password');
+                err.status = 401;
+                return res.status(401).json({
+                    message: 'Wrong username or password',
+                    error: err
+                });
+            }
+            req.session.userId = user._id;
+            return res.json(user);
+        });
+    },
+
+    logout: function(req, res, next){
+        if(req.session){
+            req.session.destroy(function(err){
+                if(err){
+                    return next(err);
+                } else{
+                    //return res.redirect('/');
+                    return res.status(201).json({});
+                }
+            });
+        }
     },
 
     update: function (req, res) {
@@ -91,7 +142,8 @@ module.exports = {
     },
 
     remove: function (req, res) {
-        var id = req.params.id;
+        var id = req.session.userId;
+
 
         UserModel.findByIdAndRemove(id, function (err, user) {
             if (err) {
@@ -100,8 +152,16 @@ module.exports = {
                     error: err
                 });
             }
-
-            return res.status(204).json();
+            if(req.session){
+                req.session.destroy(function(err){
+                    if(err){
+                        return next(err);
+                    } else{
+                        //return res.redirect('/');
+                        return res.status(204).json({});
+                    }
+                });
+            }
         });
     }
 };
