@@ -1,4 +1,5 @@
 var RequestModel = require('../models/requestModel.js');
+var PackageModel = require('../models/packageModel.js');
 
 module.exports = {
     list: function (req, res) {
@@ -40,7 +41,7 @@ module.exports = {
 			user : req.body.user,
 			package : req.body.package,
 			reason : req.body.reason,
-			created : req.body.created
+			created : Date.now()
         });
 
         request.save(function (err, request) {
@@ -53,6 +54,43 @@ module.exports = {
 
             return res.status(201).json(request);
         });
+    },
+
+	userRequestPackage: function (req, res) {
+		var packageNumber = req.body.packageNumber;
+
+		PackageModel.findOne({number: packageNumber}, function (err, package) {
+			if (err) {
+                return res.status(500).json({
+                    message: 'Error when getting package.',
+                    error: err
+                });
+            }
+
+            if (!package) {
+                return res.status(404).json({
+                    message: 'No such package'
+                });
+            }
+
+			var request = new RequestModel({
+				user : req.session.userId,
+				package : package._id,
+				reason : req.body.reason,
+				created : Date.now()
+			});
+
+			request.save(function (err, request) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when creating request',
+						error: err
+					});
+				}
+
+				return res.status(201).json(request);
+			});
+		});
     },
 
     update: function (req, res) {

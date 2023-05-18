@@ -11,6 +11,8 @@ router.get('/:id', userController.show);
 router.post('/', userController.create);
 router.post('/login', userController.login);
 
+router.put('/addPackage', userController.addPackage);
+router.put('/removePackage', userController.removePackage);
 router.put('/:id', userController.update);
 
 router.delete('/', userController.remove);

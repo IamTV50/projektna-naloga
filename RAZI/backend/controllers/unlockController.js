@@ -41,7 +41,7 @@ module.exports = {
 			user : req.body.user,
 			success : req.body.success,
 			status : req.body.status,
-			openedOn : req.body.openedOn
+			openedOn : Date.now()
         });
 
         unlock.save(function (err, unlock) {

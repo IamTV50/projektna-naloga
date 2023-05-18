@@ -1,10 +1,11 @@
 var UserModel = require('../models/userModel.js');
+var PackageModel = require('../models/packageModel.js');
 
 module.exports = {
 
     // prikaz podatkov povezanih z uporabniki
     list: function (req, res) {
-        UserModel.find(function (err, users) {
+        UserModel.find().populate("packages").exec(function (err, users) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting user.',
@@ -19,7 +20,7 @@ module.exports = {
     show: function (req, res) {
         var id = req.params.id;
 
-        UserModel.findOne({_id: id}, function (err, user) {
+        UserModel.findOne({_id: id}).populate("packages").exec(function (err, user) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting user.',
@@ -95,12 +96,11 @@ module.exports = {
     },
 
     logout: function(req, res, next){
-        if(req.session){
-            req.session.destroy(function(err){
-                if(err){
+        if (req.session) {
+            req.session.destroy(function(err) {
+                if (err) {
                     return next(err);
-                } else{
-                    //return res.redirect('/');
+                } else {
                     return res.status(201).json({});
                 }
             });
@@ -173,6 +173,14 @@ module.exports = {
 				if (!user) {
 					return res.status(404).json({
 						message: 'No such user'
+					});
+				}
+
+				var packageIndex = user.packages.indexOf(package._id);
+
+				if (packageIndex > -1) {
+					return res.status(404).json({
+						message: `User already contains package ${package.number}`
 					});
 				}
 
