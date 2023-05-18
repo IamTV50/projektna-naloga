@@ -91,7 +91,11 @@ module.exports = {
                 });
             }
             req.session.userId = user._id;
-            return res.json(user);
+			
+			// Exclude the password field from the user object
+			const { password, ...userWithoutPassword } = user.toObject();
+
+			return res.json(userWithoutPassword);
         });
     },
 
