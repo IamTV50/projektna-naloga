@@ -6,11 +6,15 @@ var userSchema = new Schema({
 	'username' : String,
 	'password' : String,
 	'email' : String,
-	'admin' : Boolean
+	'admin' : Boolean,
+	'packages' : [{
+	 	type: Schema.Types.ObjectId,
+	 	ref: 'package'
+	}]
 });
 
 // Tukaj se geslo hash-ira preden se user ustvari
-userSchema.pre('save', function(next){
+userSchema.pre('save', function(next) {
 	var user = this;
 	bcrypt.hash(user.password, 10, function(err, hash){
 		if (err) {

@@ -1,15 +1,6 @@
 var PackageModel = require('../models/packageModel.js');
 
-/**
- * packageController.js
- *
- * @description :: Server-side logic for managing packages.
- */
 module.exports = {
-
-    /**
-     * packageController.list()
-     */
     list: function (req, res) {
         PackageModel.find(function (err, packages) {
             if (err) {
@@ -23,9 +14,6 @@ module.exports = {
         });
     },
 
-    /**
-     * packageController.show()
-     */
     show: function (req, res) {
         var id = req.params.id;
 
@@ -47,12 +35,10 @@ module.exports = {
         });
     },
 
-    /**
-     * packageController.create()
-     */
     create: function (req, res) {
         var package = new PackageModel({
-			number : req.body.number
+			number : req.body.number,
+			active : true
         });
 
         package.save(function (err, package) {
@@ -67,9 +53,6 @@ module.exports = {
         });
     },
 
-    /**
-     * packageController.update()
-     */
     update: function (req, res) {
         var id = req.params.id;
 
@@ -88,6 +71,7 @@ module.exports = {
             }
 
             package.number = req.body.number ? req.body.number : package.number;
+			package.active = req.body.active ? req.body.active : package.active;
 			
             package.save(function (err, package) {
                 if (err) {
@@ -102,9 +86,6 @@ module.exports = {
         });
     },
 
-    /**
-     * packageController.remove()
-     */
     remove: function (req, res) {
         var id = req.params.id;
 
@@ -116,7 +97,7 @@ module.exports = {
                 });
             }
 
-            return res.status(204).json();
+            return res.status(204).json({});
         });
     }
 };
