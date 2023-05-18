@@ -7,6 +7,7 @@ import Register from "./components/Register";
 import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import Home from "./components/Home";
+import AdminPannel from './components/AdminPannel';
 
 function App() {
 
@@ -29,6 +30,7 @@ function App() {
               <Route path="/" exact element={<Home />}></Route>
               <Route path="/login" exact element={<Login />}></Route>
               <Route path="/register" element={<Register />}></Route>
+              <Route path="/admin" element={<AdminPannel />}></Route>
               {/*<Route path="/publish" element={<AddPhoto />}></Route>*/}
               <Route path="/profile" element={<Profile />}></Route>
               <Route path="/logout" element={<Logout />}></Route>

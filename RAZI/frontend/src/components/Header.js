@@ -13,6 +13,9 @@ function Header(props) {
                         {context => (
                             context.user ?
                                 <>
+									{context.user.admin && (
+										<li><Link to="/admin">Admin</Link> </li>
+									)}
                                     <li><Link to='/profile'>Profile</Link></li>
                                     <li><Link to='/logout'>Logout</Link></li>
                                 </>
