@@ -8,9 +8,10 @@ function Logout() {
         const logout = async function(){
             userContext.setUserContext(null);
             const res = await fetch("http://localhost:3001/users/logout");
+			console.log(res)
         }
         logout();
-    }, []);
+    });
 
     return (
         <Navigate replace to="/" />

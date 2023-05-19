@@ -15,5 +15,6 @@ router.put('/removePackage', userController.removePackage);
 router.put('/:id', userController.update);
 
 router.delete('/', userController.remove);
+router.delete('/:id', userController.adminRemove);
 
 module.exports = router;

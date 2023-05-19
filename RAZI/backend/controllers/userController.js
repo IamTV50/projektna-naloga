@@ -315,7 +315,7 @@ module.exports = {
     remove: function (req, res) {
         var id = req.session.userId;
 
-		RequestModel.deleteMany({ user: userId }, function (err) {
+		RequestModel.deleteMany({ user: id }, function (err) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when deleting requests.',
@@ -340,6 +340,30 @@ module.exports = {
 						}
 					});
 				}
+			});
+		});
+    },
+
+	adminRemove: function (req, res) {
+        var id = req.params.id;
+
+		RequestModel.deleteMany({ user: id }, function (err) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error when deleting requests.',
+                    error: err
+                });
+            }
+
+			UserModel.findByIdAndRemove(id, function (err, user) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when deleting the user.',
+						error: err
+					});
+				}
+
+				return res.status(204).json({});
 			});
 		});
     }

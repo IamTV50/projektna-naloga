@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AdminGetRequest from "./AdminGetRequest";
 import AdminAddPackage from "./AdminAddPackage";
+import AdminShowUsers from "./AdminShowUsers";
 
 function AdminPannel() {
 	const [requests, setRequests] = useState([]);
@@ -41,6 +42,10 @@ function AdminPannel() {
 						{isLoading ? "" : requests.map(request => (<AdminGetRequest request={request} key={request._id} onRequestDeleted={handleRequestDelete}></AdminGetRequest>))}
 					</ul>
 				</div>
+			</div>
+			<div>
+				<h3>Users list:</h3>
+				<AdminShowUsers></AdminShowUsers>
 			</div>
 		</div>
 	);

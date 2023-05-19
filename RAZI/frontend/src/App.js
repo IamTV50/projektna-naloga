@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { UserContext } from "./userContext";
 import Header from "./components/Header";
@@ -7,7 +7,7 @@ import Register from "./components/Register";
 import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import Home from "./components/Home";
-import AdminPannel from './components/AdminPannel';
+import AdminPannel from "./components/admin/AdminPannel";
 
 function App() {
 
