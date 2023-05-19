@@ -45,7 +45,7 @@ function AdminPannel() {
 			</div>
 			<div>
 				<h3>Users list:</h3>
-				<AdminShowUsers></AdminShowUsers>
+				<AdminShowUsers onRequestDeleted={handleRequestDelete}></AdminShowUsers>
 			</div>
 		</div>
 	);
