@@ -5,6 +5,7 @@ var packageController = require('../controllers/packageController.js');
 
 router.get('/', packageController.list);
 router.get('/:id', packageController.show);
+router.get('/user/:id', packageController.showByUser);
 
 router.post('/', packageController.create);
 

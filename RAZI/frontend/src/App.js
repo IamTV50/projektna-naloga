@@ -8,6 +8,7 @@ import Profile from "./components/Profile";
 import Logout from "./components/Logout";
 import Home from "./components/Home";
 import AdminPannel from "./components/admin/AdminPannel";
+import MyPackages from "./components/MyPackages";
 
 function App() {
 
@@ -33,6 +34,8 @@ function App() {
 						<Route path="/admin" element={<AdminPannel />}></Route>
 						<Route path="/profile" element={<Profile />}></Route>
 						<Route path="/logout" element={<Logout />}></Route>
+						<Route path="/my-packages" element={<MyPackages />}></Route>
+
 					</Routes>
 				</div>
 			</UserContext.Provider>

@@ -36,6 +36,36 @@ module.exports = {
         });
     },
 
+	showByUser: function (req, res) {
+		var id = req.params.id;
+
+		UserModel.findOne({_id: id}, function (err, user) {
+			if (err) {
+				return res.status(500).json({
+					message: 'Error when getting user.',
+					error: err
+				});
+			}
+
+			if (!user) {
+				return res.status(404).json({
+					message: 'No such user'
+				});
+			}
+
+			PackageModel.find({user: user}, function (err, packages) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when getting package.',
+						error: err
+					});
+				}
+
+				return res.json(packages);
+			});
+		});
+	},
+
     create: function (req, res) {
 		var number = req.body.number;
 
