@@ -4,11 +4,11 @@ import { Navigate } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css';
 
-function Profile(){
+function Profile() {
     const userContext = useContext(UserContext);
     const [profile, setProfile] = useState({});
 
-    useEffect(function(){
+    useEffect(function() {
         const getProfile = async function(){
             console.log("Calling profile");
             const res = await fetch("http://localhost:3001/users/profile", {credentials: "include"});

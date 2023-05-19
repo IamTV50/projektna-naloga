@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { UserContext } from '../userContext';
 import { Navigate } from 'react-router-dom';
 
-function Login(){
+function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -21,7 +21,8 @@ function Login(){
         });
         const data = await res.json();
         console.log(data);
-        if(data._id !== undefined){
+
+        if (data._id !== undefined) {
             console.log("setting user context")
             userContext.setUserContext(data);
         } else {

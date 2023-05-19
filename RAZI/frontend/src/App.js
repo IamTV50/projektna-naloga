@@ -18,28 +18,26 @@ function App() {
   }
 
 
-  return (
-      <BrowserRouter>
-        <UserContext.Provider value={{
-          user: user,
-          setUserContext: updateUserData
-        }}>
-          <div className="App">
-            <Header title="My application"></Header>
-            <Routes>
-              <Route path="/" exact element={<Home />}></Route>
-              <Route path="/login" exact element={<Login />}></Route>
-              <Route path="/register" element={<Register />}></Route>
-              <Route path="/admin" element={<AdminPannel />}></Route>
-              {/*<Route path="/publish" element={<AddPhoto />}></Route>*/}
-              <Route path="/profile" element={<Profile />}></Route>
-              <Route path="/logout" element={<Logout />}></Route>
-              {/*<Route path="photos/:id" element={<PhotoDetails />}></Route>*/}
-            </Routes>
-          </div>
-        </UserContext.Provider>
-      </BrowserRouter>
-  );
+	return (
+		<BrowserRouter>
+			<UserContext.Provider value={{
+				user: user,
+				setUserContext: updateUserData
+			}}>
+				<div className="App">
+					<Header title="My application"></Header>
+					<Routes>
+						<Route path="/" exact element={<Home />}></Route>
+						<Route path="/login" exact element={<Login />}></Route>
+						<Route path="/register" element={<Register />}></Route>
+						<Route path="/admin" element={<AdminPannel />}></Route>
+						<Route path="/profile" element={<Profile />}></Route>
+						<Route path="/logout" element={<Logout />}></Route>
+					</Routes>
+				</div>
+			</UserContext.Provider>
+		</BrowserRouter>
+	);
 }
 
 export default App;
