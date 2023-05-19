@@ -20,14 +20,19 @@ function Register() {
         });
         const data = await res.json();
         console.log(data);
-        if(data._id !== undefined){
+
+        if (data._id !== undefined) {
             window.location.href="/login";
-        }
-        else{
+        } else{
             setUsername("");
             setPassword("");
             setEmail("");
-            setError("Registration failed");
+
+			if (data.error) {
+            	setError("Registration failed");
+			} else {
+				setError(data.message);
+			}
         }
     }
 
