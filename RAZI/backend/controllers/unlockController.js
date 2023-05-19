@@ -2,7 +2,7 @@ var UnlockModel = require('../models/unlockModel.js');
 
 module.exports = {
     list: function (req, res) {
-        UnlockModel.find().populate("user").populate("package").exec(function (err, unlocks) {
+        UnlockModel.find().populate("user").populate("packager").exec(function (err, unlocks) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting unlock.',
@@ -26,7 +26,7 @@ module.exports = {
     show: function (req, res) {
         var id = req.params.id;
 
-        UnlockModel.findOne({_id: id}).populate("user").populate("package").exec(function (err, unlock) {
+        UnlockModel.findOne({_id: id}).populate("user").populate("packager").exec(function (err, unlock) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting unlock.',
@@ -52,7 +52,7 @@ module.exports = {
 
     create: function (req, res) {
         var unlock = new UnlockModel({
-			package : req.body.package,
+			packager : req.body.packager,
 			user : req.body.user,
 			success : req.body.success,
 			status : req.body.status,
@@ -88,7 +88,7 @@ module.exports = {
                 });
             }
 
-            unlock.package = req.body.package ? req.body.package : unlock.package;
+            unlock.packager = req.body.packager ? req.body.packager : unlock.packager;
 			unlock.user = req.body.user ? req.body.user : unlock.user;
 			unlock.success = req.body.success ? req.body.success : unlock.success;
 			unlock.status = req.body.status ? req.body.status : unlock.status;

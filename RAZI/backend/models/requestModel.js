@@ -6,9 +6,9 @@ var requestSchema = new Schema({
 	 	type: Schema.Types.ObjectId,
 	 	ref: 'user'
 	},
-	'package' : {
+	'packager' : {
 	 	type: Schema.Types.ObjectId,
-	 	ref: 'package'
+	 	ref: 'packager'
 	},
 	'reason' : String,
 	'created' : Date

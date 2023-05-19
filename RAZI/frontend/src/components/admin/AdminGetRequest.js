@@ -12,13 +12,13 @@ function AdminGetRequest(props) {
                 {
                     label: 'Yes',
                     onClick: () => {
-                        fetch(`http://localhost:3001/users/addPackage`, {
+                        fetch(`http://localhost:3001/users/addPackager`, {
                             method: "PUT",
 							credentials: "include",
 							headers: { 'Content-Type': 'application/json'},
 							body: JSON.stringify({
 								username: props.request.user.username,
-								packageNumber: props.request.package.number
+								packagerNumber: props.request.packager.number
 							})
                         }).then((res) => res.json())
 						.then((data) => {
@@ -31,7 +31,7 @@ function AdminGetRequest(props) {
 							}
 						})
 						.catch((err) => {
-							console.log("Error adding package to user", err);
+							console.log("Error adding packager to user", err);
 							setError("Error occurred while accepting the request!");
 						});
                     }
@@ -84,7 +84,7 @@ function AdminGetRequest(props) {
     return (
         <div>
             <p>User: {props.request.user ? props.request.user.username : "[deleted]"}</p>
-            <p>Package: {props.request.package ? props.request.package.number : "[deleted]"}</p>
+            <p>Packager: {props.request.packager ? props.request.packager.number : "[deleted]"}</p>
 			<p>Reason: {props.request.reason}</p>
 			<p>Date: {new Date(props.request.created).toLocaleString("de-DE")}</p>
 			<button onClick={acceptRequest}>Accept</button>

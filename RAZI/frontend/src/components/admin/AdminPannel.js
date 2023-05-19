@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import AdminGetRequest from "./AdminGetRequest";
-import AdminAddPackage from "./AdminAddPackage";
+import AdminAddPackager from "./AdminAddPackager";
 import AdminShowUsers from "./AdminShowUsers";
 
 function AdminPannel() {
 	const [requests, setRequests] = useState([]);
-	const [deletedRequest, setDeletedRequest] = useState(null);
+	const [deletedId, setDeletedId] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
@@ -23,29 +23,29 @@ function AdminPannel() {
 		};
 
 		fetchRequests();
-	}, [deletedRequest]);
+	}, [ deletedId ]);
 
-	const handleRequestDelete = (requestId) => {
-		setDeletedRequest(requestId);
+	const handleIdDelete = (deletedId) => {
+		setDeletedId(deletedId);
 	};
 
 	return ( 
 		<div>
 			<h3>TODO</h3>
 			<div>
-				<AdminAddPackage></AdminAddPackage>
+				<AdminAddPackager></AdminAddPackager>
 			</div>
 			<div>
 				<h3>Requests:</h3>
 				<div>
 					<ul>
-						{isLoading ? "" : requests.map(request => (<AdminGetRequest request={request} key={request._id} onRequestDeleted={handleRequestDelete}></AdminGetRequest>))}
+						{isLoading ? "" : requests.map(request => (<AdminGetRequest request={request} key={request._id} onRequestDeleted={handleIdDelete}></AdminGetRequest>))}
 					</ul>
 				</div>
 			</div>
 			<div>
 				<h3>Users list:</h3>
-				<AdminShowUsers onRequestDeleted={handleRequestDelete}></AdminShowUsers>
+				<AdminShowUsers onRequestDeleted={handleIdDelete}></AdminShowUsers>
 			</div>
 		</div>
 	);

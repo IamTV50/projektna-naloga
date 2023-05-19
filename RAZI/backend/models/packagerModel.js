@@ -1,10 +1,10 @@
 var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 
-var packageSchema = new Schema({
+var packagerSchema = new Schema({
 	'number' : Number,
 	'public' : Boolean,
 	'active' : Boolean
 });
 
-module.exports = mongoose.model('package', packageSchema);
+module.exports = mongoose.model('packager', packagerSchema);

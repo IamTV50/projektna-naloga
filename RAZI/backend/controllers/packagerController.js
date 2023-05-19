@@ -1,38 +1,38 @@
-var PackageModel = require('../models/packageModel.js');
+var PackagerModel = require('../models/packagerModel.js');
 var UserModel = require('../models/userModel.js');
 
 module.exports = {
     list: function (req, res) {
-        PackageModel.find(function (err, packages) {
+        PackagerModel.find(function (err, packagers) {
             if (err) {
                 return res.status(500).json({
-                    message: 'Error when getting package.',
+                    message: 'Error when getting packager.',
                     error: err
                 });
             }
 
-            return res.json(packages);
+            return res.json(packagers);
         });
     },
 
     show: function (req, res) {
         var id = req.params.id;
 
-        PackageModel.findOne({_id: id}, function (err, package) {
+        PackagerModel.findOne({_id: id}, function (err, packager) {
             if (err) {
                 return res.status(500).json({
-                    message: 'Error when getting package.',
+                    message: 'Error when getting packager.',
                     error: err
                 });
             }
 
-            if (!package) {
+            if (!packager) {
                 return res.status(404).json({
-                    message: 'No such package'
+                    message: 'No such packager'
                 });
             }
 
-            return res.json(package);
+            return res.json(packager);
         });
     },
 
@@ -40,35 +40,35 @@ module.exports = {
 		var number = req.body.number;
 
 		// Preveri ali je podana številka za paketnik že v bazi
-		PackageModel.findOne({ number: number }, function (err, existingPackage) {
+		PackagerModel.findOne({ number: number }, function (err, existingPackager) {
 			if (err) {
 				return res.status(500).json({
-					message: 'Error when finding package',
+					message: 'Error when finding packager',
 					error: err
 				});
 			}
 	
-			if (existingPackage) {
+			if (existingPackager) {
 				return res.status(409).json({
-					message: 'Package number already exists'
+					message: 'Packager number already exists'
 				});
 			}
 
-			var package = new PackageModel({
+			var packager = new PackagerModel({
 				number : number,
 				public : req.body.public,
 				active : true
 			});
 
-			package.save(function (err, package) {
+			packager.save(function (err, packager) {
 				if (err) {
 					return res.status(500).json({
-						message: 'Error when creating package',
+						message: 'Error when creating packager',
 						error: err
 					});
 				}
 
-				return res.status(201).json(package);
+				return res.status(201).json(packager);
 			});
 		});
     },
@@ -76,49 +76,49 @@ module.exports = {
     update: function (req, res) {
         var id = req.params.id;
 
-        PackageModel.findOne({_id: id}, function (err, package) {
+        PackagerModel.findOne({_id: id}, function (err, packager) {
             if (err) {
                 return res.status(500).json({
-                    message: 'Error when getting package',
+                    message: 'Error when getting packager',
                     error: err
                 });
             }
 
-            if (!package) {
+            if (!packager) {
                 return res.status(404).json({
-                    message: 'No such package'
+                    message: 'No such packager'
                 });
             }
 
-			if (req.body.number && req.body.number !== package.number) {
+			if (req.body.number && req.body.number !== packager.number) {
 				// Preveri ali je podana številka za paketnik že v bazi
-				PackageModel.findOne({ number: req.body.number }, function (err, existingPackage) {
+				PackagerModel.findOne({ number: req.body.number }, function (err, existingPackager) {
 					if (err) {
 						return res.status(500).json({
-							message: 'Error when finding package',
+							message: 'Error when finding packager',
 							error: err
 						});
 					}
 	
-					if (existingPackage) {
+					if (existingPackager) {
 						return res.status(409).json({
-							message: 'Package number already exists'
+							message: 'Packager number already exists'
 						});
 					}
 
-					package.number = req.body.number ? req.body.number : package.number;
-					package.public = req.body.public ? req.body.public : package.public;
-					package.active = req.body.active ? req.body.active : package.active;
+					packager.number = req.body.number ? req.body.number : packager.number;
+					packager.public = req.body.public ? req.body.public : packager.public;
+					packager.active = req.body.active ? req.body.active : packager.active;
 					
-					package.save(function (err, package) {
+					packager.save(function (err, packager) {
 						if (err) {
 							return res.status(500).json({
-								message: 'Error when updating package.',
+								message: 'Error when updating packager.',
 								error: err
 							});
 						}
 
-						return res.json(package);
+						return res.json(packager);
 					});
 				});
 			}
@@ -128,16 +128,16 @@ module.exports = {
     remove: function (req, res) {
         var id = req.params.id;
 
-        PackageModel.findByIdAndRemove(id, function (err, package) {
+        PackagerModel.findByIdAndRemove(id, function (err, packager) {
             if (err) {
                 return res.status(500).json({
-                    message: 'Error when deleting the package.',
+                    message: 'Error when deleting the packager.',
                     error: err
                 });
             }
 
             // Vsem uporabnikom odstrani izbrisan paketnik
-			UserModel.updateMany({ packages: { $in: [package._id] } }, { $pull: { packages: package._id } }, function (err, result) {
+			UserModel.updateMany({ packagers: { $in: [packager._id] } }, { $pull: { packagers: packager._id } }, function (err, result) {
 				if (err) {
 					return res.status(500).json({
 						message: 'Error when updating users.',

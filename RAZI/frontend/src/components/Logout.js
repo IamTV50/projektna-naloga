@@ -4,14 +4,15 @@ import { Navigate } from 'react-router-dom';
 
 function Logout() {
     const userContext = useContext(UserContext); 
-    useEffect(function(){
+
+    useEffect(function() {
         const logout = async function(){
             userContext.setUserContext(null);
             const res = await fetch("http://localhost:3001/users/logout");
 			console.log(res)
         }
         logout();
-    });
+    }, []);
 
     return (
         <Navigate replace to="/" />

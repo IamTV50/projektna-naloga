@@ -24,7 +24,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 // Vključimo routerje
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/userRoutes');
-var packagesRouter = require('./routes/packageRoutes');
+var packagersRouter = require('./routes/packagerRoutes');
 var unlocksRouter = require('./routes/unlockRoutes');
 var requestsRouter = require('./routes/requestRoutes');
 
@@ -80,7 +80,7 @@ app.use(function (req, res, next) {
 // Določimo kako dostopamo do vsakega routerja
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/packages', packagesRouter);
+app.use('/packagers', packagersRouter);
 app.use('/unlocks', unlocksRouter);
 app.use('/requests', requestsRouter);
 

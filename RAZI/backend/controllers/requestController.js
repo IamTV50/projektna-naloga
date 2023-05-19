@@ -1,10 +1,10 @@
 var RequestModel = require('../models/requestModel.js');
-var PackageModel = require('../models/packageModel.js');
+var PackagerModel = require('../models/packagerModel.js');
 var UserModel = require('../models/userModel.js');
 
 module.exports = {
     list: function (req, res) {
-        RequestModel.find().sort({ created: 'desc' }).populate("user").populate("package").exec(function (err, requests) {
+        RequestModel.find().sort({ created: 'desc' }).populate("user").populate("packager").exec(function (err, requests) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting request.',
@@ -28,7 +28,7 @@ module.exports = {
     show: function (req, res) {
         var id = req.params.id;
 
-        RequestModel.findOne({_id: id}).populate("user").populate("package").exec(function (err, request) {
+        RequestModel.findOne({_id: id}).populate("user").populate("packager").exec(function (err, request) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting request.',
@@ -55,7 +55,7 @@ module.exports = {
     create: function (req, res) {
         var request = new RequestModel({
 			user : req.body.user,
-			package : req.body.package,
+			packager : req.body.packager,
 			reason : req.body.reason,
 			created : Date.now()
         });
@@ -72,26 +72,26 @@ module.exports = {
         });
     },
 
-	userRequestPackage: function (req, res) {
-		var packageNumber = req.body.packageNumber;
+	userRequestPackager: function (req, res) {
+		var packagerNumber = req.body.packagerNumber;
 
-		PackageModel.findOne({number: packageNumber}, function (err, package) {
+		PackagerModel.findOne({number: packagerNumber}, function (err, packager) {
 			if (err) {
                 return res.status(500).json({
-                    message: 'Error when getting package.',
+                    message: 'Error when getting packager.',
                     error: err
                 });
             }
 
-            if (!package) {
+            if (!packager) {
                 return res.status(404).json({
-                    message: 'No such package'
+                    message: 'No such packager'
                 });
             }
 
 			var request = new RequestModel({
 				user : req.session.userId,
-				package : package._id,
+				packager : packager._id,
 				reason : req.body.reason,
 				created : Date.now()
 			});
@@ -127,7 +127,7 @@ module.exports = {
             }
 
             request.user = req.body.user ? req.body.user : request.user;
-			request.package = req.body.package ? req.body.package : request.package;
+			request.packager = req.body.packager ? req.body.packager : request.packager;
 			request.reason = req.body.reason ? req.body.reason : request.reason;
 			request.created = req.body.created ? req.body.created : request.created;
 			

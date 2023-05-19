@@ -2,9 +2,9 @@ var mongoose = require('mongoose');
 var Schema   = mongoose.Schema;
 
 var unlockSchema = new Schema({
-	'package' : {
+	'packager' : {
 	 	type: Schema.Types.ObjectId,
-	 	ref: 'package'
+	 	ref: 'packager'
 	},
 	'user' : {
 	 	type: Schema.Types.ObjectId,

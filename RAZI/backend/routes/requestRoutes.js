@@ -6,7 +6,7 @@ router.get('/', requestController.list);
 router.get('/:id', requestController.show);
 
 router.post('/', requestController.create);
-router.post('/userRequestPackage', requestController.userRequestPackage);
+router.post('/userRequestPackage', requestController.userRequestPackager);
 
 router.put('/:id', requestController.update);
 

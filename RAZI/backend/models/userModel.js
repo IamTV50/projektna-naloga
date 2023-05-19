@@ -7,9 +7,9 @@ var userSchema = new Schema({
 	'password' : String,
 	'email' : String,
 	'admin' : Boolean,
-	'packages' : [{
+	'packagers' : [{
 	 	type: Schema.Types.ObjectId,
-	 	ref: 'package'
+	 	ref: 'packager'
 	}]
 });
 

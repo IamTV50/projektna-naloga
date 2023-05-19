@@ -1,12 +1,12 @@
 var UserModel = require('../models/userModel.js');
-var PackageModel = require('../models/packageModel.js');
+var PackagerModel = require('../models/packagerModel.js');
 var RequestModel = require('../models/requestModel.js');
 
 module.exports = {
 
     // prikaz podatkov povezanih z uporabniki
     list: function (req, res) {
-        UserModel.find().populate("packages").exec(function (err, users) {
+        UserModel.find().populate("packagers").exec(function (err, users) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting user.',
@@ -28,7 +28,7 @@ module.exports = {
     show: function (req, res) {
         var id = req.params.id;
 
-        UserModel.findOne({_id: id}).populate("packages").exec(function (err, user) {
+        UserModel.findOne({_id: id}).populate("packagers").exec(function (err, user) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting user.',
@@ -106,7 +106,7 @@ module.exports = {
 					password : req.body.password,
 					email : email,
 					admin : false,
-					packages : []
+					packagers : []
 				});
 
 				user.save(function (err, user) {
@@ -177,7 +177,7 @@ module.exports = {
 			user.password = req.body.password ? req.body.password : user.password;
 			user.email = req.body.email ? req.body.email : user.email;
 			user.admin = req.body.admin ? req.body.admin : user.admin;
-			user.packages = req.body.packages ? req.body.packages : user.packages;
+			user.packagers = req.body.packagers ? req.body.packagers : user.packagers;
 			
             user.save(function (err, user) {
                 if (err) {
@@ -195,21 +195,21 @@ module.exports = {
     },
 
 	// Vpiši uporabniško ime in številko paketnika, ter dodaj paketnik uporabniku
-	addPackage: function (req, res) {
+	addPackager: function (req, res) {
         var username = req.body.username;
-		var packageNumber = req.body.packageNumber;
+		var packagerNumber = req.body.packagerNumber;
 
-		PackageModel.findOne({number: packageNumber}, function (err, package) {
+		PackagerModel.findOne({number: packagerNumber}, function (err, packager) {
 			if (err) {
                 return res.status(500).json({
-                    message: 'Error when getting package.',
+                    message: 'Error when getting packager.',
                     error: err
                 });
             }
 
-            if (!package) {
+            if (!packager) {
                 return res.status(404).json({
-                    message: 'No such package'
+                    message: 'No such packager'
                 });
             }
 
@@ -227,15 +227,15 @@ module.exports = {
 					});
 				}
 
-				var packageIndex = user.packages.indexOf(package._id);
+				var packagerIndex = user.packagers.indexOf(packager._id);
 
-				if (packageIndex > -1) {
+				if (packagerIndex > -1) {
 					return res.status(404).json({
-						message: `User already contains package ${package.number}`
+						message: `User already contains packager ${packager.number}`
 					});
 				}
 
-				user.packages.push(package._id);
+				user.packagers.push(packager._id);
 				
 				user.save(function (err, user) {
 					if (err) {
@@ -254,21 +254,21 @@ module.exports = {
     },
 
 	// Vpiši uporabniško ime in številko paketnika, ter odstrani paketnik od uporabnika
-	removePackage: function (req, res) {
+	removePackager: function (req, res) {
         var username = req.body.username;
-		var packageNumber = req.body.packageNumber;
+		var packagerNumber = req.body.packagerNumber;
 
-		PackageModel.findOne({ number: packageNumber }, function (err, package) {
+		PackagerModel.findOne({ number: packagerNumber }, function (err, packager) {
 			if (err) {
                 return res.status(500).json({
-                    message: 'Error when getting package.',
+                    message: 'Error when getting packager.',
                     error: err
                 });
             }
 
-            if (!package) {
+            if (!packager) {
                 return res.status(404).json({
-                    message: 'No such package'
+                    message: 'No such packager'
                 });
             }
 
@@ -286,15 +286,15 @@ module.exports = {
 					});
 				}
 
-				var packageIndex = user.packages.indexOf(package._id);
+				var packagerIndex = user.packagers.indexOf(packager._id);
 
-				if (packageIndex <= -1) {
+				if (packagerIndex <= -1) {
 					return res.status(404).json({
-						message: `User does not contain package ${package.number}`
+						message: `User does not contain packager ${packager.number}`
 					});
 				}
 
-				user.packages.splice(packageIndex, 1);
+				user.packagers.splice(packagerIndex, 1);
 				
 				user.save(function (err, user) {
 					if (err) {
