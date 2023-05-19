@@ -13,6 +13,13 @@ module.exports = {
                 });
             }
 
+			// Remove passwords from each user object
+			users = users.map(function(user) {
+				user = user.toObject(); // Convert Mongoose document to plain JavaScript object
+				delete user.password;
+				return user;
+			});
+
             return res.json(users);
         });
     },
@@ -34,7 +41,10 @@ module.exports = {
                 });
             }
 
-            return res.json(user);
+			// Exclude the password field from the user object
+			const { password, ...userWithoutPassword } = user.toObject();
+
+			return res.json(userWithoutPassword);
         });
     },
 
@@ -49,7 +59,9 @@ module.exports = {
                         err.status = 400;
                         return next(err);
                     } else{
-                        return res.json(user);
+                        // Exclude the password field from the user object
+						const { password, ...userWithoutPassword } = user.toObject();
+						return res.json(userWithoutPassword);
                     }
                 }
             });
@@ -142,7 +154,9 @@ module.exports = {
                     });
                 }
 
-                return res.json(user);
+				// Exclude the password field from the user object
+				const { password, ...userWithoutPassword } = user.toObject();
+				return res.json(userWithoutPassword);
             });
         });
     },
@@ -198,7 +212,9 @@ module.exports = {
 						});
 					}
 
-					return res.json(user);
+					// Exclude the password field from the user object
+					const { password, ...userWithoutPassword } = user.toObject();
+					return res.json(userWithoutPassword);
 				});
 			});
 		});
@@ -255,7 +271,9 @@ module.exports = {
 						});
 					}
 
-					return res.json(user);
+					// Exclude the password field from the user object
+					const { password, ...userWithoutPassword } = user.toObject();
+					return res.json(userWithoutPassword);
 				});
 			});
 		});
