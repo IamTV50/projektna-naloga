@@ -43,7 +43,6 @@ module.exports = {
 
 			// Exclude the password field from the user object
 			const { password, ...userWithoutPassword } = user.toObject();
-
 			return res.json(userWithoutPassword);
         });
     },
@@ -106,7 +105,6 @@ module.exports = {
 			
 			// Exclude the password field from the user object
 			const { password, ...userWithoutPassword } = user.toObject();
-
 			return res.json(userWithoutPassword);
         });
     },

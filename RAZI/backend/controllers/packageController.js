@@ -38,6 +38,7 @@ module.exports = {
     create: function (req, res) {
         var package = new PackageModel({
 			number : req.body.number,
+			public : req.body.public,
 			active : true
         });
 
@@ -71,6 +72,7 @@ module.exports = {
             }
 
             package.number = req.body.number ? req.body.number : package.number;
+			package.public = req.body.public ? req.body.public : package.public;
 			package.active = req.body.active ? req.body.active : package.active;
 			
             package.save(function (err, package) {

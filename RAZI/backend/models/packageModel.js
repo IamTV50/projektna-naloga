@@ -3,6 +3,7 @@ var Schema   = mongoose.Schema;
 
 var packageSchema = new Schema({
 	'number' : Number,
+	'public' : Boolean,
 	'active' : Boolean
 });
 
