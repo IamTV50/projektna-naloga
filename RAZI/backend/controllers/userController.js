@@ -1,5 +1,6 @@
 var UserModel = require('../models/userModel.js');
 var PackageModel = require('../models/packageModel.js');
+var RequestModel = require('../models/requestModel.js');
 
 module.exports = {
 
@@ -280,23 +281,32 @@ module.exports = {
     remove: function (req, res) {
         var id = req.session.userId;
 
-        UserModel.findByIdAndRemove(id, function (err, user) {
+		RequestModel.deleteMany({ user: userId }, function (err) {
             if (err) {
                 return res.status(500).json({
-                    message: 'Error when deleting the user.',
+                    message: 'Error when deleting requests.',
                     error: err
                 });
             }
 
-            if (req.session) {
-                req.session.destroy(function(err) {
-                    if (err) {
-                        return next(err);
-                    } else{
-                        return res.status(204).json({});
-                    }
-                });
-            }
-        });
+			UserModel.findByIdAndRemove(id, function (err, user) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when deleting the user.',
+						error: err
+					});
+				}
+
+				if (req.session) {
+					req.session.destroy(function(err) {
+						if (err) {
+							return next(err);
+						} else{
+							return res.status(204).json({});
+						}
+					});
+				}
+			});
+		});
     }
 };
