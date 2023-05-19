@@ -1,15 +1,25 @@
 var RequestModel = require('../models/requestModel.js');
 var PackageModel = require('../models/packageModel.js');
+var UserModel = require('../models/userModel.js');
 
 module.exports = {
     list: function (req, res) {
-        RequestModel.find(function (err, requests) {
+        RequestModel.find().sort({ created: 'desc' }).populate("user").populate("package").exec(function (err, requests) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting request.',
                     error: err
                 });
             }
+
+			// Remove passwords from each user object
+			requests = requests.map(function (request) {
+				request = request.toObject(); // Convert Mongoose document to plain JavaScript object
+				if (request.user) {
+					delete request.user.password;
+				}
+				return request;
+			});
 
             return res.json(requests);
         });
@@ -18,7 +28,7 @@ module.exports = {
     show: function (req, res) {
         var id = req.params.id;
 
-        RequestModel.findOne({_id: id}, function (err, request) {
+        RequestModel.findOne({_id: id}).populate("user").populate("package").exec(function (err, request) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting request.',

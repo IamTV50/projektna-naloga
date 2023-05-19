@@ -1,4 +1,5 @@
-import React, { useContext } from "react";
+import React, { useState } from "react";
+import { confirmAlert } from 'react-confirm-alert';
 
 function AdminGetRequest(props) {
     const [error, setError] = useState("");
@@ -19,13 +20,20 @@ function AdminGetRequest(props) {
 								username: props.request.user.username,
 								packageNumber: props.request.package.number
 							})
-                        }).then((res) => {
-                            //window.location.href="/";
-                        }).catch((err) => {
-                            console.log("Error adding package to user", err);
-							setError("Package doesn't exist or user already has access to this package!")
-                        });
+                        }).then((res) => res.json())
+						.then((data) => {
+							if (data.message) {
+								setError(data.message);
+							}
 
+							if (!data.error) {
+								Delete();
+							}
+						})
+						.catch((err) => {
+							console.log("Error adding package to user", err);
+							setError("Error occurred while accepting the request!");
+						});
                     }
                 },
                 {
@@ -33,7 +41,6 @@ function AdminGetRequest(props) {
                 }
             ]
         });
-
     };
 
 	const deleteRequest = () => {
@@ -44,15 +51,7 @@ function AdminGetRequest(props) {
                 {
                     label: 'Yes',
                     onClick: () => {
-                        fetch(`http://localhost:3001/requests/${props.request._id}`, {
-                            method: "DELETE",
-                            credentials: "include",
-                        }).then((res) => {
-                            //window.location.href="/";
-                        }).catch((err) => {
-                            console.log("Error deleting request", err);
-                        });
-
+                        Delete();
                     }
                 },
                 {
@@ -60,14 +59,34 @@ function AdminGetRequest(props) {
                 }
             ]
         });
-
     };
+
+	const Delete = async () => {
+		try {
+			const response = await fetch(`http://localhost:3001/requests/${props.request._id}`, {
+				method: "DELETE",
+				credentials: "include",
+			});
+		
+			if (response.status === 204) {
+				props.onRequestDeleted(props.request._id);
+			} else {
+				setError("Error occurred while deleting the request!");
+			}
+		} catch (err) {
+			console.log("Error deleting request", err);
+			setError("Error occurred while deleting the request!");
+		}
+	};
+
+	console.log(props);
 
     return (
         <div>
-            <p>User: {props.request.user.username}</p>
-            <p>Package: {props.request.package.number}</p>
+            <p>User: {props.request.user ? props.request.user.username : "[deleted]"}</p>
+            <p>Package: {props.request.package ? props.request.package.number : "[deleted]"}</p>
 			<p>Reason: {props.request.reason}</p>
+			<p>Date: {new Date(props.request.created).toLocaleString("de-DE")}</p>
 			<button onClick={acceptRequest}>Accept</button>
             <button onClick={deleteRequest}>Delete</button>
 			<p>{error}</p>

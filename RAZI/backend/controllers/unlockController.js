@@ -2,13 +2,22 @@ var UnlockModel = require('../models/unlockModel.js');
 
 module.exports = {
     list: function (req, res) {
-        UnlockModel.find(function (err, unlocks) {
+        UnlockModel.find().populate("user").populate("package").exec(function (err, unlocks) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting unlock.',
                     error: err
                 });
             }
+
+			// Remove passwords from each user object
+			unlocks = unlocks.map(function (unlock) {
+				unlock = unlock.toObject(); // Convert Mongoose document to plain JavaScript object
+				if (unlock.user) {
+					delete unlock.user.password;
+				}
+				return unlock;
+			});
 
             return res.json(unlocks);
         });
@@ -17,7 +26,7 @@ module.exports = {
     show: function (req, res) {
         var id = req.params.id;
 
-        UnlockModel.findOne({_id: id}, function (err, unlock) {
+        UnlockModel.findOne({_id: id}).populate("user").populate("package").exec(function (err, unlock) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting unlock.',
