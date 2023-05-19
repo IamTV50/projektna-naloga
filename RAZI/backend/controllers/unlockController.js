@@ -40,6 +40,12 @@ module.exports = {
                 });
             }
 
+			// Remove password from user object
+			if (unlock.user) {
+				unlock = unlock.toObject(); // Convert Mongoose document to plain JavaScript object
+				delete unlock.user.password;
+			}
+
             return res.json(unlock);
         });
     },

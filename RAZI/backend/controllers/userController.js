@@ -69,24 +69,42 @@ module.exports = {
 
     // Avtorizacija uporabnika
     create: function (req, res) {
-        var user = new UserModel({
-			username : req.body.username,
-			password : req.body.password,
-			email : req.body.email,
-			admin : false,
-			packages : []
-        });
+		var username = req.body.username;
 
-        user.save(function (err, user) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when creating user',
-                    error: err
-                });
-            }
+		// Preveri ali uporabniško ime že obstaja
+		UserModel.findOne({ username: username }, function (err, existingUser) {
+			if (err) {
+				return res.status(500).json({
+					message: 'Error when finding existing user',
+					error: err
+				});
+			}
 
-            return res.status(201).json(user);
-        });
+			if (existingUser) {
+				return res.status(409).json({
+					message: 'Username already exists'
+				});
+			}
+
+			var user = new UserModel({
+				username : username,
+				password : req.body.password,
+				email : req.body.email,
+				admin : false,
+				packages : []
+			});
+
+			user.save(function (err, user) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when creating user',
+						error: err
+					});
+				}
+
+				return res.status(201).json(user);
+			});
+		});
     },
 
     login: function(req, res, next){
