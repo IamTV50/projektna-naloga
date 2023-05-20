@@ -107,8 +107,8 @@ module.exports = {
 					}
 
 					packager.number = req.body.number ? req.body.number : packager.number;
-					packager.public = req.body.public ? req.body.public : packager.public;
-					packager.active = req.body.active ? req.body.active : packager.active;
+					packager.public = req.body.public !== undefined  ? req.body.public : packager.public;
+					packager.active = req.body.active !== undefined ? req.body.active : packager.active;
 					
 					packager.save(function (err, packager) {
 						if (err) {
@@ -118,10 +118,26 @@ module.exports = {
 							});
 						}
 
-						return res.json(packager);
+						return res.status(201).json(packager);
 					});
 				});
 			}
+			else {
+                packager.number = req.body.number ? req.body.number : packager.number;
+                packager.public = req.body.public !== undefined  ? req.body.public : packager.public;
+                packager.active = req.body.active !== undefined  ? req.body.active : packager.active;
+
+                packager.save(function (err, packager) {
+                    if (err) {
+                        return res.status(500).json({
+                            message: 'Error when updating packager.',
+                            error: err
+                        });
+                    }
+
+                    return res.status(201).json(packager);
+                });
+            }
 		});
     },
 

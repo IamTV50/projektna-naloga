@@ -1,9 +1,10 @@
-import React, {useContext, useState} from 'react'
+//import React, {useContext, useState} from 'react'
+import React, {useState} from 'react'
 import { useCollapse } from 'react-collapsed'
-import {UserContext} from "../userContext";
+//import {UserContext} from "../userContext";
 
 function RequestPackager({ onRequestAdd }) {
-    const userContext = useContext(UserContext);
+    //const userContext = useContext(UserContext);
     const [isExpanded, setExpanded] = useState(false)
     const { getCollapseProps, getToggleProps } = useCollapse({ isExpanded })
     const [reasonText, setReasonText] = useState('');
@@ -36,7 +37,7 @@ function RequestPackager({ onRequestAdd }) {
         })
             .then((res) => res.json())
             .then((data) => {
-                if (data.status != 201) {
+                if (data.status !== 201) {
                     throw new Error(data.message);
                 }
                 onRequestAdd(data);

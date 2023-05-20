@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import AdminGetRequest from "./AdminGetRequest";
 import AdminAddPackager from "./AdminAddPackager";
 import AdminShowUsers from "./AdminShowUsers";
+import AdminShowPackagers from "./AdminShowPackagers";
 
 function AdminPannel() {
 	const [requests, setRequests] = useState([]);
@@ -46,6 +47,10 @@ function AdminPannel() {
 			<div>
 				<h3>Users list:</h3>
 				<AdminShowUsers onRequestDeleted={handleIdDelete}></AdminShowUsers>
+			</div>
+			<div>
+				<h3>Packagers list:</h3>
+				<AdminShowPackagers></AdminShowPackagers>
 			</div>
 		</div>
 	);
