@@ -14,7 +14,6 @@ function AdminShowPackagers(){
 				const data = await res.json();
 				setPackagers(data);
 				setIsLoading(false);
-				console.log(data)
 			} catch (error) {
 				console.log(error)
 			}

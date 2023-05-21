@@ -5,7 +5,9 @@ function AdminShowUsers({ onRequestDeleted }){
 	const [users, setUsers] = useState({})
 	const [isLoading, setIsLoading] = useState(true);
 	const [deletedUser, setDeletedUser] = useState(null);
-
+	const [searchName, setSearchName] = useState("");
+	const [searchEmail, setSearchEmail] = useState("");
+	const [searchedUsers, setSearchedUsers] = useState([]);
 
 	useEffect(() => {
 		const fetchRequests = async () => {
@@ -51,16 +53,64 @@ function AdminShowUsers({ onRequestDeleted }){
         });
     };
 
+	const searchUsers = () => {
+		if(searchName === "" && searchEmail === ""){
+			alert("both inputs should not be empty!!");
+			return
+		}
+
+		let tmpSearchedUsers = []
+		users.map(user => {
+			if(user.username === searchName || user.email === searchEmail){
+				tmpSearchedUsers.push(user)
+			}
+		})
+
+		if(tmpSearchedUsers.length == 0){
+			alert("0 users have that name or email");
+			return
+		}
+		else{
+			setSearchedUsers(tmpSearchedUsers)
+		}
+	};
+
+	const handleResetSearch = () => {
+		setSearchName("");
+		setSearchEmail("");
+		setSearchedUsers([]);
+		document.getElementById('userNameSearch_input').value = ""
+		document.getElementById('userEmailSearch_input').value = ""
+	}
+
+	const handleNameInputChange = (e) => { setSearchName(e.target.value); }
+	const handleEmailInputChange = (e) => { setSearchEmail(e.target.value); }
+
 	return ( 
 		<div>
+			<input type='text' id='userNameSearch_input' placeholder='search by name' onChange={handleNameInputChange}/> <br/>
+			<input type='text' id='userEmailSearch_input' placeholder='search by email' onChange={handleEmailInputChange}/> <br/>
+			<button onClick={() => searchUsers()}>search</button> 
+			{ searchedUsers.length > 0 ? <button onClick={() => handleResetSearch()}>reset</button> : "" }
+			<br/>
 			<ul>
-				{isLoading ? "" : users.map(user => (
-					<li key={user._id}>
-						<span>{user.username} </span>  
+				{isLoading
+					? ""
+					: searchedUsers.length > 0
+					? searchedUsers.map((user) => (
+						<li key={user._id}>
+						<span>{user.username} </span>
 						<span> {user.email}</span>
 						<button onClick={() => deleteUser(user._id)}>delete user</button>
-					</li>	
-				))}
+						</li>
+					))
+					: users.map((user) => (
+						<li key={user._id}>
+						<span>{user.username} </span>
+						<span> {user.email}</span>
+						<button onClick={() => deleteUser(user._id)}>delete user</button>
+						</li>
+					))}
 			</ul>
 		</div>
 	 );
