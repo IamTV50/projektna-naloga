@@ -5,10 +5,7 @@ const spin = keyframes`
   to {transform: rotate(360deg)}
 `;
 
-
-
-const Button = defineStyleConfig({
-
+const IconButton = defineStyleConfig({
     // The styles all button have in common
     baseStyle: {
         fontWeight: 'bold',
@@ -28,6 +25,7 @@ const Button = defineStyleConfig({
             py: 4, // <-- these values are tokens from the design system
         },
     },
+
     // Two variants: outline and solid
     variants: {
         header: {
@@ -53,41 +51,9 @@ const Button = defineStyleConfig({
                 bg: 'green.100',
             },
         },
-
-        orange: {
-            border: '2px solid',
-            borderColor: 'orange.500',
-            color: 'orange.500',
-            _hover: {
-                // Customize the hover color for the green variant
-                bg: 'orange.100',
-            },
-        },
-
-        blue: {
-            border: '2px solid',
-            borderColor: 'blue.500',
-            color: 'blue.500',
-            _hover: {
-                // Customize the hover color for the green variant
-                bg: 'blue.100',
-            },
-        },
-
-        red: {
-            border: '2px solid',
-            borderColor: 'red.500',
-            color: 'red.500',
-            _hover: {
-                // Customize the hover color for the green variant
-                bg: 'red.100',
-            },
-        },
-
-
         outline: {
             border: '2px solid',
-            borderColor: 'gray.500',
+            borderColor: 'purple.500',
             color: 'purple.500',
         },
         solid: {
@@ -102,4 +68,4 @@ const Button = defineStyleConfig({
     },
 })
 
-export default Button
+export default IconButton;

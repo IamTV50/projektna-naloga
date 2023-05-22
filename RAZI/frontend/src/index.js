@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import {ChakraProvider, ColorModeScript, CSSReset} from '@chakra-ui/react'
+import {Box, ChakraProvider, ColorModeScript, CSSReset} from '@chakra-ui/react'
 import customTheme from './style/theme';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -13,8 +13,9 @@ root.render(
     <ChakraProvider theme={customTheme}>
         <ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
         <CSSReset />
+        <Box p={8}>
             <App />
-
+        </Box>
     </ChakraProvider>
   </React.StrictMode>
 );

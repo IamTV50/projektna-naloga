@@ -1,5 +1,6 @@
 import { extendTheme } from '@chakra-ui/react';
 import Button from "./button";
+import IconButton from "./iconButton";
 
 const config = {
     initialColorMode: 'dark',
@@ -8,11 +9,15 @@ const config = {
 
 const customTheme = extendTheme({
     colors: {
-        primary: '#FF0000',
-        secondary: '#00FF00',
+        brand: {
+            100: "#f7fafc",
+            // ...
+            900: "#1a202c",
+        },
     },
     components: {
-        Button
+        Button,
+        IconButton
     },
 
     config,
