@@ -1,18 +1,30 @@
 import React from "react";
 import { UserContext } from "../userContext";
 import { Link } from "react-router-dom";
+import {Button, ButtonGroup, Spacer, useColorMode} from "@chakra-ui/react";
 
 function Header(props) {
+    const { colorMode, toggleColorMode } = useColorMode()
     return (
         <header>
             <h1>{props.title}</h1>
             <nav>
                 <ul>
                     <li><Link to='/'>Home</Link></li>
+                    <Button size='sm' onClick={toggleColorMode}>
+                        Toggle {colorMode === 'light' ? 'Dark' : 'Light'}
+                    </Button>
                     <UserContext.Consumer>
                         {context => (
                             context.user ?
                                 <>
+                                    {/*<ButtonGroup>*/}
+
+                                    {/*</ButtonGroup>*/}
+                                    {/*<Spacer />*/}
+                                    {/*<ButtonGroup>*/}
+                                    {/*    <Button>Admin Panel</Button>*/}
+                                    {/*</ButtonGroup>*/}
 									{context.user.admin && (
 										<li><Link to="/admin">Admin</Link> </li>
 									)}

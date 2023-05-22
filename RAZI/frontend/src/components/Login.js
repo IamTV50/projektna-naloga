@@ -1,15 +1,18 @@
 import React, { useContext, useState } from 'react';
 import { UserContext } from '../userContext';
 import { Navigate } from 'react-router-dom';
+import { Button, ButtonGroup } from '@chakra-ui/react'
 
 function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const userContext = useContext(UserContext);
+    const [isLoading, setIsLoading] = useState(false);
 
     async function Login(e) {
         e.preventDefault();
+        setIsLoading(true)
         const res = await fetch("http://localhost:3001/users/login", {
             method: "POST",
             credentials: "include",
@@ -23,13 +26,15 @@ function Login() {
         console.log(data);
 
         if (data._id !== undefined) {
-            console.log("setting user context")
+            // console.log("setting user context")
             userContext.setUserContext(data);
+            setIsLoading(false)
         } else {
             console.log("invalid username or password")
             setUsername("");
             setPassword("");
             setError("Invalid username or password");
+            setIsLoading(false)
         }
     }
 
@@ -40,7 +45,7 @@ function Login() {
                    value={username} onChange={(e)=>(setUsername(e.target.value))}/>
             <input type="password" name="password" placeholder="Password"
                    value={password} onChange={(e)=>(setPassword(e.target.value))}/>
-            <input type="submit" name="submit" value="Log in"/>
+            <Button variant='green' isLoading={isLoading} type='submit'>Log in</Button>
             <label>{error}</label>
         </form>
     );
