@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
-import AdminShowUserProfile from './AdminShowUserProfile';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function AdminShowUsers({ onRequestDeleted }){
-	const navigate = useNavigate();
-
 	const [users, setUsers] = useState({})
 	const [isLoading, setIsLoading] = useState(true);
 	const [deletedUser, setDeletedUser] = useState(null);
@@ -58,23 +55,26 @@ function AdminShowUsers({ onRequestDeleted }){
     };
 
 	const searchUsers = () => {
-		if(searchName === "" && searchEmail === ""){
-			setSearchedUsers(tmpSearchedUsers)
+		if (searchName === "" && searchEmail === "") {
+			setSearchedUsers([])
 			return
 		}
 
-		let tmpSearchedUsers = []
-		users.map(user => {
-			if(user.username === searchName || user.email === searchEmail){
-				tmpSearchedUsers.push(user)
-			}
-		})
+		const filteredUsers = users.filter((user) => {
+			const usernameMatch = user.username.toLowerCase().includes(searchName.toLowerCase());
+			console.log(usernameMatch);
+			const emailMatch = user.email.toLowerCase().includes(searchEmail.toLowerCase());
+			console.log(emailMatch);
+			return usernameMatch && emailMatch;
+		});
+
+		console.log(filteredUsers);
 		
-		if(tmpSearchedUsers.length === 0){
+		if (filteredUsers.length === 0) {
 			alert("0 users have that name or email");
 		}
 
-		setSearchedUsers(tmpSearchedUsers)
+		setSearchedUsers(filteredUsers)
 	};
 
 	const handleResetSearch = () => {
