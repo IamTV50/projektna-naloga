@@ -9,6 +9,7 @@ import Logout from "./components/Logout";
 import Home from "./components/Home";
 import AdminPannel from "./components/admin/AdminPannel";
 import MyPackagers from "./components/MyPackagers";
+import AdminShowUserProfile from './components/admin/AdminShowUserProfile';
 
 function App() {
 
@@ -35,7 +36,7 @@ function App() {
 						<Route path="/profile" element={<Profile />}></Route>
 						<Route path="/logout" element={<Logout />}></Route>
 						<Route path="/my-packagers" element={<MyPackagers />}></Route>
-
+						<Route path="/admin/userInfo" element={<AdminShowUserProfile />}></Route>
 					</Routes>
 				</div>
 			</UserContext.Provider>

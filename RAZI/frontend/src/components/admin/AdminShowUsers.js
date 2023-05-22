@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
+import AdminShowUserProfile from './AdminShowUserProfile';
+import { Link, useNavigate } from 'react-router-dom';
 
 function AdminShowUsers({ onRequestDeleted }){
+	const navigate = useNavigate();
+
 	const [users, setUsers] = useState({})
 	const [isLoading, setIsLoading] = useState(true);
 	const [deletedUser, setDeletedUser] = useState(null);
@@ -55,7 +59,7 @@ function AdminShowUsers({ onRequestDeleted }){
 
 	const searchUsers = () => {
 		if(searchName === "" && searchEmail === ""){
-			alert("both inputs should not be empty!!");
+			setSearchedUsers(tmpSearchedUsers)
 			return
 		}
 
@@ -65,14 +69,12 @@ function AdminShowUsers({ onRequestDeleted }){
 				tmpSearchedUsers.push(user)
 			}
 		})
-
-		if(tmpSearchedUsers.length == 0){
+		
+		if(tmpSearchedUsers.length === 0){
 			alert("0 users have that name or email");
-			return
 		}
-		else{
-			setSearchedUsers(tmpSearchedUsers)
-		}
+
+		setSearchedUsers(tmpSearchedUsers)
 	};
 
 	const handleResetSearch = () => {
@@ -102,6 +104,9 @@ function AdminShowUsers({ onRequestDeleted }){
 						<span>{user.username} </span>
 						<span> {user.email}</span>
 						<button onClick={() => deleteUser(user._id)}>delete user</button>
+						<Link to='/admin/userInfo' state={ user }>
+							<button>show user profile</button>
+						</Link>
 						</li>
 					))
 					: users.map((user) => (
@@ -109,6 +114,9 @@ function AdminShowUsers({ onRequestDeleted }){
 						<span>{user.username} </span>
 						<span> {user.email}</span>
 						<button onClick={() => deleteUser(user._id)}>delete user</button>
+						<Link to='/admin/userInfo' state={ user }>
+							<button>show user profile</button>
+						</Link>
 						</li>
 					))}
 			</ul>

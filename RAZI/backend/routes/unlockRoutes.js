@@ -4,6 +4,7 @@ var unlockController = require('../controllers/unlockController.js');
 
 router.get('/', unlockController.list);
 router.get('/:id', unlockController.show);
+router.get('/userUnlocks/:userId', unlockController.userUnlocks);
 
 router.post('/', unlockController.create);
 
