@@ -10,6 +10,7 @@ import Home from "./components/Home";
 import AdminPannel from "./components/admin/AdminPannel";
 import MyPackagers from "./components/MyPackagers";
 import AdminShowUserProfile from './components/admin/AdminShowUserProfile';
+import UnlockHistory from './components/UnlockHistory';
 
 function App() {
 
@@ -36,6 +37,7 @@ function App() {
 						<Route path="/profile" element={<Profile />}></Route>
 						<Route path="/logout" element={<Logout />}></Route>
 						<Route path="/my-packagers" element={<MyPackagers />}></Route>
+						<Route path="/my-packagers/hostory" element={<UnlockHistory />}></Route>
 						<Route path="/admin/userInfo" element={<AdminShowUserProfile />}></Route>
 					</Routes>
 				</div>

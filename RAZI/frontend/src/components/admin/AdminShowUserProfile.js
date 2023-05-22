@@ -5,7 +5,7 @@ import { confirmAlert } from 'react-confirm-alert';
 function AdminShowUserProfile() {
 	const location = useLocation();
   	const [user, setUser] = useState(location.state);
-	const [userUnlocks, setUserUnlocks] = useState({});
+	const [userUnlocks, setUserUnlocks] = useState([]);
 	const [updatedPackager, setUpdatedPackager] = useState(0);
 	const [isLoading, setIsLoading] = useState(true);
 	const [packagerNumber, setPackagerNumber] = useState(0)
@@ -110,17 +110,17 @@ function AdminShowUserProfile() {
 			</div>
 			<div>
 			<h3>User Packagers:</h3>
-					{user.packagers.length > 0 ? 
-					<ul>
-						{user.packagers.map((packager) => (
-						<li key={packager._id}>
-							<span>packager number: {packager.number}</span>
-							<button onClick={() => deletePackager(packager.number)}>delete</button>
-						</li>
-						))}
-					</ul> :
-						<span>No packagers found for the user.</span>
-					}
+				{user.packagers.length > 0 ? 
+				<ul>
+					{user.packagers.map((packager) => (
+					<li key={packager._id}>
+						<span>packager number: {packager.number}</span>
+						<button onClick={() => deletePackager(packager.number)}>delete</button>
+					</li>
+					))}
+				</ul> :
+					<span>No packagers found for the user.</span>
+				}
 			</div>
 			<div>
 				<h3>User unlocked packagers:</h3>
