@@ -1,9 +1,12 @@
 //import React, {useContext, useState} from 'react'
 import React, {useState} from 'react'
 import { useCollapse } from 'react-collapsed'
+import {useToast} from "@chakra-ui/react";
 //import {UserContext} from "../userContext";
 
 function RequestPackager({ onRequestAdd }) {
+    const toast = useToast()
+    const toastIdRef = React.useRef()
     //const userContext = useContext(UserContext);
     const [isExpanded, setExpanded] = useState(false)
     const { getCollapseProps, getToggleProps } = useCollapse({ isExpanded })
@@ -26,6 +29,10 @@ function RequestPackager({ onRequestAdd }) {
         setPackagerNumber('')
     };
 
+    function addToast() {
+        toastIdRef.current = toast({ description: 'some text' })
+    }
+
     const submitRequest = ( reasonText, packagerNumber ) => {
         console.log("submitRequest")
         console.log(reasonText, packagerNumber);
@@ -35,14 +42,24 @@ function RequestPackager({ onRequestAdd }) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ reason: reasonText, packagerNumber: packagerNumber }),
         })
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.status !== 201) {
-                    throw new Error(data.message);
+            .then((res) => {
+                if (res.status !== 201) {
+                    throw new Error(res.message);
                 }
+                return res.json()
+            })
+            .then((data) => {
+                console.log("data");
+                console.log(data);
                 onRequestAdd(data);
             })
             .catch((err) => {
+                toast({
+                    title: "Napaka",
+                    description: "Napaka pri dodanju zahteve za paketnik.",
+                    status: "error",
+                    duration: 3000,
+                })
                 setError(err.message);
             });
     };
@@ -64,7 +81,7 @@ function RequestPackager({ onRequestAdd }) {
                     <p>Številka paketnika:
                         <input value={packagerNumber} onChange={handlePackagerNumberChange} type="number" name="packagerNumber" />
                     </p>
-                    <input type="submit"    name="submit" value="Submit"/>
+                    <input type="submit" name="submit" value="Submit"/>
                     <label>{error}</label>
                 </form>
 

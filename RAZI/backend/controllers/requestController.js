@@ -52,6 +52,36 @@ module.exports = {
         });
     },
 
+    userRequestsList: function (req, res) {
+        var userId = req.params.id;
+
+        RequestModel.find({user: userId}).populate("user").populate("packager").exec(function (err, requests) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error when getting request.',
+                    error: err
+                });
+            }
+
+            if (!requests) {
+                return res.status(404).json({
+                    message: 'No requests for this user'
+                });
+            }
+
+            // Remove passwords from each user object
+            requests = requests.map(function (request) {
+                request = request.toObject(); // Convert Mongoose document to plain JavaScript object
+                if (request.user) {
+                    delete request.user;
+                }
+                return request;
+            })
+
+            return res.json(requests);
+        });
+    },
+
     create: function (req, res) {
         var request = new RequestModel({
 			user : req.body.user,
@@ -104,7 +134,17 @@ module.exports = {
 					});
 				}
 
-				return res.status(201).json(request);
+                // populate-am request z user in packager
+                RequestModel.findOne({_id: request._id}).populate("user").populate("packager").exec(function (err, request) {
+                    if (err) {
+                        return res.status(500).json({
+                            message: 'Error when getting request.',
+                            error: err
+                        });
+                    }
+                    return res.status(201).json(request);
+                })
+
 			});
 		});
     },
