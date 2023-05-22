@@ -1,7 +1,17 @@
 //import React, {useContext, useState} from 'react'
 import React, {useState} from 'react'
 import { useCollapse } from 'react-collapsed'
-import {useToast} from "@chakra-ui/react";
+import {
+    Alert, AlertIcon,
+    Button,
+    Card,
+    CardBody,
+    Collapse,
+    NumberInput,
+    NumberInputField, Text,
+    Textarea,
+    useToast
+} from "@chakra-ui/react";
 //import {UserContext} from "../userContext";
 
 function RequestPackager({ onRequestAdd }) {
@@ -28,10 +38,6 @@ function RequestPackager({ onRequestAdd }) {
         setReasonText('');
         setPackagerNumber('')
     };
-
-    function addToast() {
-        toastIdRef.current = toast({ description: 'some text' })
-    }
 
     const submitRequest = ( reasonText, packagerNumber ) => {
         console.log("submitRequest")
@@ -66,26 +72,32 @@ function RequestPackager({ onRequestAdd }) {
 
     return (
         <div>
-            <button
+            <Button variant="blue"
                 {...getToggleProps({
                     onClick: () => setExpanded((prevExpanded) => !prevExpanded),
                 })}
             >
                 {isExpanded ? 'Pridobi paketnik' : 'Pridobi paketnik'}
-            </button>
-            <section {...getCollapseProps()}>
-                <form onSubmit={handleSubmit}>
-                    <p>Razlog:
-                        <textarea value={reasonText} onChange={handleReasonChange} name="reason" />
-                    </p>
-                    <p>Številka paketnika:
-                        <input value={packagerNumber} onChange={handlePackagerNumberChange} type="number" name="packagerNumber" />
-                    </p>
-                    <input type="submit" name="submit" value="Submit"/>
-                    <label>{error}</label>
-                </form>
+            </Button>
+            <Collapse in={isExpanded}>
+                <Card variant="elevated" bg="gray.300" display="inline-block" my={2}>
+                <CardBody>
+                    {/*TODO: custom box*/}
+                    <form onSubmit={handleSubmit}>
+                        <Text>Številka paketnika: </Text>
+                        <NumberInput>
+                            <NumberInputField border="2px solid white" _hover={{ border: "2px solid gray"}} value={packagerNumber} onChange={handlePackagerNumberChange} type="number" name="packagerNumber" />
+                        </NumberInput>
+                        <Text paddingTop={4}>Razlog:</Text>
+                        <Textarea border="2px solid white" _hover={{ border: "2px solid gray"}} value={reasonText} onChange={handleReasonChange} name="reason" />
 
-            </section>
+                        <Button mt={6} type="submit" variant="blue" name="submit" value="Submit">Submit</Button>
+                    </form>
+                </CardBody>
+
+                </Card>
+
+            </Collapse>
         </div>
     )
 }
