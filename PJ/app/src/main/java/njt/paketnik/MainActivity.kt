@@ -2,6 +2,7 @@ package njt.paketnik
 
 import android.media.AudioAttributes
 import android.media.AudioManager
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -72,6 +73,11 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }
+        }
+
+        binding.navigateQrScanner.setOnClickListener {
+            val intent = Intent(this, QrScannerActivity::class.java)
+            startActivity(intent)
         }
     }
 
