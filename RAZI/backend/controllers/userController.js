@@ -1,0 +1,370 @@
+var UserModel = require('../models/userModel.js');
+var PackagerModel = require('../models/packagerModel.js');
+var RequestModel = require('../models/requestModel.js');
+
+module.exports = {
+
+    // prikaz podatkov povezanih z uporabniki
+    list: function (req, res) {
+        UserModel.find().populate("packagers").exec(function (err, users) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error when getting user.',
+                    error: err
+                });
+            }
+
+			// Remove passwords from each user object
+			users = users.map(function(user) {
+				user = user.toObject(); // Convert Mongoose document to plain JavaScript object
+				delete user.password;
+				return user;
+			});
+
+            return res.json(users);
+        });
+    },
+
+    show: function (req, res) {
+        var id = req.params.id;
+
+        UserModel.findOne({_id: id}).populate("packagers").exec(function (err, user) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error when getting user.',
+                    error: err
+                });
+            }
+
+            if (!user) {
+                return res.status(404).json({
+                    message: 'No such user'
+                });
+            }
+
+			// Exclude the password field from the user object
+			const { password, ...userWithoutPassword } = user.toObject();
+			return res.json(userWithoutPassword);
+        });
+    },
+
+    profile: function(req, res, next){
+        UserModel.findById(req.session.userId)
+            .exec(function(error, user){
+                if(error){
+                    return next(error);
+                } else{
+                    if(user===null){
+                        const err = new Error('Not authorized, go back!');
+                        err.status = 400;
+                        return next(err);
+                    } else{
+                        // Exclude the password field from the user object
+						const { password, ...userWithoutPassword } = user.toObject();
+						return res.json(userWithoutPassword);
+                    }
+                }
+            });
+    },
+
+    // Avtorizacija uporabnika
+    create: function (req, res) {
+		var username = req.body.username;
+		var email = req.body.email;
+
+		// Preveri ali uporabniško ime že obstaja
+		UserModel.findOne({ username: username }, function (err, existingUser) {
+			if (err) {
+				return res.status(500).json({
+					message: 'Error when finding existing user',
+					error: err
+				});
+			}
+
+			if (existingUser) {
+				return res.status(409).json({
+					message: 'Username already exists'
+				});
+			}
+
+			UserModel.findOne({ email: email }, function (err, existingEmail) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when finding existing user',
+						error: err
+					});
+				}
+		  
+				if (existingEmail) {
+					return res.status(409).json({
+						message: 'Email already exists'
+					});
+				}
+
+				var user = new UserModel({
+					username : username,
+					password : req.body.password,
+					email : email,
+					admin : false,
+					packagers : []
+				});
+
+				user.save(function (err, user) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when creating user',
+							error: err
+						});
+					}
+
+					return res.status(201).json(user);
+				});
+			});
+		});
+    },
+
+    login: function(req, res, next){
+        console.log("on login " + req.body.username + " " + req.body.password)
+        UserModel.authenticate(req.body.username, req.body.password, function(err, user){
+            if(err || !user){
+                console.log("on error " + err)
+                console.log("on error " + user)
+                var err = new Error('Wrong username or password');
+                err.status = 401;
+                return res.status(401).json({
+                    message: 'Wrong username or password',
+                    error: err
+                });
+            }
+            req.session.userId = user._id;
+			
+			// Exclude the password field from the user object
+			const { password, ...userWithoutPassword } = user.toObject();
+			return res.json(userWithoutPassword);
+        });
+    },
+
+    logout: function(req, res, next){
+        if (req.session) {
+            req.session.destroy(function(err) {
+                if (err) {
+                    return next(err);
+                } else {
+                    return res.status(201).json({});
+                }
+            });
+        }
+    },
+
+    update: function (req, res) {
+        var id = req.params.id;
+
+        UserModel.findOne({_id: id}, function (err, user) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error when getting user',
+                    error: err
+                });
+            }
+
+            if (!user) {
+                return res.status(404).json({
+                    message: 'No such user'
+                });
+            }
+
+            user.username = req.body.username ? req.body.username : user.username;
+			user.password = req.body.password ? req.body.password : user.password;
+			user.email = req.body.email ? req.body.email : user.email;
+			user.admin = req.body.admin ? req.body.admin : user.admin;
+			user.packagers = req.body.packagers ? req.body.packagers : user.packagers;
+			
+            user.save(function (err, user) {
+                if (err) {
+                    return res.status(500).json({
+                        message: 'Error when updating user.',
+                        error: err
+                    });
+                }
+
+				// Exclude the password field from the user object
+				const { password, ...userWithoutPassword } = user.toObject();
+				return res.json(userWithoutPassword);
+            });
+        });
+    },
+
+	// Vpiši uporabniško ime in številko paketnika, ter dodaj paketnik uporabniku
+	addPackager: function (req, res) {
+        var username = req.body.username;
+		var packagerNumber = req.body.packagerNumber;
+
+		PackagerModel.findOne({number: packagerNumber}, function (err, packager) {
+			if (err) {
+                return res.status(500).json({
+                    message: 'Error when getting packager.',
+                    error: err
+                });
+            }
+
+            if (!packager) {
+                return res.status(404).json({
+                    message: 'No such packager'
+                });
+            }
+
+			UserModel.findOne({username: username}, function (err, user) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when getting user',
+						error: err
+					});
+				}
+
+				if (!user) {
+					return res.status(404).json({
+						message: 'No such user'
+					});
+				}
+
+				var packagerIndex = user.packagers.indexOf(packager._id);
+
+				if (packagerIndex > -1) {
+					return res.status(404).json({
+						message: `User already contains packager ${packager.number}`
+					});
+				}
+
+				user.packagers.push(packager._id);
+				
+				user.save(function (err, user) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when updating user.',
+							error: err
+						});
+					}
+
+					// Exclude the password field from the user object
+					const { password, ...userWithoutPassword } = user.toObject();
+					return res.json(userWithoutPassword);
+				});
+			});
+		});
+    },
+
+	// Vpiši uporabniško ime in številko paketnika, ter odstrani paketnik od uporabnika
+	removePackager: function (req, res) {
+        var username = req.body.username;
+		var packagerNumber = req.body.packagerNumber;
+
+		PackagerModel.findOne({ number: packagerNumber }, function (err, packager) {
+			if (err) {
+                return res.status(500).json({
+                    message: 'Error when getting packager.',
+                    error: err
+                });
+            }
+
+            if (!packager) {
+                return res.status(404).json({
+                    message: 'No such packager'
+                });
+            }
+
+			UserModel.findOne({username: username}, function (err, user) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when getting user',
+						error: err
+					});
+				}
+
+				if (!user) {
+					return res.status(404).json({
+						message: 'No such user'
+					});
+				}
+
+				var packagerIndex = user.packagers.indexOf(packager._id);
+
+				if (packagerIndex <= -1) {
+					return res.status(404).json({
+						message: `User does not contain packager ${packager.number}`
+					});
+				}
+
+				user.packagers.splice(packagerIndex, 1);
+				
+				user.save(function (err, user) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when updating user.',
+							error: err
+						});
+					}
+
+					// Exclude the password field from the user object
+					const { password, ...userWithoutPassword } = user.toObject();
+					return res.json(userWithoutPassword);
+				});
+			});
+		});
+    },
+
+    remove: function (req, res) {
+        var id = req.session.userId;
+
+		RequestModel.deleteMany({ user: id }, function (err) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error when deleting requests.',
+                    error: err
+                });
+            }
+
+			UserModel.findByIdAndRemove(id, function (err, user) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when deleting the user.',
+						error: err
+					});
+				}
+
+				if (req.session) {
+					req.session.destroy(function(err) {
+						if (err) {
+							return next(err);
+						} else{
+							return res.status(204).json({});
+						}
+					});
+				}
+			});
+		});
+    },
+
+	adminRemove: function (req, res) {
+        var id = req.params.id;
+
+		RequestModel.deleteMany({ user: id }, function (err) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error when deleting requests.',
+                    error: err
+                });
+            }
+
+			UserModel.findByIdAndRemove(id, function (err, user) {
+				if (err) {
+					return res.status(500).json({
+						message: 'Error when deleting the user.',
+						error: err
+					});
+				}
+
+				return res.status(204).json({});
+			});
+		});
+    }
+};
