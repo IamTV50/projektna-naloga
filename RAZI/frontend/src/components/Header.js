@@ -5,6 +5,7 @@ import {Button, ButtonGroup, HStack, IconButton, Spacer, useColorMode, useColorM
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 function Header(props) {
+
     const { colorMode, toggleColorMode } = useColorMode()
     const color = useColorModeValue('white', `gray.800`)
     return (
@@ -29,26 +30,40 @@ function Header(props) {
                     </UserContext.Consumer>
                 </ButtonGroup>
                 <Spacer/>
-                <ButtonGroup isAttached={true}>
-                    <UserContext.Consumer>
-                        {context => (
-                            context.user ?
-                                <>
-                                    {context.user.admin && (
-                                        <Button variant='header' as={Link} to='/admin'>Admin Panel</Button>
-                                    )}
-                                </>
-                                :
-                                <></>
-                        )}
-                    </UserContext.Consumer>
-                    <IconButton
-                        variant="header"
-                        aria-label="Toggle color mode"
-                        icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-                        onClick={toggleColorMode}
-                    />
-                </ButtonGroup>
+                <UserContext.Consumer>
+                    {context => (
+                        context.user ?
+                            <>
+                                {context.user.admin ? (
+                                    <ButtonGroup isAttached={true} variant='outline'>
+                                        <Button variant='admin' as={Link} to='/admin'>Admin</Button>
+                                        <IconButton
+                                            variant="admin_icon"
+                                            aria-label="Toggle color mode"
+                                            icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                                            onClick={toggleColorMode}
+                                        />
+                                    </ButtonGroup>
+                                ) : (
+                                    <IconButton
+                                        variant="header"
+                                        aria-label="Toggle color mode"
+                                        icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                                        onClick={toggleColorMode}
+                                    />
+                                )}
+                            </>
+                            :
+                            <><IconButton
+                                variant="header"
+                                aria-label="Toggle color mode"
+                                icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                                onClick={toggleColorMode}
+                            /></>
+                    )}
+                </UserContext.Consumer>
+
+
 
             </HStack>
         </header >

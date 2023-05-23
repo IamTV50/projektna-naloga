@@ -82,7 +82,6 @@ function RequestPackager({ onRequestAdd }) {
             <Collapse in={isExpanded}>
                 <Card variant="elevated" bg="gray.300" display="inline-block" my={2}>
                 <CardBody>
-                    {/*TODO: custom box*/}
                     <form onSubmit={handleSubmit}>
                         <Text>Številka paketnika: </Text>
                         <NumberInput>
