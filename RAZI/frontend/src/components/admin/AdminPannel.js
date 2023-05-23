@@ -3,6 +3,9 @@ import AdminGetRequest from "./AdminGetRequest";
 import AdminAddPackager from "./AdminAddPackager";
 import AdminShowUsers from "./AdminShowUsers";
 import AdminShowPackagers from "./AdminShowPackagers";
+import {Box} from "@chakra-ui/react";
+import AdminRequestsList from "./AdminRequestsList";
+import AdminUsersList from "./AdminUsersList";
 
 function AdminPannel() {
 	const [requests, setRequests] = useState([]);
@@ -32,20 +35,22 @@ function AdminPannel() {
 
 	return ( 
 		<div>
-			<h3>TODO</h3>
 			<div>
 				<AdminAddPackager></AdminAddPackager>
 			</div>
+			<Box h={4}/>
 			<div>
-				<h3>Requests:</h3>
-				<div>
-					<ul>
-						{isLoading ? "" : requests.map(request => (<AdminGetRequest request={request} key={request._id} onRequestDeleted={handleIdDelete}></AdminGetRequest>))}
-					</ul>
-				</div>
+				<AdminRequestsList requests={requests} onRequestDeleted={handleIdDelete}></AdminRequestsList>
+
+				{/*<h3>Zahteve:</h3>*/}
+				{/*<div>*/}
+				{/*	<ul>*/}
+				{/*		{isLoading ? "" : requests.map(request => (<AdminGetRequest request={request} key={request._id} onRequestDeleted={handleIdDelete}></AdminGetRequest>))}*/}
+				{/*	</ul>*/}
+				{/*</div>*/}
 			</div>
+			<Box h={4}/>
 			<div>
-				<h3>Users list:</h3>
 				<AdminShowUsers onRequestDeleted={handleIdDelete}></AdminShowUsers>
 			</div>
 			<div>

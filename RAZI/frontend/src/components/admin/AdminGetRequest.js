@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { confirmAlert } from 'react-confirm-alert';
+import {Alert, AlertIcon, Button, Card, HStack, Text} from "@chakra-ui/react";
 
 function AdminGetRequest(props) {
     const [error, setError] = useState("");
@@ -82,15 +83,31 @@ function AdminGetRequest(props) {
 	console.log(props);
 
     return (
-        <div>
-            <p>User: {props.request.user ? props.request.user.username : "[deleted]"}</p>
-            <p>Packager: {props.request.packager ? props.request.packager.number : "[deleted]"}</p>
-			<p>Reason: {props.request.reason}</p>
-			<p>Date: {new Date(props.request.created).toLocaleString("de-DE")}</p>
-			<button onClick={acceptRequest}>Accept</button>
-            <button onClick={deleteRequest}>Delete</button>
-			<p>{error}</p>
-        </div>
+        <Card variant={"elevated"} backgroundColor={"gray.300"} mb={5} p={5}>
+            <Text>Uporabnik: {props.request.user ? props.request.user.username : "[deleted]"}</Text>
+            <Text>Paketnik: {props.request.packager ? props.request.packager.number : "[deleted]"}</Text>
+            <Text>Razlog: {props.request.reason}</Text>
+            <Text>Datum: {new Date(props.request.created).toLocaleString("de-DE")}</Text>
+            <HStack>
+                <Button variant={"green"} onClick={acceptRequest}>Accept</Button>
+                <Button variant={"red"} onClick={deleteRequest}>Delete</Button>
+            </HStack>
+            {error !== "" && (
+                <Alert status="error">
+                    <AlertIcon/>
+                    {error}
+                </Alert>
+            )}
+        </Card>
+        // <div>
+        //     <p>User: {props.request.user ? props.request.user.username : "[deleted]"}</p>
+        //     <p>Packager: {props.request.packager ? props.request.packager.number : "[deleted]"}</p>
+		// 	<p>Reason: {props.request.reason}</p>
+		// 	<p>Date: {new Date(props.request.created).toLocaleString("de-DE")}</p>
+		// 	<button onClick={acceptRequest}>Accept</button>
+        //     <button onClick={deleteRequest}>Delete</button>
+		// 	<p>{error}</p>
+        // </div>
     );
 }
  
