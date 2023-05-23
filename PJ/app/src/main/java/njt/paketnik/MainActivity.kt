@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.util.zip.GZIPInputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 
@@ -45,8 +46,9 @@ class MainActivity : AppCompatActivity() {
             //binding.showTxt.text = "call api click"
 
             //daj v .env
+            val format = 2
             val apiUrl = "https://api-d4me-stage.direct4.me/sandbox/v1/Access/openbox"
-            val jsonData = "{\"deliveryId\":0,\"boxId\":541,\"tokenFormat\":2,\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
+            val jsonData = "{\"deliveryId\":0,\"boxId\":541,\"tokenFormat\":$format,\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
 
             lifecycleScope.launch {
                 val resJson:JSONObject
@@ -60,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     else{
                         binding.showTxt.text = "uspeh"
-                        convertB64ToSound(resJson["data"].toString())
+                        convertB64ToSound(resJson["data"].toString(), format)
                     }
                 }
                 catch (e:JSONException){
@@ -71,7 +73,6 @@ class MainActivity : AppCompatActivity() {
                         binding.showTxt.text = "pasring error"
                     }
                 }
-
             }
         }
 
@@ -102,47 +103,89 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun convertB64ToSound(base64String : String) {
-        val byteArray = Base64.decode(base64String, Base64.DEFAULT)
-
+    private fun convertB64ToSound(base64String: String, format: Int) {
         try {
-            val zipInputStream = ZipInputStream(ByteArrayInputStream(byteArray))
-            var zipEntry: ZipEntry? = zipInputStream.nextEntry
-            while (zipEntry != null) {
-                val entryName = zipEntry.name
-                if (!zipEntry.isDirectory && entryName.endsWith(".wav")) {
+            val byteArray = Base64.decode(base64String, Base64.DEFAULT)
+
+            when (format) {
+                1, 3 -> {
+                    val gzipInputStream = GZIPInputStream(ByteArrayInputStream(byteArray))
                     val outputStream = ByteArrayOutputStream()
                     val buffer = ByteArray(1024)
                     var length: Int
-                    while (zipInputStream.read(buffer).also { length = it } > 0) {
+
+                    while (gzipInputStream.read(buffer).also { length = it } > 0) {
                         outputStream.write(buffer, 0, length)
                     }
+
                     val soundBytes = outputStream.toByteArray()
-                    playSoundFile(soundBytes)
-                    break
+                    playSoundFile(soundBytes, format)
+                    gzipInputStream.close()
                 }
-                zipEntry = zipInputStream.nextEntry
+
+                2, 4 -> {
+                    val zipInputStream = ZipInputStream(ByteArrayInputStream(byteArray))
+                    var zipEntry: ZipEntry? = zipInputStream.nextEntry
+
+                    while (zipEntry != null) {
+                        if (!zipEntry.isDirectory && zipEntry.name.endsWith(".wav")) {
+                            val outputStream = ByteArrayOutputStream()
+                            val buffer = ByteArray(1024)
+                            var length: Int
+
+                            while (zipInputStream.read(buffer).also { length = it } > 0) {
+                                outputStream.write(buffer, 0, length)
+                            }
+
+                            val soundBytes = outputStream.toByteArray()
+                            playSoundFile(soundBytes, format)
+
+                            break
+                        }
+                        zipEntry = zipInputStream.nextEntry
+                    }
+                    zipInputStream.close()
+                }
+
+                5, 6 -> {
+                    playSoundFile(byteArray, format)
+                }
+
+                else -> throw IllegalArgumentException("Wrong format given: $format")
             }
-            zipInputStream.close()
+        } catch (e: IllegalArgumentException) {
+            e.printStackTrace()
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
-    private fun saveSoundFile(wavBytes: ByteArray): File {
+    private fun saveSoundFile(soundBytes: ByteArray, format: Int): File {
         val tempDir = cacheDir
-        val tempFile = File.createTempFile("temp", ".wav", tempDir)
+
+        val tempFile = when (format) {
+            in 1..4 -> {
+                File.createTempFile("temp", ".wav", tempDir)
+            }
+
+            5, 6 -> {
+                File.createTempFile("temp", ".mp3", tempDir)
+            }
+
+            else -> throw IllegalArgumentException("Wrong format given: $format")
+        }
+
         val outputStream = FileOutputStream(tempFile)
-        outputStream.write(wavBytes)
+        outputStream.write(soundBytes)
         outputStream.close()
         return tempFile
     }
 
-    private fun playSoundFile(soundBytes: ByteArray) {
+    private fun playSoundFile(soundBytes: ByteArray, format: Int) {
         releaseMediaPlayer()
 
         try {
-            val soundFile = saveSoundFile(soundBytes)
+            val soundFile = saveSoundFile(soundBytes, format)
 
             mediaPlayer = MediaPlayer()
             mediaPlayer?.setAudioAttributes(
@@ -160,6 +203,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun releaseMediaPlayer() {
         File(cacheDir, "temp.wav").delete()
+        File(cacheDir, "temp.mp3").delete()
         mediaPlayer?.release()
         mediaPlayer = null
     }
