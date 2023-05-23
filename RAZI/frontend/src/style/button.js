@@ -44,6 +44,39 @@ const Button = defineStyleConfig({
                 // animation: `${spin} 2s linear infinite`
             }
         },
+        admin: {
+            border: '2px solid',
+            borderColor: "gray.300",
+            borderRadius: '4px 0 0 4px',
+            // bg: 'blue.400',
+            // color: 'white',
+            // transform: "skewX(-25deg)",
+            transition: "border-color 0.3s",
+            // animation: `${spin} 1s linear infinite`,
+            // transition: "skewX 1s",
+            _hover: {
+                borderColor: "blue.500",
+                // animation: `${spin} 2s linear infinite`
+            }
+        },
+
+        admin_icon: {
+            border: '2px solid',
+            borderColor: "gray.300",
+            borderLeft: 'none',
+            borderRadius: '0 4px 4px 0',
+            // bg: 'blue.400',
+            // color: 'white',
+            // transform: "skewX(-25deg)",
+            transition: "border-color 0.3s",
+            // animation: `${spin} 1s linear infinite`,
+            // transition: "skewX 1s",
+            _hover: {
+                borderColor: "blue.500",
+                // animation: `${spin} 2s linear infinite`
+            }
+        },
+
         green: {
             border: '2px solid',
             borderColor: 'green.500',
