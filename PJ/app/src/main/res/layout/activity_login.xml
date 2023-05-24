@@ -7,37 +7,41 @@
     tools:context=".LoginActivity">
 
     <EditText
-        android:id="@+id/login_name_input"
+        android:id="@+id/loginNameInput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:ems="10"
-        android:hint="username"
+        android:hint="@string/usernameHint"
         android:inputType="text"
         android:minHeight="48dp"
+        android:textColorHint="#8D6E63"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:autofillHints="@string/usernameHint" />
 
     <EditText
-        android:id="@+id/login_passwd_input"
+        android:id="@+id/loginPasswdInput"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:ems="10"
-        android:hint="password"
+        android:hint="@string/passwordHint"
         android:inputType="textPassword"
         android:minHeight="48dp"
+        android:textColorHint="#8D6E63"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_name_input" />
+        app:layout_constraintTop_toBottomOf="@+id/loginNameInput"
+        android:autofillHints="@string/passwordHint" />
 
     <Button
-        android:id="@+id/login_btn"
+        android:id="@+id/loginBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="200dp"
-        android:text="Login"
+        android:text="@string/loginText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

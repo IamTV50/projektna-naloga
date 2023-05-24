@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
 
                 lifecycleScope.launch{
                     val resJson: JSONObject
-                    val response = sendPostRequest(apiUrl, jsonData)
+                    val response = app.sendPostRequest(apiUrl, jsonData)
 
                     try {
                         resJson = JSONObject(response)

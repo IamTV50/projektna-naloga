@@ -8,17 +8,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Base64
 import android.media.MediaPlayer
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
+import com.google.zxing.integration.android.IntentIntegrator
+import com.google.zxing.integration.android.IntentResult
 import njt.paketnik.databinding.ActivityMainBinding
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.IOException
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
@@ -42,49 +40,11 @@ class MainActivity : AppCompatActivity() {
         app = application as MyApp
         setContentView(view)
 
-        if (app.userInfo.getString("userID", "") == "") {
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
+        binding.openScannerBtn.setOnClickListener {
+            startQRScanner()
         }
 
-        binding.showTxt.text = "test"
-
-        binding.callAPIBtn.setOnClickListener {
-            //binding.showTxt.text = "call api click"
-
-            //daj v .env
-            val format = 2
-            val apiUrl = "https://api-d4me-stage.direct4.me/sandbox/v1/Access/openbox"
-            val jsonData = "{\"deliveryId\":0,\"boxId\":541,\"tokenFormat\":$format,\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
-
-            lifecycleScope.launch {
-                val resJson:JSONObject
-                val response = sendPostRequest(apiUrl, jsonData)
-
-                try {
-                    resJson = JSONObject(response)
-
-                    if (resJson["errorNumber"] != 0){
-                        binding.showTxt.text = "napaka"
-                    }
-                    else{
-                        binding.showTxt.text = "uspeh"
-                        convertB64ToSound(resJson["data"].toString(), format)
-                    }
-                }
-                catch (e:JSONException){
-                    if (response == ""){
-                        binding.showTxt.text = "unexpected response"
-                    }
-                    else{
-                        binding.showTxt.text = "pasring error"
-                    }
-                }
-            }
-        }
-
-        binding.tmpOut.setOnClickListener{
+        binding.logoutBtn.setOnClickListener{
             app.userInfo.edit().putString("userID", "").apply()
             app.userInfo.edit().putString("username", "").apply()
             app.userInfo.edit().putString("email", "").apply()
@@ -96,11 +56,75 @@ class MainActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         }
+    }
 
-        binding.navigateQrScanner.setOnClickListener {
-            val intent = Intent(this, QrScannerActivity::class.java)
+    override fun onResume() {
+        super.onResume()
+
+        if (app.userInfo.getString("userID", "") == "") {
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         }
+    }
+
+    private val qrScannerActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val intentResult: IntentResult? = IntentIntegrator.parseActivityResult(result.resultCode, result.data)
+        if (intentResult != null) {
+            if (intentResult.contents.isNullOrEmpty()) {
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
+            } else {
+                val boxId = getNumberFromUrl(intentResult.contents)
+                binding.resultTxt.text = boxId?.toString() ?: "Invalid URL"
+
+                if (boxId != null) {
+                    val format = 2
+                    val apiUrl = "https://api-d4me-stage.direct4.me/sandbox/v1/Access/openbox"
+                    val jsonData =
+                        "{\"deliveryId\":0,\"boxId\":$boxId,\"tokenFormat\":$format,\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
+
+                    lifecycleScope.launch {
+                        val resJson: JSONObject
+                        val response = app.sendPostRequest(apiUrl, jsonData)
+
+                        try {
+                            resJson = JSONObject(response)
+
+                            if (resJson["errorNumber"] != 0) {
+                                binding.statusTxt.text = getString(R.string.responseErrorText)
+                            } else {
+                                binding.statusTxt.text = getString(R.string.successText)
+                                convertB64ToSound(resJson["data"].toString(), format)
+                            }
+                        } catch (e: JSONException) {
+                            if (response == "") {
+                                binding.statusTxt.text = getString(R.string.unexpectedResponseText)
+                            } else {
+                                binding.statusTxt.text = getString(R.string.parsingErrorText)
+                            }
+                        }
+                    }
+                } else {
+                    binding.statusTxt.text = getString(R.string.parsingErrorText)
+                }
+            }
+        }
+    }
+
+    private fun getNumberFromUrl(url: String): Int? {
+        val pattern = """/\d+/(\d+)/""".toRegex()
+        val matchResult = pattern.find(url)
+        return matchResult?.groupValues?.get(1)?.toInt()
+    }
+
+    private fun startQRScanner() {
+        val integrator = IntentIntegrator(this)
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE)
+        integrator.setPrompt("Scan a QR Code")
+        integrator.setCameraId(0) // Use the rear camera by default
+        integrator.setBeepEnabled(false) // Disable beep sound
+        integrator.setOrientationLocked(false) // Allow rotation
+        qrScannerActivityResultLauncher.launch(integrator.createScanIntent())
     }
 
     private fun convertB64ToSound(base64String: String, format: Int) {
