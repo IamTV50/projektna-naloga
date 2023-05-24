@@ -22,13 +22,13 @@ class LoginActivity : AppCompatActivity() {
 
         binding.loginBtn.setOnClickListener{
             val uname = binding.loginNameInput.text.toString()
-            val pass = binding.loginPasswdInput.toString()
+            val pass = binding.loginPasswdInput.text.toString()
 
-            if (uname.isNotEmpty() && pass.isNotEmpty()) {
+            if (uname == "" || pass == "") {
                 Toast.makeText(this, "Please fill in all the fields", Toast.LENGTH_SHORT).show()
             } else {
-                val apiUrl = "http://localhost:3001/users/login"
-                val jsonData = "{\"username \":$uname,\"password\":$pass}"
+                val apiUrl = "http://192.168.1.11:3001/users/login"
+                val jsonData = "{\"username\":\"$uname\",\"password\":\"$pass\"}"
 
                 lifecycleScope.launch{
                     val resJson: JSONObject
@@ -44,6 +44,8 @@ class LoginActivity : AppCompatActivity() {
                             app.userInfo.edit().putString("userID", resJson["_id"].toString()).apply()
                             app.userInfo.edit().putString("username", resJson["username"].toString()).apply()
                             app.userInfo.edit().putString("email", resJson["email"].toString()).apply()
+                            app.userInfo.edit().putString("admin", resJson["admin"].toString()).apply()
+                            app.userInfo.edit().putString("packagers", resJson["packagers"].toString()).apply()
 
                             Toast.makeText(applicationContext, "login success", Toast.LENGTH_SHORT).show()
                             finish()
