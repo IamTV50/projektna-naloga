@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
-        app = application as MyApp //execption 'java.lang.ClassCastException' here
+        app = application as MyApp
         setContentView(view)
 
         if(app.userInfo.getString("userID", "") == ""){
