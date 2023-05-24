@@ -32,13 +32,20 @@ import java.util.zip.ZipInputStream
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var mediaPlayer: MediaPlayer? = null
+    private lateinit var app: MyApp
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
+        app = application as MyApp //execption 'java.lang.ClassCastException' here
         setContentView(view)
+
+        if(app.userInfo.getString("userID", "") == ""){
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
 
         binding.showTxt.text = "test"
 
@@ -79,27 +86,6 @@ class MainActivity : AppCompatActivity() {
         binding.navigateQrScanner.setOnClickListener {
             val intent = Intent(this, QrScannerActivity::class.java)
             startActivity(intent)
-        }
-    }
-
-    private suspend fun sendPostRequest(apiUrl: String, jsonBody: String): String {
-        val mediaType = "application/json".toMediaType()
-        val requestBody = jsonBody.toRequestBody(mediaType)
-        val request = Request.Builder()
-            .url(apiUrl)
-            .header("Authorization", "Bearer 9ea96945-3a37-4638-a5d4-22e89fbc998f") //daj v .env
-            .post(requestBody)
-            .build()
-        val client = OkHttpClient()
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = client.newCall(request).execute()
-                return@withContext response.body?.string() ?: ""
-                //return@withContext response.code.toString()
-            } catch (e: IOException) {
-                e.printStackTrace()
-                return@withContext ""
-            }
         }
     }
 
@@ -211,5 +197,26 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         releaseMediaPlayer()
+    }
+}
+
+internal suspend fun sendPostRequest(apiUrl: String, jsonBody: String): String {
+    val mediaType = "application/json".toMediaType()
+    val requestBody = jsonBody.toRequestBody(mediaType)
+    val request = Request.Builder()
+        .url(apiUrl)
+        .header("Authorization", "Bearer 9ea96945-3a37-4638-a5d4-22e89fbc998f") //daj v .env
+        .post(requestBody)
+        .build()
+    val client = OkHttpClient()
+    return withContext(Dispatchers.IO) {
+        try {
+            val response = client.newCall(request).execute()
+            return@withContext response.body?.string() ?: ""
+            //return@withContext response.code.toString()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return@withContext ""
+        }
     }
 }
