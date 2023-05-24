@@ -24,11 +24,6 @@
             tools:replace="android:screenOrientation"
             android:stateNotNeeded="true"/>
         <activity
-            android:name=".QrScannerActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            tools:ignore="LockedOrientationActivity" />
-        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait"
