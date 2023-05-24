@@ -21,6 +21,12 @@ class LoginActivity : AppCompatActivity() {
         app = application as MyApp
         setContentView(view)
 
+        if (app.userInfo.getString("userID", "") != "") {
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        }
+
         binding.loginBtn.setOnClickListener{
             val uname = binding.loginNameInput.text.toString()
             val pass = binding.loginPasswdInput.text.toString()
@@ -29,7 +35,8 @@ class LoginActivity : AppCompatActivity() {
                 Toast.makeText(this, "Please fill in all the fields", Toast.LENGTH_SHORT).show()
             } else {
                 // Tu vpiši IP računalnika, ki hosta backend
-                val apiUrl = "http://192.168.1.11:3001/users/login"
+                val backendIP = "192.168.0.14"
+                val apiUrl = "http://$backendIP:3001/users/login"
                 val jsonData = "{\"username\":\"$uname\",\"password\":\"$pass\"}"
 
                 lifecycleScope.launch{
