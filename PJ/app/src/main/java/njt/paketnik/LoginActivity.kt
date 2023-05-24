@@ -1,5 +1,6 @@
 package njt.paketnik
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -49,7 +50,10 @@ class LoginActivity : AppCompatActivity() {
                             app.userInfo.edit().putString("packagers", resJson["packagers"].toString()).apply()
 
                             Toast.makeText(applicationContext, "login success", Toast.LENGTH_SHORT).show()
-                            finish()
+
+                            val intent = Intent(applicationContext, MainActivity::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                            startActivity(intent)
                         }
                     }
                     catch (e: JSONException){
