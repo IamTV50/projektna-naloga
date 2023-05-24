@@ -3,7 +3,6 @@ import {
     Alert,
     AlertIcon, Box,
     Button,
-    ButtonGroup,
     Center, Heading,
     Input,
     InputGroup,
@@ -56,9 +55,11 @@ function Register() {
 
     return(
         <Center flex={1}>
-            <VStack width={{base: "100%", md: "70%", xl: "25%"}} >
+
+            <VStack as="form" onSubmit={Register} width={{base: "100%", md: "70%", xl: "25%"}} bgColor={"gray.100"} borderRadius={"25"} padding={10} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
                 <Heading mb={4}>Register</Heading>
-                <Input marginBottom={2} type="text" name="email" placeholder="Email" value={email} onChange={(e)=>(setEmail(e.target.value))} />
+                <Input type="text" name="email" placeholder="Email" value={email} onChange={(e)=>(setEmail(e.target.value))} />
+                <Box h={0}/>
                 <Input type="text" name="username" placeholder="Username" value={username} onChange={(e)=>(setUsername(e.target.value))}/>
                 <InputGroup size='md' py={2}>
                     <Input
@@ -69,12 +70,12 @@ function Register() {
                         placeholder='Enter password'
                     />
                     <InputRightElement width='4.5rem'>
-                        <Button variant={"solid"} h='1.75rem' right={1} top={2} onClick={handleClick}>
+                        <Button variant={"solid"} color={"white"} bgColor={"gray.400"} _hover={{bgColor: "gray.500"}} h='1.75rem' right={1} top={2} onClick={handleClick}>
                             {show ? 'Hide' : 'Show'}
                         </Button>
                     </InputRightElement>
                 </InputGroup>
-                <Button colorScheme={"blue"} isLoading={isLoading} onClick={Register}>Register</Button>
+                <Button type="submit" colorScheme={"blue"} isLoading={isLoading} loadingText="Registering..." onClick={Register}>Register</Button>
 
                 {error ? <Alert status="error">
                     <AlertIcon />

@@ -53,7 +53,7 @@ function Login() {
 
     return (
         <Center flex={1}>
-            <VStack width={{base: "100%", md: "70%", xl: "25%"}} >
+            <VStack as="form" onSubmit={Login} width={{base: "100%", md: "70%", xl: "25%"}} bgColor={"gray.100"} borderRadius={"25"} padding={10} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
                 {userContext.user ? <Navigate replace to="/" /> : ""}
                 <Heading mb={4}>Login</Heading>
                 <Input type="text" name="username" placeholder="Username"
@@ -73,7 +73,7 @@ function Login() {
                     </InputRightElement>
                 </InputGroup>
                 <ButtonGroup size='md' py={2}>
-                    <Button colorScheme={"green"} isLoading={isLoading} loadingText="Logging in..." onClick={Login}>Login</Button>
+                    <Button type="submit" colorScheme={"green"} isLoading={isLoading} loadingText="Logging in..." onClick={Login}>Login</Button>
                     {/*<Button as={Link} to='/register'>Register</Button>*/}
                 </ButtonGroup>
                 {error ? <Alert status="error">
