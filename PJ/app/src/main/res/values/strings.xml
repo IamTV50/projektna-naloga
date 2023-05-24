@@ -14,4 +14,6 @@
     <string name="responseErrorText">Response error!</string>
     <string name="unexpectedResponseText">Unexpected response!</string>
     <string name="parsingErrorText">Pasring error!</string>
+    <string name="emptyPackagerListText">You can not open any private packager!</string>
+    <string name="notContainPackagerText">You can not open this packager: %s!</string>
 </resources>

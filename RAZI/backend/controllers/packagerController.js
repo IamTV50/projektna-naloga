@@ -15,6 +15,27 @@ module.exports = {
         });
     },
 
+	getByNumber: function (req, res) {
+        var number = req.params.number;
+
+        PackagerModel.findOne({number: number}, function (err, packager) {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Error when getting packager.',
+                    error: err
+                });
+            }
+
+            if (!packager) {
+                return res.status(404).json({
+                    message: 'No such packager'
+                });
+            }
+
+            return res.json(packager);
+        });
+    },
+
     show: function (req, res) {
         var id = req.params.id;
 

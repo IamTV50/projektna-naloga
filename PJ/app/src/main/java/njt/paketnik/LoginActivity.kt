@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import njt.paketnik.databinding.ActivityLoginBinding
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -34,9 +35,8 @@ class LoginActivity : AppCompatActivity() {
             if (uname == "" || pass == "") {
                 Toast.makeText(this, "Please fill in all the fields", Toast.LENGTH_SHORT).show()
             } else {
-                // Tu vpiši IP računalnika, ki hosta backend
-                val backendIP = "192.168.0.14"
-                val apiUrl = "http://$backendIP:3001/users/login"
+                // V MyApp vpiši IP računalnika, ki hosta backend
+                val apiUrl = "${app.backend}/users/login"
                 val jsonData = "{\"username\":\"$uname\",\"password\":\"$pass\"}"
 
                 lifecycleScope.launch{
@@ -53,8 +53,16 @@ class LoginActivity : AppCompatActivity() {
                             app.userInfo.edit().putString("userID", resJson["_id"].toString()).apply()
                             app.userInfo.edit().putString("username", resJson["username"].toString()).apply()
                             app.userInfo.edit().putString("email", resJson["email"].toString()).apply()
-                            app.userInfo.edit().putString("admin", resJson["admin"].toString()).apply()
-                            app.userInfo.edit().putString("packagers", resJson["packagers"].toString()).apply()
+                            app.userInfo.edit().putBoolean("admin", resJson["admin"].toString().toBoolean()).apply()
+
+                            val packagersArray: JSONArray = resJson.getJSONArray("packagers")
+
+                            val packagersSet = mutableSetOf<String>()
+                            for (i in 0 until packagersArray.length()) {
+                                packagersSet.add(packagersArray.getString(i))
+                            }
+
+                            app.userInfo.edit().putStringSet("packagers", packagersSet).apply()
 
                             Toast.makeText(applicationContext, "login success", Toast.LENGTH_SHORT).show()
 

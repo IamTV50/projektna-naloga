@@ -78,14 +78,50 @@ class MainActivity : AppCompatActivity() {
                 binding.resultTxt.text = boxId?.toString() ?: "Invalid URL"
 
                 if (boxId != null) {
-                    val format = 2
-                    val apiUrl = "https://api-d4me-stage.direct4.me/sandbox/v1/Access/openbox"
-                    val jsonData =
-                        "{\"deliveryId\":0,\"boxId\":$boxId,\"tokenFormat\":$format,\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
+                    var apiUrl: String
+                    var resJson: JSONObject
+                    var response: String
 
                     lifecycleScope.launch {
-                        val resJson: JSONObject
-                        val response = app.sendPostRequest(apiUrl, jsonData)
+                        if (!app.userInfo.getBoolean("admin", false)) {
+                            apiUrl = "${app.backend}/packagers/byNumber/$boxId"
+                            response = app.sendGetRequest(apiUrl)
+
+                            try {
+                                resJson = JSONObject(response)
+
+                                if (resJson.has("message")) {
+                                    binding.statusTxt.text = getString(R.string.responseErrorText)
+                                    return@launch
+                                }
+                            } catch (e: JSONException) {
+                                if (response == "") {
+                                    binding.statusTxt.text = getString(R.string.unexpectedResponseText)
+                                } else {
+                                    binding.statusTxt.text = getString(R.string.parsingErrorText)
+                                }
+                                return@launch
+                            }
+
+                            if (!resJson["public"].toString().toBoolean()) {
+                                val packagerSet = app.userInfo.getStringSet("packagers", emptySet())
+
+                                if (packagerSet.isNullOrEmpty()) {
+                                    binding.statusTxt.text = getString(R.string.emptyPackagerListText)
+                                    return@launch
+                                }
+
+                                if (!packagerSet.contains(resJson["_id"].toString())) {
+                                    binding.statusTxt.text = getString(R.string.notContainPackagerText, boxId.toString())
+                                    return@launch
+                                }
+                            }
+                        }
+
+                        apiUrl = "https://api-d4me-stage.direct4.me/sandbox/v1/Access/openbox"
+                        val jsonData = "{\"deliveryId\":0,\"boxId\":$boxId,\"tokenFormat\":${app.format},\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
+
+                        response = app.sendPostRequest(apiUrl, jsonData)
 
                         try {
                             resJson = JSONObject(response)
@@ -94,7 +130,7 @@ class MainActivity : AppCompatActivity() {
                                 binding.statusTxt.text = getString(R.string.responseErrorText)
                             } else {
                                 binding.statusTxt.text = getString(R.string.successText)
-                                convertB64ToSound(resJson["data"].toString(), format)
+                                convertB64ToSound(resJson["data"].toString(), app.format)
                             }
                         } catch (e: JSONException) {
                             if (response == "") {
