@@ -200,8 +200,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun releaseMediaPlayer() {
-        File(cacheDir, "temp.wav").delete()
-        File(cacheDir, "temp.mp3").delete()
+        val filesToDelete = cacheDir.listFiles { file ->
+            file.name.matches(Regex("^temp.*\\.(wav|mp3)$"))
+        }
+
+        filesToDelete?.forEach { file ->
+            file.delete()
+        }
+
         mediaPlayer?.release()
         mediaPlayer = null
     }

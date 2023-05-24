@@ -27,6 +27,7 @@ class LoginActivity : AppCompatActivity() {
             if (uname == "" || pass == "") {
                 Toast.makeText(this, "Please fill in all the fields", Toast.LENGTH_SHORT).show()
             } else {
+                // Tu vpiši IP računalnika, ki hosta backend
                 val apiUrl = "http://192.168.1.11:3001/users/login"
                 val jsonData = "{\"username\":\"$uname\",\"password\":\"$pass\"}"
 
