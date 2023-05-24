@@ -11,15 +11,14 @@ import AdminPannel from "./components/admin/AdminPannel";
 import MyPackagers from "./components/MyPackagers";
 import AdminShowUserProfile from './components/admin/AdminShowUserProfile';
 import UnlockHistory from './components/UnlockHistory';
+import {Flex} from "@chakra-ui/react";
 
 function App() {
-
-  const [user, setUser] = useState(localStorage.user ? JSON.parse(localStorage.user) : null);
-  const updateUserData = (userInfo) => {
-    localStorage.setItem("user", JSON.stringify(userInfo));
-    setUser(userInfo);
-  }
-
+	const [user, setUser] = useState(localStorage.user ? JSON.parse(localStorage.user) : null);
+	const updateUserData = (userInfo) => {
+	localStorage.setItem("user", JSON.stringify(userInfo));
+	setUser(userInfo);
+	}
 
 	return (
 		<BrowserRouter>
@@ -27,20 +26,22 @@ function App() {
 				user: user,
 				setUserContext: updateUserData
 			}}>
-				<div className="App">
+				<Flex className="App" direction={"column"} height={"100vh"} padding={8}>
 					<Header title="My application"></Header>
-					<Routes>
-						<Route path="/" exact element={<Home />}></Route>
-						<Route path="/login" exact element={<Login />}></Route>
-						<Route path="/register" element={<Register />}></Route>
-						<Route path="/admin" element={<AdminPannel />}></Route>
-						<Route path="/profile" element={<Profile />}></Route>
-						<Route path="/logout" element={<Logout />}></Route>
-						<Route path="/my-packagers" element={<MyPackagers />}></Route>
-						<Route path="/my-packagers/hostory" element={<UnlockHistory />}></Route>
-						<Route path="/admin/userInfo" element={<AdminShowUserProfile />}></Route>
-					</Routes>
-				</div>
+					<Flex flexGrow={1} overflowY="auto" paddingBottom={"8%"}>
+						<Routes>
+							<Route path="/" exact element={<Home />}></Route>
+							<Route path="/login" exact element={<Login />}></Route>
+							<Route path="/register" element={<Register />}></Route>
+							<Route path="/admin" element={<AdminPannel />}></Route>
+							<Route path="/profile" element={<Profile />}></Route>
+							<Route path="/logout" element={<Logout />}></Route>
+							<Route path="/my-packagers" element={<MyPackagers />}></Route>
+							<Route path="/my-packagers/hostory" element={<UnlockHistory />}></Route>
+							<Route path="/admin/userInfo" element={<AdminShowUserProfile />}></Route>
+						</Routes>
+					</Flex>
+				</Flex>
 			</UserContext.Provider>
 		</BrowserRouter>
 	);

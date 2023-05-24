@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import {Alert, AlertIcon, Button, Input, InputGroup, InputRightElement, VStack} from "@chakra-ui/react";
+import {
+    Alert,
+    AlertIcon, Box,
+    Button,
+    ButtonGroup,
+    Center, Heading,
+    Input,
+    InputGroup,
+    InputRightElement,
+    VStack
+} from "@chakra-ui/react";
 
 function Register() {
     const [username, setUsername] = useState([]);
@@ -45,9 +55,10 @@ function Register() {
     }
 
     return(
-        <form onSubmit={Register}>
-            <VStack width="40%" alignItems="flex-start">
-                <InputGroup py={2}><Input type="text" name="email" placeholder="Email" value={email} onChange={(e)=>(setEmail(e.target.value))} /></InputGroup>
+        <Center flex={1}>
+            <VStack width={{base: "100%", md: "70%", xl: "25%"}} >
+                <Heading mb={4}>Register</Heading>
+                <Input marginBottom={2} type="text" name="email" placeholder="Email" value={email} onChange={(e)=>(setEmail(e.target.value))} />
                 <Input type="text" name="username" placeholder="Username" value={username} onChange={(e)=>(setUsername(e.target.value))}/>
                 <InputGroup size='md' py={2}>
                     <Input
@@ -58,21 +69,47 @@ function Register() {
                         placeholder='Enter password'
                     />
                     <InputRightElement width='4.5rem'>
-                        <Button variant={"solid"} color={"white"} bgColor={"gray.400"} _hover={{bgColor: "gray.500"}} h='1.75rem' right={1} top={2} onClick={handleClick}>
+                        <Button variant={"solid"} h='1.75rem' right={1} top={2} onClick={handleClick}>
                             {show ? 'Hide' : 'Show'}
                         </Button>
                     </InputRightElement>
                 </InputGroup>
-                <Button variant='blue' isLoading={isLoading} type='submit'>Register</Button>
-                {error !== "" && (
-                    <Alert status="error">
-                        <AlertIcon/>
-                        {error}
-                    </Alert>
-                )}
+                <Button colorScheme={"blue"} isLoading={isLoading} onClick={Register}>Register</Button>
 
+                {error ? <Alert status="error">
+                    <AlertIcon />
+                    {error}
+                </Alert> : ""}
             </VStack>
-        </form>
+        </Center>
+        // <form onSubmit={Register}>
+        //     <VStack width="40%" alignItems="flex-start">
+        //         <InputGroup py={2}><Input type="text" name="email" placeholder="Email" value={email} onChange={(e)=>(setEmail(e.target.value))} /></InputGroup>
+        //         <Input type="text" name="username" placeholder="Username" value={username} onChange={(e)=>(setUsername(e.target.value))}/>
+        //         <InputGroup size='md' py={2}>
+        //             <Input
+        //                 value={password}
+        //                 onChange={(e)=>(setPassword(e.target.value))}
+        //                 pr='4.5rem'
+        //                 type={show ? 'text' : 'password'}
+        //                 placeholder='Enter password'
+        //             />
+        //             <InputRightElement width='4.5rem'>
+        //                 <Button variant={"solid"} color={"white"} bgColor={"gray.400"} _hover={{bgColor: "gray.500"}} h='1.75rem' right={1} top={2} onClick={handleClick}>
+        //                     {show ? 'Hide' : 'Show'}
+        //                 </Button>
+        //             </InputRightElement>
+        //         </InputGroup>
+        //         <Button variant='blue' isLoading={isLoading} type='submit'>Register</Button>
+        //         {error !== "" && (
+        //             <Alert status="error">
+        //                 <AlertIcon/>
+        //                 {error}
+        //             </Alert>
+        //         )}
+        //
+        //     </VStack>
+        // </form>
     );
 }
 

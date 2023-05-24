@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
 import { UserContext } from '../userContext';
-import { Navigate } from 'react-router-dom';
+import {Link, Navigate} from 'react-router-dom';
 import {
     Alert,
     AlertIcon,
     Button,
-    ButtonGroup,
+    ButtonGroup, Center, Heading,
     HStack,
     Input,
     InputGroup,
@@ -52,35 +52,36 @@ function Login() {
     }
 
     return (
-        <form onSubmit={Login}>
-            {/*<HStack width="60%">*/}
-            <VStack width="40%" alignItems="flex-start">
-            {userContext.user ? <Navigate replace to="/" /> : ""}
-            <Input type="text" name="username" placeholder="Username"
-                   value={username} onChange={(e)=>(setUsername(e.target.value))}/>
-            <InputGroup size='md' py={2}>
-                <Input
-                    value={password}
-                    onChange={(e)=>(setPassword(e.target.value))}
-                    pr='4.5rem'
-                    type={show ? 'text' : 'password'}
-                    placeholder='Enter password'
-                />
-                <InputRightElement width='4.5rem'>
-                    <Button variant={"solid"} color={"white"} bgColor={"gray.400"} _hover={{bgColor: "gray.500"}} h='1.75rem' right={1} top={2} onClick={handleClick}>
-                        {show ? 'Hide' : 'Show'}
-                    </Button>
-                </InputRightElement>
-            </InputGroup>
-            <Button variant='green' isLoading={isLoading} type='submit'>Log in</Button>
-                {error !== "" && (
-                    <Alert status="error">
-                        <AlertIcon/>
-                        {error}
-                    </Alert>
-                )}
+        <Center flex={1}>
+            <VStack width={{base: "100%", md: "70%", xl: "25%"}} >
+                {userContext.user ? <Navigate replace to="/" /> : ""}
+                <Heading mb={4}>Login</Heading>
+                <Input type="text" name="username" placeholder="Username"
+                          value={username} onChange={(e)=>(setUsername(e.target.value))}/>
+                <InputGroup size='md' py={2}>
+                    <Input
+                        value={password}
+                        onChange={(e)=>(setPassword(e.target.value))}
+                        pr='4.5rem'
+                        type={show ? 'text' : 'password'}
+                        placeholder='Enter password'
+                    />
+                    <InputRightElement width='4.5rem'>
+                        <Button variant={"solid"} color={"white"} bgColor={"gray.400"} _hover={{bgColor: "gray.500"}} h='1.75rem' right={1} top={2} onClick={handleClick}>
+                            {show ? 'Hide' : 'Show'}
+                        </Button>
+                    </InputRightElement>
+                </InputGroup>
+                <ButtonGroup size='md' py={2}>
+                    <Button colorScheme={"green"} isLoading={isLoading} loadingText="Logging in..." onClick={Login}>Login</Button>
+                    {/*<Button as={Link} to='/register'>Register</Button>*/}
+                </ButtonGroup>
+                {error ? <Alert status="error">
+                    <AlertIcon />
+                    {error}
+                </Alert> : ""}
             </VStack>
-        </form>
+        </Center>
     );
 }
 
