@@ -46,10 +46,9 @@ class LoginActivity : AppCompatActivity() {
                     try {
                         resJson = JSONObject(response)
 
-                        if (resJson.has("error")){ //error
+                        if (resJson.has("error")) { //error
                             Toast.makeText(applicationContext, resJson["error"].toString(), Toast.LENGTH_SHORT).show()
-                        }
-                        else{
+                        } else {
                             app.userInfo.edit().putString("userID", resJson["_id"].toString()).apply()
                             app.userInfo.edit().putString("username", resJson["username"].toString()).apply()
                             app.userInfo.edit().putString("email", resJson["email"].toString()).apply()

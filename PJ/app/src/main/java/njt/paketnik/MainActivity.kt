@@ -40,31 +40,22 @@ class MainActivity : AppCompatActivity() {
         app = application as MyApp
         setContentView(view)
 
+        if (app.userInfo.getString("userID", "") == "") {
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        } else {
+            lifecycleScope.launch {
+                app.getUserInfo()
+            }
+        }
+
         binding.openScannerBtn.setOnClickListener {
             startQRScanner()
         }
 
         binding.logoutBtn.setOnClickListener{
-            app.userInfo.edit().putString("userID", "").apply()
-            app.userInfo.edit().putString("username", "").apply()
-            app.userInfo.edit().putString("email", "").apply()
-            app.userInfo.edit().putString("admin", "").apply()
-            app.userInfo.edit().putString("packagers", "").apply()
-
-            //show login page
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        if (app.userInfo.getString("userID", "") == "") {
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
+            app.unsetUser()
         }
     }
 
