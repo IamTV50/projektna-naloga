@@ -3,7 +3,44 @@ import Packager from "./Packager";
 import { useContext } from "react";
 import {UserContext} from "../userContext";
 import RequestPackager from "./RequestPackager";
-import {useToast} from "@chakra-ui/react";
+import {
+    Box,
+    Button,
+    ButtonGroup,
+    Card,
+    Center,
+    Collapse,
+    Divider,
+    Flex, FocusLock,
+    Heading,
+    HStack,
+    IconButton,
+    Popover,
+    PopoverArrow, PopoverBody,
+    PopoverCloseButton,
+    PopoverContent,
+    PopoverTrigger,
+    SimpleGrid,
+    Spacer,
+    Spinner,
+    Stack,
+    Tab,
+    TabList,
+    TabPanel,
+    TabPanels,
+    Tabs,
+    Text,
+    useDisclosure,
+    useToast,
+    VStack,
+    Wrap
+} from "@chakra-ui/react";
+import {Navigate} from "react-router-dom";
+import { animated, useSpring } from '@react-spring/web'
+import {AddIcon} from "@chakra-ui/icons";
+import UnlockHistory from "./UnlockHistory";
+import Request from "./Request";
+import { motion } from "framer-motion";
 
 function MyPackagers(){
     const toast = useToast()
@@ -12,6 +49,60 @@ function MyPackagers(){
     const [user, setUser] = useState(null);
     const [requests, setRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { isOpen, onToggle } = useDisclosure()
+    const [selectedPackager, setSelectedPackager] = useState(null);
+    const [packagerUnlocks, setPackagerUnlocks] = useState([]);
+
+    // popover
+    const { onOpenPopover, onClosePopover, isOpenPopover } = useDisclosure()
+    const firstFieldRef = React.useRef(null)
+
+    const transition = {
+        type: "spring",
+        duration: 0.3
+    };
+
+    const variants = {
+        open: { opacity: 1, scale: 1 },
+        closed: { opacity: 0, scale: 0 }
+    };
+
+    const inverseVariants = {
+        open: { opacity: 0, scale: 0 },
+        closed: { opacity: 1, scale: 1 }
+    };
+
+    const handlePackagerClick = (packager) => {
+        const fetchUnlocks = async () => {
+            try {
+                const res = await fetch(`http://localhost:3001/unlocks/packagerUnlocks/${packager._id}`, {
+                    credentials: "include"
+                })
+                const data = await res.json();
+                console.log("Unlock history:");
+                console.log(data);
+
+                if (!data.message) {
+                    setPackagerUnlocks(data);
+                }
+                else {
+                    setPackagerUnlocks([]);
+                }
+
+                setIsLoading(false);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        setSelectedPackager(packager);
+        fetchUnlocks();
+        if (!isOpen) {
+            onToggle();
+        }
+        if (packager === selectedPackager) {
+            onToggle();
+        }
+    };
 
     useEffect(function() {
         const getUser = async function() {
@@ -52,28 +143,187 @@ function MyPackagers(){
         setRequests([...requests, newRequest]);
     };
 
+    const handleRequestDelete = (requestId) => {
+        console.log("Deleting request with id: " + requestId);
+
+        try {
+            fetch(`http://localhost:3001/requests/${requestId}`, {
+                method: "DELETE",
+                credentials: "include"
+            });
+            const updatedRequests = requests.filter((request) => request._id !== requestId);
+            setRequests(updatedRequests);
+            toast({
+                title: "Request deleted",
+                description: "Request deleted successfully",
+                status: "success",
+                duration: 3000,
+            })
+        } catch (error) {
+            toast({
+                title: "Request not deleted",
+                description: "Request not deleted successfully",
+                status: "error",
+                duration: 3000,
+            })
+            console.log(error);
+        }
+
+    }
+
+    const Form = ({ firstFieldRef, onCancel }) => {
+        return (
+            <Card spacing={4} p={6}>
+                <RequestPackager onRequestAdd={handleRequestAdd} onCancel={onCancel} />
+                <Button colorScheme={"red"} onClick={onCancel}>
+                    Cancel
+                </Button>
+                {/*<TextInput*/}
+                {/*    label='First name'*/}
+                {/*    id='first-name'*/}
+                {/*    ref={firstFieldRef}*/}
+                {/*    defaultValue='John'*/}
+                {/*/>*/}
+                {/*<TextInput label='Last name' id='last-name' defaultValue='Smith' />*/}
+                {/*<ButtonGroup display='flex' justifyContent='flex-end'>*/}
+                {/*    <Button variant='outline' onClick={onCancel}>*/}
+                {/*        Cancel*/}
+                {/*    </Button>*/}
+                {/*    <Button isDisabled colorScheme='teal'>*/}
+                {/*        Save*/}
+                {/*    </Button>*/}
+                {/*</ButtonGroup>*/}
+            </Card>
+        )
+    }
+
+    // divider={<Divider/>} maxH={"80%"} alignItems={"flex-start"} minH={"70%"} width={{base: "100%", md: "70%", xl: "25%"}} bgColor={"gray.100"} borderRadius={"25"} padding={10} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}
     return(
-        <div>
-            <h3>My packagers:</h3>
-            <ul>
-                {isLoading ? "" : packagers.length === 0 ? "Ni paketnikov" : packagers.map(packager => (
-                    <Packager packager={packager} key={packager._id}></Packager>
-                ))}
-            </ul>
-            <h3>My requests:</h3>
-            <ul>
-                {isLoading ? "" : requests.length === 0 ? "Ni zahtevkov" : requests.map(request => (
-                    <div key={request._id}>
-                        <h5>Packager number: {request.packager.number}</h5>
-                        <p>Reason: {request.reason}</p>
-                        <p>Date: {new Date(request.created).toLocaleString("de-DE")}</p>
-                        <p>Public: {request.packager.public.toString()}</p>
-                    </div>
-                ))}
-            </ul>
-            <RequestPackager onRequestAdd={handleRequestAdd}></RequestPackager>
-        </div>
+        <Center flex={1}>
+            {userContext.user ? "" : <Navigate replace to="/" />}
+            <Box w={isOpen ? "70%" : "50%"} h="70%" display="flex" flexDirection={"row"}>
+                <Box marginRight={"10px"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} width={"100%"} as={Card} height="100%" bgColor="gray.100" overflow="auto"
+                     css={{
+                    "&::-webkit-scrollbar": {
+                        width: "0",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                        backgroundColor: "#888",
+                    },
+                    }}>
+                    <Tabs isLazy>
+                        <TabList
+                            position="sticky"
+                            top="0"
+                            bgColor="gray.100"
+                            zIndex="sticky"
+                            p={4}
+                            minWidth="100%"
+                            width="fit-content"
+                        >
+                            <Tab>My Packagers</Tab>
+                            <Tab>My Requests</Tab>
+                            <Spacer/>
+                            <Popover
+                                isOpen={isOpenPopover}
+                                initialFocusRef={firstFieldRef}
+                                onOpen={onOpenPopover}
+                                onClose={onClosePopover}
+                                placement='bottom'
+                                closeOnBlur={false}>
+                                <PopoverTrigger>
+                                    <IconButton aria-label="Search database" position="relative" right={0} icon={<AddIcon />} />
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                    <PopoverArrow/>
+                                    <PopoverCloseButton fontSize="md"/>
+                                    <PopoverBody>
+                                        <RequestPackager onRequestAdd={handleRequestAdd}/>
+                                    </PopoverBody>
+
+                                </PopoverContent>
+
+                            </Popover>
+                            {/*<IconButton aria-label="Search database" position="relative" right={0} icon={<AddIcon />} />*/}
+                        </TabList>
+                        <TabPanels>
+                            <TabPanel>
+                                    <Box flex={1} w="100%" h="100%" overflowY="auto">
+                                        {isLoading ? (
+                                            <Center>
+                                                <Spinner />
+                                            </Center>
+                                        ) : packagers.length === 0 ? (
+                                            "No packagers"
+                                        ) : (
+                                            packagers.map((packager) => (
+                                                <>
+                                                    <Packager
+                                                        packager={packager}
+                                                        key={packager._id}
+                                                        onToggle={() => handlePackagerClick(packager)}
+                                                    />
+                                                    <Divider/>
+                                                </>
+                                            ))
+                                        )}
+                                    </Box>
+                            </TabPanel>
+                            <TabPanel>
+                                    <Box flex={1} w="100%" h="100%" overflowY="auto">
+                                        {isLoading ? (
+                                            <Center>
+                                                <Spinner />
+                                            </Center>
+                                        ) : requests.length === 0 ? (
+                                            "No requests"
+                                        ) : (
+                                            requests.map((request) => (
+                                                <>
+                                                    <Request key={request._id} request={request} handleDelete={handleRequestDelete}/>
+                                                    <Divider my={7}/>
+                                                </>
+                                            ))
+                                        )}
+                                    </Box>
+                            </TabPanel>
+                        </TabPanels>
+                    </Tabs>
+                </Box>
+                <Box marginLeft={"10px"}  w={isOpen ? "70%" : "0"} hidden={!isOpen} >
+                    {/*<Collapse in={isOpen} animateOpacity>*/}
+                    <Box
+                        flex={1}
+                        width="100%"
+                        h="100%"
+                        overflow="auto"
+                        bgColor="gray.100"
+                        borderRadius={25}
+                        padding={10}
+                        boxShadow="10px 15px 20px rgba(0, 0, 0, 0.1)"
+                        as={motion.div}
+                        initial="closed"
+                        animate={isOpen ? "open" : "closed"}
+                        variants={variants}
+                        transition={transition}
+                        css={{
+                            "&::-webkit-scrollbar": {
+                                width: "0",
+                            },
+                            "&::-webkit-scrollbar-thumb": {
+                                backgroundColor: "#888",
+                            },
+                        }}>
+                            {selectedPackager && <UnlockHistory packager={selectedPackager} unlockHistory={packagerUnlocks} />}
+                        </Box>
+                    {/*</Collapse>*/}
+                </Box>
+
+
+            </Box>
+        </Center>
     );
+
 }
 
 export default MyPackagers;

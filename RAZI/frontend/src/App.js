@@ -28,7 +28,7 @@ function App() {
 			}}>
 				<Flex className="App" direction={"column"} height={"100vh"} padding={8}>
 					<Header title="My application"></Header>
-					<Flex flexGrow={1} overflowY="auto" paddingBottom={"8%"}>
+					<Flex flexGrow={1} overflowY="auto" paddingBottom={"0"}>
 						<Routes>
 							<Route path="/" exact element={<Home />}></Route>
 							<Route path="/login" exact element={<Login />}></Route>
