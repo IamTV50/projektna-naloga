@@ -22,7 +22,7 @@ import java.io.IOException
 
 class MyApp : Application() {
     lateinit var userInfo: SharedPreferences
-    val backend = "http://192.168.0.14:3001"
+    val backend = "http://164.8.113.38:3001"
     val format = 2
 
     override fun onCreate() {

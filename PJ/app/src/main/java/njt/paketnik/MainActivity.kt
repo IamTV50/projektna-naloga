@@ -57,6 +57,11 @@ class MainActivity : AppCompatActivity() {
         binding.logoutBtn.setOnClickListener{
             app.unsetUser()
         }
+
+        binding.openPackagersList.setOnClickListener {
+            val intent = Intent(this, Packagers::class.java)
+            startActivity(intent)
+        }
     }
 
     private val qrScannerActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
