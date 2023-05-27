@@ -9,6 +9,7 @@
     <string name="resultText">Result</string>
     <string name="statusText">Status</string>
     <string name="packagersText">Packagers</string>
+    <string name="unlocksText">Unlocks</string>
     <string name="settingsText">Settings</string>
     <string name="logoutText">Logout</string>
 

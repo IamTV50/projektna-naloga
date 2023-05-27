@@ -64,6 +64,16 @@
         app:layout_constraintTop_toBottomOf="@+id/statusTxt" />
 
     <Button
+        android:id="@+id/openUnlocksList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/unlocksText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/openPackagersList" />
+
+    <Button
         android:id="@+id/openSettings"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -71,6 +81,6 @@
         android:text="@string/settingsText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/openPackagersList" />
+        app:layout_constraintTop_toBottomOf="@+id/openUnlocksList" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

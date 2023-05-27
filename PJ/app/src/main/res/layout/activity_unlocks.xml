@@ -4,10 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".PackagersActivity">
+    tools:context=".UnlocksActivity">
 
     <ListView
-        android:id="@+id/packagerList"
+        android:id="@+id/unlocksList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </ListView>

@@ -78,6 +78,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        binding.openUnlocksList.setOnClickListener {
+            val intent = Intent(this, UnlocksActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.openSettings.setOnClickListener {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
