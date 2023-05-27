@@ -13,9 +13,7 @@ root.render(
     <ChakraProvider theme={customTheme}>
         <ColorModeScript initialColorMode={customTheme.config.initialColorMode} />
         <CSSReset />
-        <Box p={8}>
-            <App />
-        </Box>
+        <App />
     </ChakraProvider>
   </React.StrictMode>
 );

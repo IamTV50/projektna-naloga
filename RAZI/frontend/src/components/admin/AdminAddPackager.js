@@ -61,15 +61,15 @@ function AdminAddPackager() {
                 <FormLabel htmlFor='packagerNumber' mb='0'>
                     Številka paketnika:
                 </FormLabel>
-                <NumberInput>
-                    <NumberInputField id='packagerNumber' border="2px solid gray" _hover={{ border: "2px solid blue"}} value={number} onChange={(e)=>(setNumber(e.target.value))} type="number" name="packagerNumber" />
+                <NumberInput value={number} onChange={(valueString) => setNumber(Number(valueString))}>
+                    <NumberInputField id='packagerNumber' border="2px solid gray" _hover={{ border: "2px solid blue"}} type="text" name="packagerNumber" />
                 </NumberInput>
             </HStack>
             <HStack py={4}>
             <FormLabel htmlFor='publicPackager' mb='0'>
                 Public:
             </FormLabel>
-            <Switch id='publicPackager' checked={publicPackager} onChange={(e) => setPublicPackager(e.target.checked)} />
+            <Switch id='publicPackager' isChecked={publicPackager} onChange={(e) => setPublicPackager(e.target.checked)} />
             </HStack>
             <Button variant="blue" type="submit" name="submit">Dodaj</Button>
             <Box h={4}/>

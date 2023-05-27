@@ -83,22 +83,26 @@ function AdminGetRequest(props) {
 	console.log(props);
 
     return (
-        <Card variant={"elevated"} backgroundColor={"gray.300"} mb={5} p={5}>
-            <Text>Uporabnik: {props.request.user ? props.request.user.username : "[deleted]"}</Text>
-            <Text>Paketnik: {props.request.packager ? props.request.packager.number : "[deleted]"}</Text>
-            <Text>Razlog: {props.request.reason}</Text>
-            <Text>Datum: {new Date(props.request.created).toLocaleString("de-DE")}</Text>
-            <HStack>
-                <Button variant={"green"} onClick={acceptRequest}>Accept</Button>
-                <Button variant={"red"} onClick={deleteRequest}>Delete</Button>
-            </HStack>
-            {error !== "" && (
-                <Alert status="error">
-                    <AlertIcon/>
-                    {error}
-                </Alert>
-            )}
-        </Card>
+        <>
+			{!props.request.packager.owner && (
+				<Card variant={"elevated"} backgroundColor={"gray.300"} mb={5} p={5}>
+					<Text>Uporabnik: {props.request.user ? props.request.user.username : "[deleted]"}</Text>
+					<Text>Paketnik: {props.request.packager ? props.request.packager.number : "[deleted]"}</Text>
+					<Text>Razlog: {props.request.reason}</Text>
+					<Text>Datum: {new Date(props.request.created).toLocaleString("de-DE")}</Text>
+					<HStack>
+						<Button variant={"green"} onClick={acceptRequest}>Accept</Button>
+						<Button variant={"red"} onClick={deleteRequest}>Delete</Button>
+					</HStack>
+					{error !== "" && (
+						<Alert status="error">
+							<AlertIcon/>
+							{error}
+						</Alert>
+					)}
+				</Card>
+			)}
+		</>
         // <div>
         //     <p>User: {props.request.user ? props.request.user.username : "[deleted]"}</p>
         //     <p>Packager: {props.request.packager ? props.request.packager.number : "[deleted]"}</p>

@@ -1,7 +1,17 @@
 import React from "react";
 import { UserContext } from "../userContext";
 import { Link } from "react-router-dom";
-import {Button, ButtonGroup, HStack, IconButton, Spacer, useColorMode, useColorModeValue} from "@chakra-ui/react";
+import {
+    Button,
+    ButtonGroup,
+    Flex,
+    HStack,
+    IconButton,
+    Spacer,
+    Stack,
+    useColorMode,
+    useColorModeValue
+} from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 function Header(props) {
@@ -9,26 +19,26 @@ function Header(props) {
     const { colorMode, toggleColorMode } = useColorMode()
     const color = useColorModeValue('white', `gray.800`)
     return (
-        <header>
-            <HStack paddingBottom={8}>
-                <ButtonGroup>
-                    <Button variant='header' as={Link} to='/'>Home</Button>
+        <Flex as="nav" wrap={"wrap"} justify={"space-between"} paddingBottom={8}>
+            {/*<HStack paddingBottom={8}>*/}
+            <Stack direction={["column", "row"]} spacing={4}>
+                    <Button as={Link} to='/'>Home</Button>
                     <UserContext.Consumer>
                         {context => (
                             context.user ?
                                 <>
-                                <Button variant='header' as={Link} to='/my-packagers'>My Packagers</Button>
-                                <Button variant='header' as={Link} to='/profile'>Profile</Button>
-                                <Button variant='header' as={Link} to='/logout'>Logout</Button>
+                                <Button as={Link} to='/my-packagers'>My Packagers</Button>
+                                <Button as={Link} to='/profile'>Profile</Button>
+                                <Button as={Link} to='/logout'>Logout</Button>
                                 </>
                                 :
                                 <>
-                                <Button variant='header' as={Link} to='/login'>Login</Button>
-                                <Button variant='header' as={Link} to='/register'>Register</Button>
+                                <Button as={Link} to='/login'>Login</Button>
+                                <Button as={Link} to='/register'>Register</Button>
                                 </>
                         )}
                     </UserContext.Consumer>
-                </ButtonGroup>
+            </Stack>
                 <Spacer/>
                 <UserContext.Consumer>
                     {context => (
@@ -65,8 +75,8 @@ function Header(props) {
 
 
 
-            </HStack>
-        </header >
+            {/*</HStack>*/}
+        </Flex >
     );
 }
 

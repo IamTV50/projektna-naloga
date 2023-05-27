@@ -4,6 +4,7 @@ const userController = require('../controllers/userController.js');
 
 router.get('/profile', userController.profile);
 router.get('/logout', userController.logout);
+router.get('/myPackagers', userController.myPackagers);
 router.get('/', userController.list);
 router.get('/:id', userController.show);
 

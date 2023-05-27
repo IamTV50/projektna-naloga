@@ -55,7 +55,7 @@ module.exports = {
     userRequestsList: function (req, res) {
         var userId = req.params.id;
 
-        RequestModel.find({user: userId}).populate("user").populate("packager").exec(function (err, requests) {
+        RequestModel.find({user: userId}).populate("user").populate("packager").sort({ created: 'desc' }).exec(function (err, requests) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting request.',
@@ -107,13 +107,16 @@ module.exports = {
 
 		PackagerModel.findOne({number: packagerNumber}, function (err, packager) {
 			if (err) {
+                console.log("Error when getting packager")
                 return res.status(500).json({
+
                     message: 'Error when getting packager.',
                     error: err
                 });
             }
 
             if (!packager) {
+                console.log("No such packager" + packagerNumber)
                 return res.status(404).json({
                     message: 'No such packager'
                 });
@@ -142,9 +145,15 @@ module.exports = {
                             error: err
                         });
                     }
-                    return res.status(201).json(request);
-                })
 
+					// Remove password from user object
+					if (request.user) {
+						request = request.toObject(); // Convert Mongoose document to plain JavaScript object
+						delete request.user.password;
+					}
+
+                    return res.status(201).json(request);
+                });
 			});
 		});
     },
@@ -195,7 +204,7 @@ module.exports = {
                 });
             }
 
-            return res.status(204).json();
+            return res.status(204).json({});
         });
     }
 };
