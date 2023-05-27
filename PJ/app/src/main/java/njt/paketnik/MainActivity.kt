@@ -11,6 +11,7 @@ import android.media.MediaPlayer
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
@@ -95,17 +96,17 @@ class MainActivity : AppCompatActivity() {
             if (intentResult.contents.isNullOrEmpty()) {
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
             } else {
-                val boxId = getNumberFromUrl(intentResult.contents)
-                binding.resultTxt.text = boxId?.toString() ?: "Invalid URL"
+                val boxNumber = getNumberFromUrl(intentResult.contents)
+                binding.resultTxt.text = boxNumber?.toString() ?: "Invalid URL"
 
-                if (boxId != null) {
+                if (boxNumber != null) {
                     var apiUrl: String
                     var resJson: JSONObject
                     var response: String
 
                     lifecycleScope.launch {
                         if (!app.userInfo.getBoolean("admin", false)) {
-                            apiUrl = "${app.backend}/packagers/byNumber/$boxId"
+                            apiUrl = "${app.backend}/packagers/byNumber/$boxNumber"
                             response = app.sendGetRequest(apiUrl)
 
                             try {
@@ -138,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                                 }
 
                                 if (!packagerIds.contains(resJson["_id"].toString())) {
-                                    binding.statusTxt.text = getString(R.string.notContainPackagerText, boxId.toString())
+                                    binding.statusTxt.text = getString(R.string.notContainPackagerText, boxNumber.toString())
                                     return@launch
                                 }
                             }
@@ -146,7 +147,7 @@ class MainActivity : AppCompatActivity() {
 
                         val format = app.settings.getInt("Format", 1) + 1
                         apiUrl = "https://api-d4me-stage.direct4.me/sandbox/v1/Access/openbox"
-                        val jsonData = "{\"deliveryId\":0,\"boxId\":$boxId,\"tokenFormat\":${format},\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
+                        val jsonData = "{\"deliveryId\":0,\"boxId\":$boxNumber,\"tokenFormat\":${format},\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
 
                         response = app.sendPostRequest(apiUrl, jsonData)
 
@@ -157,7 +158,7 @@ class MainActivity : AppCompatActivity() {
                                 binding.statusTxt.text = getString(R.string.responseErrorText)
                             } else {
                                 binding.statusTxt.text = getString(R.string.successText)
-                                convertB64ToSound(resJson["data"].toString(), format)
+                                convertB64ToSound(resJson["data"].toString(), format, boxNumber)
                             }
                         } catch (e: JSONException) {
                             if (response == "") {
@@ -190,7 +191,7 @@ class MainActivity : AppCompatActivity() {
         qrScannerActivityResultLauncher.launch(integrator.createScanIntent())
     }
 
-    private fun convertB64ToSound(base64String: String, format: Int) {
+    private fun convertB64ToSound(base64String: String, format: Int, boxNumber: Int) {
         try {
             val byteArray = Base64.decode(base64String, Base64.DEFAULT)
 
@@ -206,7 +207,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     val soundBytes = outputStream.toByteArray()
-                    playSoundFile(soundBytes, format)
+                    playSoundFile(soundBytes, format, boxNumber)
                     gzipInputStream.close()
                 }
 
@@ -225,7 +226,7 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             val soundBytes = outputStream.toByteArray()
-                            playSoundFile(soundBytes, format)
+                            playSoundFile(soundBytes, format, boxNumber)
 
                             break
                         }
@@ -235,7 +236,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 5, 6 -> {
-                    playSoundFile(byteArray, format)
+                    playSoundFile(byteArray, format, boxNumber)
                 }
 
                 else -> throw IllegalArgumentException("Wrong format given: $format")
@@ -268,7 +269,7 @@ class MainActivity : AppCompatActivity() {
         return tempFile
     }
 
-    private fun playSoundFile(soundBytes: ByteArray, format: Int) {
+    private fun playSoundFile(soundBytes: ByteArray, format: Int, boxNumber: Int) {
         releaseMediaPlayer()
 
         try {
@@ -282,9 +283,96 @@ class MainActivity : AppCompatActivity() {
             )
             mediaPlayer?.setDataSource(soundFile.path)
             mediaPlayer?.prepare()
+            mediaPlayer?.setOnCompletionListener {
+                showUnlockConfirmationDialog(boxNumber)
+            }
             mediaPlayer?.start()
         } catch (e: IOException) {
             e.printStackTrace()
+        }
+    }
+
+    private fun showUnlockConfirmationDialog(boxNumber: Int) {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Unlock Confirmation")
+            .setMessage("Was the unlock successful?")
+            .setPositiveButton("Yes") { _, _ ->
+                showSpinnerDialog(true, boxNumber)
+            }
+            .setNegativeButton("No") { _, _ ->
+                showSpinnerDialog(false, boxNumber)
+            }
+            .setCancelable(false)
+            .create()
+        dialog.show()
+    }
+
+    private fun showSpinnerDialog(success: Boolean, boxNumber: Int) {
+        val items = if (success) {
+            resources.getStringArray(R.array.addUnlockTrue)
+        } else {
+            resources.getStringArray(R.array.addUnlockFalse)
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Select Option")
+            .setItems(items) { _, which ->
+                val selectedOption = items[which]
+                addUnlock(success, selectedOption, boxNumber)
+            }
+            .setCancelable(false)
+            .create()
+        dialog.show()
+    }
+
+    private fun addUnlock(success: Boolean, reason: String, boxNumber: Int) {
+        var apiUrl: String
+        var resJson: JSONObject
+        var response: String
+        var boxId: String
+
+        lifecycleScope.launch {
+            apiUrl = "${app.backend}/packagers/byNumber/$boxNumber"
+            response = app.sendGetRequest(apiUrl)
+
+            try {
+                resJson = JSONObject(response)
+
+                if (resJson.has("message")) {
+                    binding.statusTxt.text = getString(R.string.responseErrorText)
+                    return@launch
+                } else {
+                    boxId = resJson["_id"].toString()
+                }
+            } catch (e: JSONException) {
+                if (response == "") {
+                    binding.statusTxt.text = getString(R.string.unexpectedResponseText)
+                } else {
+                    binding.statusTxt.text = getString(R.string.parsingErrorText)
+                }
+                return@launch
+            }
+
+            apiUrl = "${app.backend}/unlocks"
+            val jsonData = "{\"packager\":\"$boxId\",\"user\":\"${app.userInfo.getString("userID", "")}\",\"success\":$success,\"status\":\"$reason\"}"
+
+            response = app.sendPostRequest(apiUrl, jsonData)
+
+            try {
+                resJson = JSONObject(response)
+
+                if (resJson.has("error")) {
+                    binding.statusTxt.text = getString(R.string.responseErrorText)
+                } else {
+                    binding.statusTxt.text = getString(R.string.successText)
+                }
+            } catch (e: JSONException) {
+                if (response == "") {
+                    binding.statusTxt.text = getString(R.string.unexpectedResponseText)
+                } else {
+                    binding.statusTxt.text = getString(R.string.parsingErrorText)
+                }
+            }
         }
     }
 

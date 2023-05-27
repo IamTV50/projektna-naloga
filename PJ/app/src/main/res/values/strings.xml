@@ -12,6 +12,19 @@
     <string name="unlocksText">Unlocks</string>
     <string name="settingsText">Settings</string>
     <string name="logoutText">Logout</string>
+    <string-array name="addUnlockTrue">
+        <item>Picked up package</item>
+        <item>Delivered package</item>
+        <item>Box full</item>
+        <item>Other/Maintenance</item>
+    </string-array>
+    <string-array name="addUnlockFalse">
+        <item>No sound</item>
+        <item>Wrong packager</item>
+        <item>Lock failiure</item>
+        <item>Low battery</item>
+        <item>Other</item>
+    </string-array>
 
     <string name="textViewTheme">Theme:</string>
     <string name="textViewFormat">Format:</string>
