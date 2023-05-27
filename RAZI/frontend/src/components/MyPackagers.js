@@ -40,6 +40,7 @@ import { animated, useSpring } from '@react-spring/web'
 import {AddIcon} from "@chakra-ui/icons";
 import UnlockHistory from "./UnlockHistory";
 import Request from "./Request";
+import UserRequest from "./UserRequest";
 import { motion } from "framer-motion";
 
 function MyPackagers(){
@@ -48,6 +49,7 @@ function MyPackagers(){
     const [packagers, setPackagers] = useState([]);
     const [user, setUser] = useState(null);
     const [requests, setRequests] = useState([]);
+	const [userRequests, setUserRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { isOpen, onToggle } = useDisclosure()
     const [selectedPackager, setSelectedPackager] = useState(null);
@@ -120,17 +122,30 @@ function MyPackagers(){
 				console.log(data)
 			}
         }
-        getUser();
-    }, []);
 
-    useEffect(function() {
         const getRequests = async function(){
             const res = await fetch(`http://localhost:3001/requests/user/${userContext.user._id}`);
             const data = await res.json();
             console.log(data)
             setRequests(data);
         }
+
+		const getUserRequests = async function(){
+            const res = await fetch(`http://localhost:3001/requests/`);
+            const data = await res.json();
+
+			// Filter the requests based on the condition
+			const filteredRequests = data.filter(
+				(request) => request.packager.owner === userContext.user._id
+			);
+
+            console.log(filteredRequests)
+            setUserRequests(filteredRequests);
+        }
+		
+		getUser();
         getRequests();
+		getUserRequests();
     }, []);
 
     const handleRequestAdd = (newRequest) => {
@@ -168,7 +183,66 @@ function MyPackagers(){
             })
             console.log(error);
         }
+    }
 
+	const handleUserRequestDelete = (requestId) => {
+        console.log("Deleting request with id: " + requestId);
+
+        try {
+            fetch(`http://localhost:3001/requests/${requestId}`, {
+                method: "DELETE",
+                credentials: "include"
+            });
+            const updatedRequests = userRequests.filter((request) => request._id !== requestId);
+            setUserRequests(updatedRequests);
+            toast({
+                title: "Request deleted",
+                description: "Request deleted successfully",
+                status: "success",
+                duration: 3000,
+            })
+        } catch (error) {
+            toast({
+                title: "Request not deleted",
+                description: "Request not deleted successfully",
+                status: "error",
+                duration: 3000,
+            })
+            console.log(error);
+        }
+    }
+
+	const handleUserRequestApprove = (request) => {
+        console.log("Approving request with id: " + request._id);
+
+        try {
+            fetch(`http://localhost:3001/users/addPackager`, {
+                method: "PUT",
+				credentials: "include",
+				headers: { 'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					username: request.user.username,
+					packagerNumber: request.packager.number
+				})
+            });
+            
+			handleUserRequestDelete(request._id);
+
+            toast({
+                title: "Request approved",
+                description: "Request approved successfully",
+                status: "success",
+                duration: 3000,
+            })
+        } catch (error) {
+            toast({
+                title: "Request not approved",
+                description: "Request not approved successfully",
+                status: "error",
+                duration: 3000,
+            })
+            console.log(error);
+        }
     }
 
     const Form = ({ firstFieldRef, onCancel }) => {
@@ -223,6 +297,8 @@ function MyPackagers(){
                         >
                             <Tab>My Packagers</Tab>
                             <Tab>My Requests</Tab>
+							<Tab>Approve Requests</Tab>
+							{/*<Tab>Packager Users</Tab>*/}
                             <Spacer/>
                             <Popover
                                 isOpen={isOpenPopover}
@@ -281,6 +357,24 @@ function MyPackagers(){
                                             requests.map((request) => (
                                                 <>
                                                     <Request key={request._id} request={request} handleDelete={handleRequestDelete}/>
+                                                    <Divider my={7}/>
+                                                </>
+                                            ))
+                                        )}
+                                    </Box>
+                            </TabPanel>
+							<TabPanel>
+                                    <Box flex={1} w="100%" h="100%" overflowY="auto">
+                                        {isLoading ? (
+                                            <Center>
+                                                <Spinner />
+                                            </Center>
+                                        ) : userRequests.length === 0 ? (
+                                            "No requests from other users"
+                                        ) : (
+                                            userRequests.map((request) => (
+                                                <>
+                                                    <UserRequest key={request._id} request={request} handleApprove={handleUserRequestApprove} handleDelete={handleUserRequestDelete}/>
                                                     <Divider my={7}/>
                                                 </>
                                             ))

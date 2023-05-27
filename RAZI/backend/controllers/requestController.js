@@ -145,9 +145,15 @@ module.exports = {
                             error: err
                         });
                     }
-                    return res.status(201).json(request);
-                })
 
+					// Remove password from user object
+					if (request.user) {
+						request = request.toObject(); // Convert Mongoose document to plain JavaScript object
+						delete request.user.password;
+					}
+
+                    return res.status(201).json(request);
+                });
 			});
 		});
     },
