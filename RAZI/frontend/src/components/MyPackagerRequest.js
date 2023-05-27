@@ -2,7 +2,7 @@ import React from "react";
 import {Badge, Box, Button, Heading, HStack, IconButton, Spacer, Text, VStack} from "@chakra-ui/react";
 import {ArrowForwardIcon, CheckIcon, CloseIcon} from "@chakra-ui/icons";
 
-function UserRequest(props) {
+function MyPackagerRequest(props) {
 	const handleRequestApprove = () => {
         props.handleApprove(props.request);
     }
@@ -33,4 +33,4 @@ function UserRequest(props) {
     );
 }
 
-export default UserRequest;
+export default MyPackagerRequest;

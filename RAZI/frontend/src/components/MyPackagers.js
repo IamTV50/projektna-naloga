@@ -40,16 +40,18 @@ import { animated, useSpring } from '@react-spring/web'
 import {AddIcon} from "@chakra-ui/icons";
 import UnlockHistory from "./UnlockHistory";
 import Request from "./Request";
-import UserRequest from "./UserRequest";
+import MyPackagerRequest from "./MyPackagerRequest";
+import MyPackagerUsers from "./MyPackagerUsers";
 import { motion } from "framer-motion";
 
 function MyPackagers(){
     const toast = useToast()
     const userContext = useContext(UserContext);
     const [packagers, setPackagers] = useState([]);
-    const [user, setUser] = useState(null);
+    const [userChanges, setUserChanges] = useState(false);
     const [requests, setRequests] = useState([]);
-	const [userRequests, setUserRequests] = useState([]);
+	const [myPackagerRequests, setMyPackagerRequests] = useState([]);
+	const [myPackagerUsers, setMyPackagerUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { isOpen, onToggle } = useDisclosure()
     const [selectedPackager, setSelectedPackager] = useState(null);
@@ -107,7 +109,7 @@ function MyPackagers(){
     };
 
     useEffect(function() {
-        const getUser = async function() {
+        const getUserPackagers = async function() {
 			if (userContext.user.admin) {
 				const res = await fetch(`http://localhost:3001/packagers`);
 				const data = await res.json();
@@ -130,7 +132,7 @@ function MyPackagers(){
             setRequests(data);
         }
 
-		const getUserRequests = async function(){
+		const getMyPackagerRequests = async function(){
             const res = await fetch(`http://localhost:3001/requests/`);
             const data = await res.json();
 
@@ -140,13 +142,25 @@ function MyPackagers(){
 			);
 
             console.log(filteredRequests)
-            setUserRequests(filteredRequests);
+            setMyPackagerRequests(filteredRequests);
         }
 		
-		getUser();
+		getUserPackagers();
         getRequests();
-		getUserRequests();
+		getMyPackagerRequests();
     }, []);
+
+	useEffect(function() {
+		const getMyPackagerUsers = async function(){
+			const res = await fetch(`http://localhost:3001/users/myPackagers/`, {credentials: "include"});
+			const data = await res.json();
+
+			console.log(data)
+			setMyPackagerUsers(data);
+		}
+
+		getMyPackagerUsers();
+    }, [userChanges]);
 
     const handleRequestAdd = (newRequest) => {
         toast({
@@ -193,8 +207,8 @@ function MyPackagers(){
                 method: "DELETE",
                 credentials: "include"
             });
-            const updatedRequests = userRequests.filter((request) => request._id !== requestId);
-            setUserRequests(updatedRequests);
+            const updatedRequests = myPackagerRequests.filter((request) => request._id !== requestId);
+            setMyPackagerRequests(updatedRequests);
             toast({
                 title: "Request deleted",
                 description: "Request deleted successfully",
@@ -238,6 +252,39 @@ function MyPackagers(){
             toast({
                 title: "Request not approved",
                 description: "Request not approved successfully",
+                status: "error",
+                duration: 3000,
+            })
+            console.log(error);
+        }
+    }
+
+	const handleUserPackagerDelete = (user, packager) => {
+        console.log("Deleting packager with id: " + packager._id + " from user with id: " + user._id);
+
+        try {
+            fetch(`http://localhost:3001/users/removePackager`, {
+                method: "PUT",
+				credentials: "include",
+				headers: { 'Content-Type': 'application/json'},
+				body: JSON.stringify({
+					username: user.username,
+					packagerNumber: packager.number
+				})
+            });
+
+            setUserChanges(!userChanges);
+
+            toast({
+                title: "Packager deleted",
+                description: "Packager deleted successfully",
+                status: "success",
+                duration: 3000,
+            })
+        } catch (error) {
+            toast({
+                title: "Packager not deleted",
+                description: "Packager not deleted successfully",
                 status: "error",
                 duration: 3000,
             })
@@ -298,7 +345,7 @@ function MyPackagers(){
                             <Tab>My Packagers</Tab>
                             <Tab>My Requests</Tab>
 							<Tab>Approve Requests</Tab>
-							{/*<Tab>Packager Users</Tab>*/}
+							{/*<Tab>My Packager Users</Tab>*/}
                             <Spacer/>
                             <Popover
                                 isOpen={isOpenPopover}
@@ -369,18 +416,36 @@ function MyPackagers(){
                                             <Center>
                                                 <Spinner />
                                             </Center>
-                                        ) : userRequests.length === 0 ? (
+                                        ) : myPackagerRequests.length === 0 ? (
                                             "No requests from other users"
                                         ) : (
-                                            userRequests.map((request) => (
+                                            myPackagerRequests.map((request) => (
                                                 <>
-                                                    <UserRequest key={request._id} request={request} handleApprove={handleUserRequestApprove} handleDelete={handleUserRequestDelete}/>
+                                                    <MyPackagerRequest key={request._id} request={request} handleApprove={handleUserRequestApprove} handleDelete={handleUserRequestDelete}/>
                                                     <Divider my={7}/>
                                                 </>
                                             ))
                                         )}
                                     </Box>
                             </TabPanel>
+							{/*<TabPanel>
+                                    <Box flex={1} w="100%" h="100%" overflowY="auto">
+                                        {isLoading ? (
+                                            <Center>
+                                                <Spinner />
+                                            </Center>
+                                        ) : myPackagerUsers.length === 0 ? (
+                                            "No requests from other users"
+                                        ) : (
+                                            myPackagerUsers.map((user) => (
+                                                <>
+                                                    <MyPackagerUsers key={user._id} user={user} owner={userContext.user._id} handleDelete={handleUserPackagerDelete}/>
+                                                    <Divider my={7}/>
+                                                </>
+                                            ))
+                                        )}
+                                    </Box>
+							</TabPanel>*/}
                         </TabPanels>
                     </Tabs>
                 </Box>

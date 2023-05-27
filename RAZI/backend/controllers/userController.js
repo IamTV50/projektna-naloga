@@ -50,6 +50,7 @@ module.exports = {
 
     profile: function(req, res, next){
         UserModel.findById(req.session.userId)
+			.populate("packagers")
             .exec(function(error, user){
                 if(error){
                     return next(error);
@@ -154,6 +155,43 @@ module.exports = {
                 }
             });
         }
+    },
+
+	myPackagers: function (req, res) {
+		var id = req.session.userId;
+		console.log(id);
+
+        // Find all packagers where the owner is the specified user ID
+		PackagerModel.find({ owner: id }, function (err, packagers) {
+			if (err) {
+				return res.status(500).json({
+					message: 'Error when getting packagers.',
+					error: err
+				});
+			}
+
+			//console.log(packagers);
+
+			// Get an array of packager IDs
+			var packagerIds = packagers.map(function (packager) {
+				return packager._id;
+			});
+
+			// Find all users that have any of the packager IDs in their packagers array
+			UserModel.find({ packagers: { $in: packagerIds }, admin: false  })
+				.populate("packagers")
+				.select('-password') // Exclude the 'password' field from the result
+				.exec(function (err, users) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when getting users.',
+							error: err
+						});
+					}
+
+					return res.json(users);
+				});
+		});
     },
 
     update: function (req, res) {

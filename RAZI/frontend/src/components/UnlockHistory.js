@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from 'react-router-dom';
 import {
+	Badge,
 	Box,
 	Heading,
 	Spinner,
@@ -70,6 +71,8 @@ function UnlockHistory({ packager, unlockHistory }) {
 						<Box flexShrink='0'>
 							<StepTitle>{new Date(unlock.openedOn).toLocaleString("de-DE")}</StepTitle>
 							<StepDescription>By: {unlock.user.username}</StepDescription>
+							<StepDescription>Success: {unlock.success ? <Badge colorScheme={"green"}>Opened</Badge> : <Badge colorScheme={"red"}>Failed</Badge>}</StepDescription>
+							<StepDescription>Reason: {unlock.status}</StepDescription>
 						</Box>
 						<StepSeparator />
 					</Step>
