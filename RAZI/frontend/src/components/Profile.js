@@ -10,7 +10,7 @@ import {
     AlertDialogOverlay,
     Button,
     Card,
-    CardBody, useDisclosure,
+    CardBody, CardFooter, CardHeader, Center, Heading, Text, useDisclosure,
     VStack
 } from "@chakra-ui/react";
 import {hover} from "@testing-library/user-event/dist/hover";
@@ -44,18 +44,21 @@ function Profile() {
     };
 
     return (
-        <>
-            <VStack alignItems={"self-start"}>
-                {!userContext.user ? <Navigate replace to="/login" /> : ""}
-                <h1>Uporabniški račun</h1>
-                <Card variant="elevated" bgColor="gray.300" display="inline-block" my={2} padding={4} paddingBottom={0}>
-                    <CardBody >
-                        <p>Username: {profile.username}</p>
-                        <p>Email: {profile.email}</p>
-                    </CardBody>
-                </Card>
-                <Button variant="red" onClick={onOpen}>Delete Profile</Button>
-            </VStack>
+        <Center flex={1}>
+            {userContext.user ? "" : <Navigate replace to="/" />}
+            <Card alignItems={"center"} paddingX={"6%"} paddingTop={4} bgColor={"gray.100"} borderRadius={"25"} variant={"elevated"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
+                <CardHeader>
+                    <Heading >My profile</Heading>
+                </CardHeader>
+                <CardBody>
+                    <Text>Username: {profile.username}</Text>
+                    <Text>Email: {profile.email}</Text>
+                </CardBody>
+                <CardFooter>
+                    <Button colorScheme="red" onClick={onOpen}>Delete Profile</Button>
+                </CardFooter>
+
+            </Card>
             <AlertDialog
                 isOpen={isOpen}
                 leastDestructiveRef={cancelRef}
@@ -64,7 +67,7 @@ function Profile() {
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                            Delete Customer
+                            Delete Profile
                         </AlertDialogHeader>
 
                         <AlertDialogBody>
@@ -72,18 +75,17 @@ function Profile() {
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
-                            <Button variant="blue" ref={cancelRef} onClick={onClose}>
+                            <Button colorScheme={"blue"} ref={cancelRef} onClick={onClose}>
                                 Cancel
                             </Button>
-                            <Button variant='red' onClick={deleteProfile} ml={3}>
+                            <Button colorScheme={"red"} onClick={deleteProfile} ml={3}>
                                 Delete
                             </Button>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialogOverlay>
             </AlertDialog>
-
-        </>
+        </Center>
     );
 }
 

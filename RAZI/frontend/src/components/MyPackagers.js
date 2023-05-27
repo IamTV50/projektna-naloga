@@ -369,7 +369,7 @@ function MyPackagers(){
                             </Popover>
                             {/*<IconButton aria-label="Search database" position="relative" right={0} icon={<AddIcon />} />*/}
                         </TabList>
-                        <TabPanels>
+                        <TabPanels paddingLeft={4} paddingTop={2}>
                             <TabPanel>
                                     <Box flex={1} w="100%" h="100%" overflowY="auto">
                                         {isLoading ? (

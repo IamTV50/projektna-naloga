@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import {Box, Divider} from "@chakra-ui/react";
+import AdminGetPackager from "./AdminGetPackager";
 
 function AdminShowPackagers(){
 	const [packagers, setPackagers] = useState({})
@@ -35,7 +37,7 @@ function AdminShowPackagers(){
 			return res.json();
 		})
 		.then((data) => {
-			setPackagerChanged(packagerChanged ? false : true)
+			setPackagerChanged(!packagerChanged)
 		})
 		.catch((err) => {
 			console.log("Error during fetch", err); // Handle the network error here
@@ -55,27 +57,28 @@ function AdminShowPackagers(){
 			return res.json();
 		})
 		.then((data) => {
-			setPackagerChanged(packagerChanged ? false : true)
+			setPackagerChanged(!packagerChanged)
 		})
 		.catch((err) => {
 			console.log("Error during fetch", err); // Handle the network error here
 		});
     };
 
-	return ( 
-		<div>
-			{isLoading ? "" : packagers.map(packager => (
-				<li key={packager._id}>
-					<span>package number: {packager.number} </span>
-					<span>visibility: {packager.public ? "public" : "private"} </span>
-					<span>active: {packager.active ? "yes" : "no"} </span>
-					{packager.active ? 
-						<button onClick={() => setPackagerToNotActive(packager._id)}>deactivate</button>
-						: <button onClick={() => setPackagerToActive(packager._id)}>activate</button>
-					}
-				</li>
-			))}
-		</div>
+	return (
+		<Box flex={1} w="100%" h="100%" overflowY="auto">
+			<div>
+				{isLoading ? "" : packagers.map(packager => (
+					<>
+						<AdminGetPackager
+							key={packager._id}
+							packager={packager}
+							setPackagerToNotActive={setPackagerToNotActive}
+							setPackagerToActive={setPackagerToActive}/>
+						<Divider />
+					</>
+				))}
+			</div>
+		</Box>
 	 );
 }
  

@@ -1,76 +1,71 @@
 import React, { useState } from "react";
 import { confirmAlert } from 'react-confirm-alert';
-import {Alert, AlertIcon, Button, Card, HStack, Text} from "@chakra-ui/react";
+import {
+	Alert,
+	AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader,
+	AlertDialogOverlay,
+	AlertIcon, Badge,
+	Button,
+	Card,
+	HStack, Spacer,
+	Text,
+	useDisclosure
+} from "@chakra-ui/react";
 
-function AdminGetRequest(props) {
+function AdminGetRequest({ request, onRequestDeleted }) {
     const [error, setError] = useState("");
 
+	// Alert dialog
+	const { isOpen, onOpen, onClose } = useDisclosure()
+	const cancelRef = React.useRef()
+
+	const [isAccept, setIsAccept] = useState(false);
+
+	const AcceptRequest = () => {
+		setIsAccept(true);
+		onOpen();
+	}
+
+	const DeleteRequest = () => {
+		setIsAccept(false);
+		onOpen();
+	}
+
 	const acceptRequest = () => {
-        confirmAlert({
-            title: 'Confirm to submit',
-            message: 'Are you sure you want to accept this request?',
-            buttons: [
-                {
-                    label: 'Yes',
-                    onClick: () => {
-                        fetch(`http://localhost:3001/users/addPackager`, {
-                            method: "PUT",
-							credentials: "include",
-							headers: { 'Content-Type': 'application/json'},
-							body: JSON.stringify({
-								username: props.request.user.username,
-								packagerNumber: props.request.packager.number
-							})
-                        }).then((res) => res.json())
-						.then((data) => {
-							if (data.message) {
-								setError(data.message);
-							}
+		fetch(`http://localhost:3001/users/addPackager`, {
+			method: "PUT",
+			credentials: "include",
+			headers: { 'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				username: request.user.username,
+				packagerNumber: request.packager.number
+			})
+		}).then((res) => res.json())
+		.then((data) => {
+			if (data.message) {
+				setError(data.message);
+			}
 
-							if (!data.error) {
-								Delete();
-							}
-						})
-						.catch((err) => {
-							console.log("Error adding packager to user", err);
-							setError("Error occurred while accepting the request!");
-						});
-                    }
-                },
-                {
-                    label: 'No',
-                }
-            ]
-        });
-    };
-
-	const deleteRequest = () => {
-        confirmAlert({
-            title: 'Confirm to submit',
-            message: 'Are you sure you want to delete this request?',
-            buttons: [
-                {
-                    label: 'Yes',
-                    onClick: () => {
-                        Delete();
-                    }
-                },
-                {
-                    label: 'No',
-                }
-            ]
-        });
-    };
+			if (!data.error) {
+				Delete();
+			}
+		})
+		.catch((err) => {
+			console.log("Error adding packager to user", err);
+			setError("Error occurred while accepting the request!");
+		});
+    }
 
 	const Delete = async () => {
 		try {
-			const response = await fetch(`http://localhost:3001/requests/${props.request._id}`, {
+			const response = await fetch(`http://localhost:3001/requests/${request._id}`, {
 				method: "DELETE",
 				credentials: "include",
 			});
 		
 			if (response.status === 204) {
-				props.onRequestDeleted(props.request._id);
+				onRequestDeleted(request._id);
+				onClose();
 			} else {
 				setError("Error occurred while deleting the request!");
 			}
@@ -80,19 +75,25 @@ function AdminGetRequest(props) {
 		}
 	};
 
-	console.log(props);
 
     return (
         <>
-			{!props.request.packager.owner && (
+			{!request.packager.owner && (
 				<Card variant={"elevated"} backgroundColor={"gray.300"} mb={5} p={5}>
-					<Text>Uporabnik: {props.request.user ? props.request.user.username : "[deleted]"}</Text>
-					<Text>Paketnik: {props.request.packager ? props.request.packager.number : "[deleted]"}</Text>
-					<Text>Razlog: {props.request.reason}</Text>
-					<Text>Datum: {new Date(props.request.created).toLocaleString("de-DE")}</Text>
 					<HStack>
-						<Button variant={"green"} onClick={acceptRequest}>Accept</Button>
-						<Button variant={"red"} onClick={deleteRequest}>Delete</Button>
+						<Text>Request by: {request.user ? request.user.username : "[deleted]"}</Text>
+						<Spacer/>
+						<Text>{new Date(request.created).toLocaleString("de-DE")}</Text>
+
+					</HStack>
+
+
+					<Text>Packager: <Badge colorScheme={"blue"} fontSize='1.1em'>{request.packager ? request.packager.number : "[deleted]"}</Badge></Text>
+					<Text>Description: {request.reason}</Text>
+
+					<HStack>
+						<Button colorScheme="green" onClick={AcceptRequest}>Accept</Button>
+						<Button colorScheme="red" onClick={DeleteRequest}>Delete</Button>
 					</HStack>
 					{error !== "" && (
 						<Alert status="error">
@@ -102,16 +103,46 @@ function AdminGetRequest(props) {
 					)}
 				</Card>
 			)}
+			<AlertDialog
+				isOpen={isOpen}
+				leastDestructiveRef={cancelRef}
+				onClose={onClose}
+				isCentered>
+				<AlertDialogOverlay>
+					<AlertDialogContent>
+						{isAccept ? (
+							<AlertDialogHeader fontSize='lg' fontWeight='bold'>
+								Accept Request
+							</AlertDialogHeader>
+						) : (
+							<AlertDialogHeader fontSize='lg' fontWeight='bold'>
+								Delete Request
+							</AlertDialogHeader>
+						)}
+
+						<AlertDialogBody>
+							Are you sure? You can't undo this action afterwards.
+						</AlertDialogBody>
+
+						<AlertDialogFooter>
+							<Button colorScheme={"blue"} ref={cancelRef} onClick={onClose}>
+								Cancel
+							</Button>
+							{isAccept ? (
+								<Button colorScheme={"green"} onClick={acceptRequest} ml={3}>
+									Accept
+								</Button>
+							) : (
+								<Button colorScheme={"red"} onClick={Delete} ml={3}>
+									Delete
+								</Button>
+							)}
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialogOverlay>
+			</AlertDialog>
+
 		</>
-        // <div>
-        //     <p>User: {props.request.user ? props.request.user.username : "[deleted]"}</p>
-        //     <p>Packager: {props.request.packager ? props.request.packager.number : "[deleted]"}</p>
-		// 	<p>Reason: {props.request.reason}</p>
-		// 	<p>Date: {new Date(props.request.created).toLocaleString("de-DE")}</p>
-		// 	<button onClick={acceptRequest}>Accept</button>
-        //     <button onClick={deleteRequest}>Delete</button>
-		// 	<p>{error}</p>
-        // </div>
     );
 }
  

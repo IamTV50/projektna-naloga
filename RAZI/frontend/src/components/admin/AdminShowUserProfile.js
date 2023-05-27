@@ -1,6 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from 'react-router-dom';
 import { confirmAlert } from 'react-confirm-alert';
+import {
+	Badge,
+	Box, Button,
+	Card,
+	Center, Divider,
+	Heading, HStack, IconButton, Spacer,
+	Tab,
+	TabList,
+	TabPanel,
+	TabPanels,
+	Tabs,
+	Text,
+	useColorMode, VStack
+} from "@chakra-ui/react";
+import {CloseIcon} from "@chakra-ui/icons";
 
 function AdminShowUserProfile() {
 	const location = useLocation();
@@ -10,6 +25,7 @@ function AdminShowUserProfile() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [packagerNumber, setPackagerNumber] = useState(0)
 	const [error, setError] = useState("");
+	const { colorMode, toggleColorMode } = useColorMode()
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -101,52 +117,110 @@ function AdminShowUserProfile() {
         });
     };
 
-	return ( 
-		<div>
-			<div>
-				<h3>User info</h3>
-				<p>Username: {user.username}</p>
-				<p>Email: {user.email}</p>
-			</div>
-			<div>
-			<h3>User Packagers:</h3>
-				{user.packagers.length > 0 ? 
-				<ul>
-					{user.packagers.map((packager) => (
-					<li key={packager._id}>
-						<span>packager number: {packager.number}</span>
-						<button onClick={() => deletePackager(packager.number)}>delete</button>
-					</li>
-					))}
-				</ul> :
-					<span>No packagers found for the user.</span>
-				}
-			</div>
-			<div>
-				<h3>User unlocked packagers:</h3>
-				{isLoading ? ""
-				: userUnlocks.message !== undefined ? <span>{userUnlocks.message}</span> 
-				: <ul>
-					{userUnlocks.map((unlock) => (
-					<li key={unlock._id}>
-						<span>packager number: {unlock.packager.number}</span>
-						<span> successfully opened: {unlock.success ? "true" : "false"}</span>
-						<span> reason: {unlock.status}</span>
-						<span> date: {new Date(unlock.openedOn).toLocaleString("de-DE")}</span>
-					</li>
-					))}
-				</ul>
-				}
-			</div>
-			<div>
-				<form onSubmit={AddPackagerToUser}>
-					<input type="number" name="number" placeholder="Number"
-						value={packagerNumber} onChange={(e)=>(setPackagerNumber(e.target.value), setError(""))}/>
-					<input type="submit" name="submit" value="Add"/>
-					<label>{error}</label>
-				</form>
-			</div>
-		</div>
+	return (
+		<Center flex={1}>
+			<Box w="70%" h="70%" display="flex" flexDirection={"row"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} as={Card} bgColor={colorMode === "light" ? "gray.100" : "blue.800"}>
+				<Box w="30%" h="100%" display="flex" flexDirection={"column"} alignItems={"start"} padding={10}>
+					<Heading paddingBottom={10}>User info</Heading>
+					<Text>Username: {user.username}</Text>
+					<Text>Email: {user.email}</Text>
+				</Box>
+				<Box w="70%" h="100%" display="flex" flexDirection={"column"} alignItems={"start"} padding={10} overflow="auto"
+					 css={{
+						 "&::-webkit-scrollbar": {
+							 width: "0",
+						 },
+						 "&::-webkit-scrollbar-thumb": {
+							 backgroundColor: "#888",
+						 },
+					 }}>
+					<Tabs isLazy colorScheme={"blue"} flex={1} w={"100%"} h={"100%"}>
+						<TabList>
+							<Tab>User Packagers</Tab>
+							<Tab>User Unlocked Packagers</Tab>
+						</TabList>
+						<TabPanels>
+							<TabPanel>
+								<Box flex={1} w="100%" h="100%" overflowY="auto">
+								{user.packagers.length > 0 ?
+									<>
+										{user.packagers.map((packager) => (
+											<>
+												<HStack alignContent={"space-between"}>
+													<Heading size={"md"} key={packager._id}>Packager number: {packager.number}</Heading>
+													<Spacer/>
+													<IconButton aria-label='Delete reques' onClick={() => deletePackager(packager.number)} icon={<CloseIcon color={"red"}/>} />
+												</HStack>
+												<HStack paddingY={2}>
+													{packager.active ? <Badge colorScheme={"green"}>Active</Badge> : <Badge colorScheme={"red"}>Inactive</Badge>}
+													{packager.public ? <Badge colorScheme={"orange"}>Public</Badge> : <Badge bgColor={colorMode === "light" ? "gray.300" : ""}>Private</Badge>}
+												</HStack>
+												<Divider marginBottom={6}/>
+											</>
+										))}
+									</>
+									:
+									<Text>No packagers</Text>
+								}
+
+								</Box>
+							</TabPanel>
+							<TabPanel>
+							</TabPanel>
+						</TabPanels>
+					</Tabs>
+
+
+				</Box>
+			</Box>
+
+
+		</Center>
+		// <div>
+		// 	<div>
+		// 		<h3>User info</h3>
+		// 		<p>Username: {user.username}</p>
+		// 		<p>Email: {user.email}</p>
+		// 	</div>
+		// 	<div>
+		// 	<h3>User Packagers:</h3>
+		// 		{user.packagers.length > 0 ?
+		// 		<ul>
+		// 			{user.packagers.map((packager) => (
+		// 			<li key={packager._id}>
+		// 				<span>packager number: {packager.number}</span>
+		// 				<button onClick={() => deletePackager(packager.number)}>delete</button>
+		// 			</li>
+		// 			))}
+		// 		</ul> :
+		// 			<span>No packagers found for the user.</span>
+		// 		}
+		// 	</div>
+		// 	<div>
+		// 		<h3>User unlocked packagers:</h3>
+		// 		{isLoading ? ""
+		// 		: userUnlocks.message !== undefined ? <span>{userUnlocks.message}</span>
+		// 		: <ul>
+		// 			{userUnlocks.map((unlock) => (
+		// 			<li key={unlock._id}>
+		// 				<span>packager number: {unlock.packager.number}</span>
+		// 				<span> successfully opened: {unlock.success ? "true" : "false"}</span>
+		// 				<span> reason: {unlock.status}</span>
+		// 				<span> date: {new Date(unlock.openedOn).toLocaleString("de-DE")}</span>
+		// 			</li>
+		// 			))}
+		// 		</ul>
+		// 		}
+		// 	</div>
+		// 	<div>
+		// 		<form onSubmit={AddPackagerToUser}>
+		// 			<input type="number" name="number" placeholder="Number"
+		// 				value={packagerNumber} onChange={(e)=>(setPackagerNumber(e.target.value), setError(""))}/>
+		// 			<input type="submit" name="submit" value="Add"/>
+		// 			<label>{error}</label>
+		// 		</form>
+		// 	</div>
+		// </div>
 	 );
 }
  

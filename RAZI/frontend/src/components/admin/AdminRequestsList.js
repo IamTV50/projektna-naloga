@@ -1,38 +1,57 @@
-import React, {useState} from 'react'
-import {Card, CardBody, Collapse, Heading, HStack, Icon, IconButton, Text, VStack} from "@chakra-ui/react";
-import {ChevronDownIcon, ChevronUpIcon} from "@chakra-ui/icons";
-import {useCollapse} from "react-collapsed";
+import React, {useEffect, useState} from 'react'
+import {
+    Box,
+    Center,
+    Spinner,
+    Text,
+} from "@chakra-ui/react";
 import AdminGetRequest from "./AdminGetRequest";
 
 
-function AdminRequestsList({ requests, onRequestDeleted }) {
-    console.log(requests)
-    const [isExpanded, setExpanded] = useState(false)
-    const { getCollapseProps, getToggleProps } = useCollapse({ isExpanded })
+function AdminRequestsList() {
+    const [isLoading, setIsLoading] = useState(true);
+    const [requests, setRequests] = useState([]);
+
+    useEffect(() => {
+        const fetchRequests = async () => {
+            try {
+                const res = await fetch(`http://localhost:3001/requests`, {
+                    credentials: "include"
+                })
+                const data = await res.json();
+                console.log("requests")
+                console.log(data)
+                setRequests(data.filter((request) => !request.packager.owner));
+            } catch (error) {
+                console.log(error)
+            }
+            setIsLoading(false);
+        }
+        fetchRequests();
+    }, [])
+
+    const handleRequestDeleted = (deletedRequestId) => {
+        setRequests((prevRequests) => prevRequests.filter((request) => request._id !== deletedRequestId));
+    };
 
     return (
-        <VStack alignItems="flex-start">
-            <HStack>
-                <Heading size="sl">Zahteve</Heading>
-                <IconButton variant="blue"
-                            icon={<Icon as={isExpanded ? ChevronUpIcon : ChevronDownIcon} boxSize={6} />}
-                            {...getToggleProps({
-                                onClick: () => setExpanded((prevExpanded) => !prevExpanded),
-                            })}>
-                </IconButton>
-            </HStack>
 
-            <Collapse in={isExpanded}>
-                <div>
-                        {requests.map(request => (
-                            <AdminGetRequest request={request} key={request._id} onRequestDeleted={onRequestDeleted} />
-                            // <li key={request._id}>
-                            //     <p>{request.reason}</p>
-                            // </li>
-                        ))}
-                </div>
-            </Collapse>
-        </VStack>
+        <Box flex={1} w="100%" h="100%" overflowY="auto">
+            {isLoading ? (
+                <Center><Spinner/></Center>
+            ) : requests.length === 0 ? (
+                <Center>
+                    <Text fontSize="xl">No requests</Text>
+                </Center>
+            ) : (
+                requests.map(request => (
+                    <AdminGetRequest
+                        request={request}
+                        key={request._id}
+                        onRequestDeleted={handleRequestDeleted} />
+                ))
+            )}
+        </Box>
     )
 }
 
