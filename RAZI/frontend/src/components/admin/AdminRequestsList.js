@@ -25,7 +25,7 @@ function AdminRequestsList({ requests, onRequestDeleted }) {
             <Collapse in={isExpanded}>
                 <div>
                         {requests.map(request => (
-                            <AdminGetRequest request={request} onRequestDeleted={onRequestDeleted} />
+                            <AdminGetRequest request={request} key={request._id} onRequestDeleted={onRequestDeleted} />
                             // <li key={request._id}>
                             //     <p>{request.reason}</p>
                             // </li>

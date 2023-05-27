@@ -21,7 +21,7 @@ function RequestPackager({ onRequestAdd }) {
     const [isExpanded, setExpanded] = useState(false)
     const { getCollapseProps, getToggleProps } = useCollapse({ isExpanded })
     const [reasonText, setReasonText] = useState('');
-    const [packagerNumber, setPackagerNumber] = useState('');
+    const [packagerNumber, setPackagerNumber] = useState(0);
     const [error, setError] = useState("");
 
     const handleReasonChange = (e) => {
@@ -36,7 +36,7 @@ function RequestPackager({ onRequestAdd }) {
         e.preventDefault();
         submitRequest(reasonText, packagerNumber);
         setReasonText('');
-        setPackagerNumber('')
+        setPackagerNumber(0)
     };
 
     const submitRequest = ( reasonText, packagerNumber ) => {
@@ -100,9 +100,9 @@ function RequestPackager({ onRequestAdd }) {
         //         <CardBody>
         //             <form onSubmit={handleSubmit}>
         //                 <Text>Številka paketnika: </Text>
-        //                 <NumberInput>
-        //                     <NumberInputField border="2px solid white" _hover={{ border: "2px solid gray"}} value={packagerNumber} onChange={handlePackagerNumberChange} type="number" name="packagerNumber" />
-        //                 </NumberInput>
+        //                 <NumberInput value={packagerNumber} onChange={(valueString) => setPackagerNumber(Number(valueString))}>
+		//     				   <NumberInputField border="2px solid white" _hover={{ border: "2px solid gray"}} type="text" name="packagerNumber" />
+		// 				   </NumberInput>
         //                 <Text paddingTop={4}>Razlog:</Text>
         //                 <Textarea border="2px solid white" _hover={{ border: "2px solid gray"}} value={reasonText} onChange={handleReasonChange} name="reason" />
         //

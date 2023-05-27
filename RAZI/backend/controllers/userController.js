@@ -176,7 +176,7 @@ module.exports = {
             user.username = req.body.username ? req.body.username : user.username;
 			user.password = req.body.password ? req.body.password : user.password;
 			user.email = req.body.email ? req.body.email : user.email;
-			user.admin = req.body.admin ? req.body.admin : user.admin;
+			user.admin = req.body.admin == undefined ? req.body.admin : user.admin;
 			user.packagers = req.body.packagers ? req.body.packagers : user.packagers;
 			
             user.save(function (err, user) {
@@ -245,9 +245,26 @@ module.exports = {
 						});
 					}
 
-					// Exclude the password field from the user object
-					const { password, ...userWithoutPassword } = user.toObject();
-					return res.json(userWithoutPassword);
+					if (!packager.owner) {
+						packager.owner = user._id
+
+						packager.save(function (err, packager) {
+							if (err) {
+								return res.status(500).json({
+									message: 'Error when updating packager.',
+									error: err
+								});
+							}
+
+							// Exclude the password field from the user object
+							const { password, ...userWithoutPassword } = user.toObject();
+							return res.json(userWithoutPassword);
+						});
+					} else {
+						// Exclude the password field from the user object
+						const { password, ...userWithoutPassword } = user.toObject();
+						return res.json(userWithoutPassword);
+					}
 				});
 			});
 		});
@@ -304,9 +321,26 @@ module.exports = {
 						});
 					}
 
-					// Exclude the password field from the user object
-					const { password, ...userWithoutPassword } = user.toObject();
-					return res.json(userWithoutPassword);
+					if (packager.owner && packager.owner == user._id) {
+						packager.owner = null
+
+						packager.save(function (err, packager) {
+							if (err) {
+								return res.status(500).json({
+									message: 'Error when updating packager.',
+									error: err
+								});
+							}
+
+							// Exclude the password field from the user object
+							const { password, ...userWithoutPassword } = user.toObject();
+							return res.json(userWithoutPassword);
+						});
+					} else {
+						// Exclude the password field from the user object
+						const { password, ...userWithoutPassword } = user.toObject();
+						return res.json(userWithoutPassword);
+					}
 				});
 			});
 		});
