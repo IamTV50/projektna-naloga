@@ -60,6 +60,7 @@ function AdminShowUsers({ onRequestDeleted }){
                         }).then((res) => {
                             setDeletedUser(uid)
 							onRequestDeleted(uid)
+							handleResetSearch()
                         }).catch((err) => {
                             console.log("Error deleting user", err);
                         });
@@ -100,8 +101,6 @@ function AdminShowUsers({ onRequestDeleted }){
 		setSearchName("");
 		setSearchEmail("");
 		setSearchedUsers([]);
-		document.getElementById('userNameSearch_input').value = ""
-		document.getElementById('userEmailSearch_input').value = ""
 	}
 
 	const handleNameInputChange = (e) => { setSearchName(e.target.value); }
@@ -122,8 +121,8 @@ function AdminShowUsers({ onRequestDeleted }){
 			<Collapse in={isExpanded}>
 				<div>
 
-					<Input type="text" placeholder="Search by name" onChange={handleNameInputChange} mb={4}/>
-					<Input type="text" placeholder="Search by email" onChange={handleEmailInputChange} mb={4}/>
+					<Input type="text" placeholder="Search by name" value={searchName} onChange={handleNameInputChange} mb={4}/>
+					<Input type="text" placeholder="Search by email" value={searchEmail} onChange={handleEmailInputChange} mb={4}/>
 					<Button variant="blue" onClick={() => searchUsers()}>Search</Button>
 					{/*{ searchedUsers.length > 0 ? <Button variant="blue" mx={2} onClick={() => handleResetSearch()}>Reset</Button> : "" }*/}
 					<Box h={4}/>

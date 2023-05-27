@@ -3,13 +3,22 @@ var UserModel = require('../models/userModel.js');
 
 module.exports = {
     list: function (req, res) {
-        PackagerModel.find(function (err, packagers) {
+        PackagerModel.find().populate("owner").exec(function (err, packagers) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting packager.',
                     error: err
                 });
             }
+
+			// Remove passwords from each user object
+			packagers = packagers.map(function (packager) {
+				packager = packager.toObject(); // Convert Mongoose document to plain JavaScript object
+				if (packager.owner) {
+					delete packager.owner.password;
+				}
+				return packager;
+			});
 
             return res.json(packagers);
         });
@@ -39,7 +48,7 @@ module.exports = {
     show: function (req, res) {
         var id = req.params.id;
 
-        PackagerModel.findOne({_id: id}, function (err, packager) {
+        PackagerModel.findOne({_id: id}).populate("owner").exec(function (err, packager) {
             if (err) {
                 return res.status(500).json({
                     message: 'Error when getting packager.',
@@ -52,6 +61,12 @@ module.exports = {
                     message: 'No such packager'
                 });
             }
+
+			// Remove password from user object
+			if (packager.owner) {
+				packager = packager.toObject(); // Convert Mongoose document to plain JavaScript object
+				delete packager.owner.password;
+			}
 
             return res.json(packager);
         });
@@ -78,7 +93,8 @@ module.exports = {
 			var packager = new PackagerModel({
 				number : number,
 				public : req.body.public,
-				active : true
+				active : true,
+				owner : null
 			});
 
 			packager.save(function (err, packager) {
@@ -130,6 +146,7 @@ module.exports = {
 					packager.number = req.body.number ? req.body.number : packager.number;
 					packager.public = req.body.public !== undefined  ? req.body.public : packager.public;
 					packager.active = req.body.active !== undefined ? req.body.active : packager.active;
+					packager.owner = req.body.owner !== undefined ? req.body.owner : packager.owner;
 					
 					packager.save(function (err, packager) {
 						if (err) {
@@ -147,6 +164,7 @@ module.exports = {
                 packager.number = req.body.number ? req.body.number : packager.number;
                 packager.public = req.body.public !== undefined  ? req.body.public : packager.public;
                 packager.active = req.body.active !== undefined  ? req.body.active : packager.active;
+				packager.owner = req.body.owner !== undefined ? req.body.owner : packager.owner;
 
                 packager.save(function (err, packager) {
                     if (err) {
