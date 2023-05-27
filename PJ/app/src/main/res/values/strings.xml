@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">PJ</string>
+
+    <string name="usernameHint">username</string>
+    <string name="passwordHint">password</string>
+    <string name="loginText">Login</string>
+
+    <string name="scannerText">Scanner</string>
+    <string name="resultText">Result</string>
+    <string name="statusText">Status</string>
+    <string name="logoutText">Logout</string>
+
+    <string name="successText">Success</string>
+    <string name="responseErrorText">Response error!</string>
+    <string name="unexpectedResponseText">Unexpected response!</string>
+    <string name="parsingErrorText">Pasring error!</string>
+    <string name="emptyPackagerListText">You can not open any private packager!</string>
+    <string name="notContainPackagerText">You can not open this packager: %s!</string>
 </resources>

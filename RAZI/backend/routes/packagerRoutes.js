@@ -4,6 +4,7 @@ var packagerController = require('../controllers/packagerController.js');
 
 
 router.get('/', packagerController.list);
+router.get('/byNumber/:number', packagerController.getByNumber);
 router.get('/:id', packagerController.show);
 
 router.post('/', packagerController.create);
