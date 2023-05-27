@@ -8,7 +8,29 @@
     <string name="scannerText">Scanner</string>
     <string name="resultText">Result</string>
     <string name="statusText">Status</string>
+    <string name="packagersText">Packagers</string>
+    <string name="settingsText">Settings</string>
     <string name="logoutText">Logout</string>
+
+    <string name="textViewTheme">Theme:</string>
+    <string name="textViewFormat">Format:</string>
+    <string name="spinnerTheme">Theme</string>
+    <string name="spinnerFormat">Format</string>
+    <string-array name="themesArray">
+        <item>System</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="formatArray">
+        <item>WAV GZIP</item>
+        <item>WAV ZIP</item>
+        <item>WAV GZIP HF</item>
+        <item>WAV ZIP HF</item>
+        <item>MP3</item>
+        <item>MP3 HF</item>
+    </string-array>
+    <string name="confirmText">Confirm</string>
+    <string name="exitText">Exit</string>
 
     <string name="successText">Success</string>
     <string name="responseErrorText">Response error!</string>

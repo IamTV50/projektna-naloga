@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ListView
 
-class Packagers : AppCompatActivity() {
+class PackagersActivity : AppCompatActivity() {
     private lateinit var listView: ListView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +17,7 @@ class Packagers : AppCompatActivity() {
 
         var userInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE)
 
-        val apiUrl = "http://164.8.113.38:3001/users/${userInfo.getString("userID", "")}"
+        val apiUrl = "http://164.8.113.38:3001/unlocks/userUnlocks/${userInfo.getString("userID", "")}"
 
         fetchPackagres()
 //        // use arrayadapter and define an array

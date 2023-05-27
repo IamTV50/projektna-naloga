@@ -22,12 +22,13 @@ import java.io.IOException
 
 class MyApp : Application() {
     lateinit var userInfo: SharedPreferences
-    val backend = "http://164.8.113.38:3001"
-    val format = 2
+    lateinit var settings: SharedPreferences
+    val backend = "http://192.168.0.14:3001"
 
     override fun onCreate() {
         super.onCreate()
         userInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+        settings = getSharedPreferences("settings", Context.MODE_PRIVATE)
     }
 
     fun unsetUser() {

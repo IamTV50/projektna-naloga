@@ -11,6 +11,7 @@ import android.media.MediaPlayer
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
@@ -40,6 +41,20 @@ class MainActivity : AppCompatActivity() {
         app = application as MyApp
         setContentView(view)
 
+        if (app.settings.contains("Theme")) {
+            when (app.settings.getInt("Theme", 0)) {
+                0 -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                }
+                1 -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                }
+                2 -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                }
+            }
+        }
+
         if (app.userInfo.getString("userID", "") == "") {
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -59,7 +74,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.openPackagersList.setOnClickListener {
-            val intent = Intent(this, Packagers::class.java)
+            val intent = Intent(this, PackagersActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.openSettings.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
     }
@@ -107,15 +127,21 @@ class MainActivity : AppCompatActivity() {
                                     return@launch
                                 }
 
-                                if (!packagerSet.contains(resJson["_id"].toString())) {
+                                val packagerIds = packagerSet.map { packager ->
+                                    val jsonObject = JSONObject(packager)
+                                    jsonObject.optString("_id")
+                                }
+
+                                if (!packagerIds.contains(resJson["_id"].toString())) {
                                     binding.statusTxt.text = getString(R.string.notContainPackagerText, boxId.toString())
                                     return@launch
                                 }
                             }
                         }
 
+                        val format = app.settings.getInt("Format", 1) + 1
                         apiUrl = "https://api-d4me-stage.direct4.me/sandbox/v1/Access/openbox"
-                        val jsonData = "{\"deliveryId\":0,\"boxId\":$boxId,\"tokenFormat\":${app.format},\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
+                        val jsonData = "{\"deliveryId\":0,\"boxId\":$boxId,\"tokenFormat\":${format},\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
 
                         response = app.sendPostRequest(apiUrl, jsonData)
 
@@ -126,7 +152,7 @@ class MainActivity : AppCompatActivity() {
                                 binding.statusTxt.text = getString(R.string.responseErrorText)
                             } else {
                                 binding.statusTxt.text = getString(R.string.successText)
-                                convertB64ToSound(resJson["data"].toString(), app.format)
+                                convertB64ToSound(resJson["data"].toString(), format)
                             }
                         } catch (e: JSONException) {
                             if (response == "") {
