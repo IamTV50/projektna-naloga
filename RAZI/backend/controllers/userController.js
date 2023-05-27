@@ -50,6 +50,7 @@ module.exports = {
 
     profile: function(req, res, next){
         UserModel.findById(req.session.userId)
+			.populate("packagers")
             .exec(function(error, user){
                 if(error){
                     return next(error);
@@ -156,6 +157,42 @@ module.exports = {
         }
     },
 
+	myPackagers: function (req, res) {
+		var id = req.session.userId;
+
+        // Find all packagers where the owner is the specified user ID
+		PackagerModel.find({ owner: id }, function (err, packagers) {
+			if (err) {
+				return res.status(500).json({
+					message: 'Error when getting packagers.',
+					error: err
+				});
+			}
+
+			//console.log(packagers);
+
+			// Get an array of packager IDs
+			var packagerIds = packagers.map(function (packager) {
+				return packager._id;
+			});
+
+			// Find all users that have any of the packager IDs in their packagers array
+			UserModel.find({ packagers: { $in: packagerIds }, admin: false  })
+				.populate("packagers")
+				.select('-password') // Exclude the 'password' field from the result
+				.exec(function (err, users) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when getting users.',
+							error: err
+						});
+					}
+
+					return res.json(users);
+				});
+		});
+    },
+
     update: function (req, res) {
         var id = req.params.id;
 
@@ -176,7 +213,7 @@ module.exports = {
             user.username = req.body.username ? req.body.username : user.username;
 			user.password = req.body.password ? req.body.password : user.password;
 			user.email = req.body.email ? req.body.email : user.email;
-			user.admin = req.body.admin ? req.body.admin : user.admin;
+			user.admin = req.body.admin == undefined ? req.body.admin : user.admin;
 			user.packagers = req.body.packagers ? req.body.packagers : user.packagers;
 			
             user.save(function (err, user) {
@@ -245,9 +282,26 @@ module.exports = {
 						});
 					}
 
-					// Exclude the password field from the user object
-					const { password, ...userWithoutPassword } = user.toObject();
-					return res.json(userWithoutPassword);
+					if (!packager.owner && !packager.public) {
+						packager.owner = user._id
+
+						packager.save(function (err, packager) {
+							if (err) {
+								return res.status(500).json({
+									message: 'Error when updating packager.',
+									error: err
+								});
+							}
+
+							// Exclude the password field from the user object
+							const { password, ...userWithoutPassword } = user.toObject();
+							return res.json(userWithoutPassword);
+						});
+					} else {
+						// Exclude the password field from the user object
+						const { password, ...userWithoutPassword } = user.toObject();
+						return res.json(userWithoutPassword);
+					}
 				});
 			});
 		});
@@ -304,9 +358,26 @@ module.exports = {
 						});
 					}
 
-					// Exclude the password field from the user object
-					const { password, ...userWithoutPassword } = user.toObject();
-					return res.json(userWithoutPassword);
+					if (packager.owner && packager.owner.equals(user._id)) {
+						packager.owner = null
+
+						packager.save(function (err, packager) {
+							if (err) {
+								return res.status(500).json({
+									message: 'Error when updating packager.',
+									error: err
+								});
+							}
+
+							// Exclude the password field from the user object
+							const { password, ...userWithoutPassword } = user.toObject();
+							return res.json(userWithoutPassword);
+						});
+					} else {
+						// Exclude the password field from the user object
+						const { password, ...userWithoutPassword } = user.toObject();
+						return res.json(userWithoutPassword);
+					}
 				});
 			});
 		});
@@ -315,55 +386,73 @@ module.exports = {
     remove: function (req, res) {
         var id = req.session.userId;
 
-		RequestModel.deleteMany({ user: id }, function (err) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when deleting requests.',
-                    error: err
-                });
-            }
-
-			UserModel.findByIdAndRemove(id, function (err, user) {
+		PackagerModel.updateMany({ owner: id }, { $set: { owner: null } }, function(err) {
+			if (err) {
+				return res.status(500).json({
+					message: 'Error when updating packagers.',
+					error: err
+				});
+			}
+	
+			RequestModel.deleteMany({ user: id }, function (err) {
 				if (err) {
 					return res.status(500).json({
-						message: 'Error when deleting the user.',
+						message: 'Error when deleting requests.',
 						error: err
 					});
 				}
-
-				if (req.session) {
-					req.session.destroy(function(err) {
-						if (err) {
-							return next(err);
-						} else{
-							return res.status(204).json({});
-						}
-					});
-				}
+	
+				UserModel.findByIdAndRemove(id, function (err, user) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when deleting the user.',
+							error: err
+						});
+					}
+	
+					if (req.session) {
+						req.session.destroy(function(err) {
+							if (err) {
+								return next(err);
+							} else {
+								return res.status(204).json({});
+							}
+						});
+					}
+				});
 			});
 		});
-    },
+	},
 
 	adminRemove: function (req, res) {
         var id = req.params.id;
 
-		RequestModel.deleteMany({ user: id }, function (err) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when deleting requests.',
-                    error: err
-                });
-            }
+		PackagerModel.updateMany({ owner: id }, { $set: { owner: null } }, function(err) {
+			if (err) {
+				return res.status(500).json({
+					message: 'Error when updating packagers.',
+					error: err
+				});
+			}
 
-			UserModel.findByIdAndRemove(id, function (err, user) {
+			RequestModel.deleteMany({ user: id }, function (err) {
 				if (err) {
 					return res.status(500).json({
-						message: 'Error when deleting the user.',
+						message: 'Error when deleting requests.',
 						error: err
 					});
 				}
 
-				return res.status(204).json({});
+				UserModel.findByIdAndRemove(id, function (err, user) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when deleting the user.',
+							error: err
+						});
+					}
+
+					return res.status(204).json({});
+				});
 			});
 		});
     }

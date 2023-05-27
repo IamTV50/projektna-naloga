@@ -30,24 +30,23 @@ const Button = defineStyleConfig({
     },
     // Two variants: outline and solid
     variants: {
-        header: {
-            border: '2px solid',
-            borderColor: "gray.300",
-            // bg: 'blue.400',
-            // color: 'white',
-            // transform: "skewX(-25deg)",
-            transition: "border-color 0.3s",
-            // animation: `${spin} 1s linear infinite`,
-            // transition: "skewX 1s",
-            _hover: {
-                borderColor: "blue.500",
-                // animation: `${spin} 2s linear infinite`
-            }
-        },
+        // header: {
+        //     border: '2px solid',
+        //     borderColor: "gray.300",
+        //     // bg: 'blue.400',
+        //     // color: 'white',
+        //     // transform: "skewX(-25deg)",
+        //     transition: "border-color 0.3s",
+        //     // animation: `${spin} 1s linear infinite`,
+        //     // transition: "skewX 1s",
+        //     _hover: {
+        //         borderColor: "blue.500",
+        //         // animation: `${spin} 2s linear infinite`
+        //     }
+        // },
         admin: {
             border: '2px solid',
             borderColor: "gray.300",
-            borderRadius: '4px 0 0 4px',
             // bg: 'blue.400',
             // color: 'white',
             // transform: "skewX(-25deg)",
@@ -77,62 +76,62 @@ const Button = defineStyleConfig({
             }
         },
 
-        green: {
-            border: '2px solid',
-            borderColor: 'green.500',
-            color: 'green.500',
-            _hover: {
-                // Customize the hover color for the green variant
-                bg: 'green.100',
-            },
-        },
-
-        orange: {
-            border: '2px solid',
-            borderColor: 'orange.500',
-            color: 'orange.500',
-            _hover: {
-                // Customize the hover color for the green variant
-                bg: 'orange.100',
-            },
-        },
-
-        blue: {
-            border: '2px solid',
-            borderColor: 'blue.500',
-            color: 'blue.500',
-            _hover: {
-                // Customize the hover color for the green variant
-                bg: 'blue.100',
-            },
-        },
-
-        red: {
-            border: '2px solid',
-            borderColor: 'red.500',
-            color: 'red.500',
-            _hover: {
-                // Customize the hover color for the green variant
-                bg: 'red.100',
-            },
-        },
-
-
-        outline: {
-            border: '2px solid',
-            borderColor: 'gray.500',
-            color: 'purple.500',
-        },
-        solid: {
-            bg: 'purple.500',
-            color: 'white',
-        },
+        // green: {
+        //     border: '2px solid',
+        //     borderColor: 'green.500',
+        //     color: 'green.500',
+        //     _hover: {
+        //         // Customize the hover color for the green variant
+        //         bg: 'green.100',
+        //     },
+        // },
+        //
+        // orange: {
+        //     border: '2px solid',
+        //     borderColor: 'orange.500',
+        //     color: 'orange.500',
+        //     _hover: {
+        //         // Customize the hover color for the green variant
+        //         bg: 'orange.100',
+        //     },
+        // },
+        //
+        // blue: {
+        //     border: '2px solid',
+        //     borderColor: 'blue.500',
+        //     color: 'blue.500',
+        //     _hover: {
+        //         // Customize the hover color for the green variant
+        //         bg: 'blue.100',
+        //     },
+        // },
+        //
+        // red: {
+        //     border: '2px solid',
+        //     borderColor: 'red.500',
+        //     color: 'red.500',
+        //     _hover: {
+        //         // Customize the hover color for the green variant
+        //         bg: 'red.100',
+        //     },
+        // },
+        //
+        //
+        // outline: {
+        //     border: '2px solid',
+        //     borderColor: 'gray.500',
+        //     color: 'purple.500',
+        // },
+        // solid: {
+        //     bg: 'purple.500',
+        //     color: 'white',
+        // },
     },
     // The default size and variant values
-    defaultProps: {
-        size: 'md',
-        variant: 'outline',
-    },
+    // defaultProps: {
+    //     size: 'md',
+    //     variant: 'outline',
+    // },
 })
 
 export default Button
