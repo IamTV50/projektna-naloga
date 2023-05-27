@@ -203,7 +203,6 @@ module.exports = {
                     error: err
                 });
             }
-            console.log("Deleted request: " + request);
 
             return res.status(204).json({});
         });

@@ -345,7 +345,7 @@ function MyPackagers(){
                             <Tab>My Packagers</Tab>
                             <Tab>My Requests</Tab>
 							<Tab>Approve Requests</Tab>
-							{/*<Tab>My Packager Users</Tab>*/}
+							<Tab>My Packager Users</Tab>
                             <Spacer/>
                             <Popover
                                 isOpen={isOpenPopover}
@@ -428,14 +428,14 @@ function MyPackagers(){
                                         )}
                                     </Box>
                             </TabPanel>
-							{/*<TabPanel>
+							<TabPanel>
                                     <Box flex={1} w="100%" h="100%" overflowY="auto">
                                         {isLoading ? (
                                             <Center>
                                                 <Spinner />
                                             </Center>
                                         ) : myPackagerUsers.length === 0 ? (
-                                            "No requests from other users"
+                                            "No other user has access to your packager"
                                         ) : (
                                             myPackagerUsers.map((user) => (
                                                 <>
@@ -445,7 +445,7 @@ function MyPackagers(){
                                             ))
                                         )}
                                     </Box>
-							</TabPanel>*/}
+							</TabPanel>
                         </TabPanels>
                     </Tabs>
                 </Box>

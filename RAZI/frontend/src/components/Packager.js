@@ -42,7 +42,7 @@ function Package(props) {
 				<>
 					<h6>Last opened: {new Date(packagerUnlocks[0].openedOn).toLocaleString("de-DE")}</h6>
 					<Text>By: {packagerUnlocks[0].user.username}</Text>
-					<Text>Successfully: {packagerUnlocks[0].success.toString()}</Text>
+					<Text>Success: {packagerUnlocks[0].success ? <Badge colorScheme={"green"}>Opened</Badge> : <Badge colorScheme={"red"}>Failed</Badge>}</Text>
 					<Text>Reason: {packagerUnlocks[0].status}</Text>
 				</>
 				}

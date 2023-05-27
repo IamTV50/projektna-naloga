@@ -159,7 +159,6 @@ module.exports = {
 
 	myPackagers: function (req, res) {
 		var id = req.session.userId;
-		console.log(id);
 
         // Find all packagers where the owner is the specified user ID
 		PackagerModel.find({ owner: id }, function (err, packagers) {
@@ -283,7 +282,7 @@ module.exports = {
 						});
 					}
 
-					if (!packager.owner) {
+					if (!packager.owner && !packager.public) {
 						packager.owner = user._id
 
 						packager.save(function (err, packager) {
@@ -359,7 +358,7 @@ module.exports = {
 						});
 					}
 
-					if (packager.owner && packager.owner == user._id) {
+					if (packager.owner && packager.owner.equals(user._id)) {
 						packager.owner = null
 
 						packager.save(function (err, packager) {
@@ -387,55 +386,73 @@ module.exports = {
     remove: function (req, res) {
         var id = req.session.userId;
 
-		RequestModel.deleteMany({ user: id }, function (err) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when deleting requests.',
-                    error: err
-                });
-            }
-
-			UserModel.findByIdAndRemove(id, function (err, user) {
+		PackagerModel.updateMany({ owner: id }, { $set: { owner: null } }, function(err) {
+			if (err) {
+				return res.status(500).json({
+					message: 'Error when updating packagers.',
+					error: err
+				});
+			}
+	
+			RequestModel.deleteMany({ user: id }, function (err) {
 				if (err) {
 					return res.status(500).json({
-						message: 'Error when deleting the user.',
+						message: 'Error when deleting requests.',
 						error: err
 					});
 				}
-
-				if (req.session) {
-					req.session.destroy(function(err) {
-						if (err) {
-							return next(err);
-						} else{
-							return res.status(204).json({});
-						}
-					});
-				}
+	
+				UserModel.findByIdAndRemove(id, function (err, user) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when deleting the user.',
+							error: err
+						});
+					}
+	
+					if (req.session) {
+						req.session.destroy(function(err) {
+							if (err) {
+								return next(err);
+							} else {
+								return res.status(204).json({});
+							}
+						});
+					}
+				});
 			});
 		});
-    },
+	},
 
 	adminRemove: function (req, res) {
         var id = req.params.id;
 
-		RequestModel.deleteMany({ user: id }, function (err) {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Error when deleting requests.',
-                    error: err
-                });
-            }
+		PackagerModel.updateMany({ owner: id }, { $set: { owner: null } }, function(err) {
+			if (err) {
+				return res.status(500).json({
+					message: 'Error when updating packagers.',
+					error: err
+				});
+			}
 
-			UserModel.findByIdAndRemove(id, function (err, user) {
+			RequestModel.deleteMany({ user: id }, function (err) {
 				if (err) {
 					return res.status(500).json({
-						message: 'Error when deleting the user.',
+						message: 'Error when deleting requests.',
 						error: err
 					});
 				}
 
-				return res.status(204).json({});
+				UserModel.findByIdAndRemove(id, function (err, user) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when deleting the user.',
+							error: err
+						});
+					}
+
+					return res.status(204).json({});
+				});
 			});
 		});
     }

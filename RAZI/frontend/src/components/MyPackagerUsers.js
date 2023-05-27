@@ -7,9 +7,6 @@ function MyPackagerUsers(props) {
         props.handleDelete(props.user, packager);
     }
 
-	console.log(props.user.packagers)
-	console.log(props.owner)
-
     return(
         <Box w={"100%"}>
             <HStack alignContent={"space-between"}>
@@ -21,7 +18,7 @@ function MyPackagerUsers(props) {
 								<HStack w="full">
 									<Text>Packager: {packager.number}</Text>
 									<Spacer />
-									<IconButton aria-label='Delete user packager' onClick={handleUserDelete(packager)} icon={<CloseIcon color={"red"} />}/>
+									<IconButton aria-label='Delete user packager' onClick={() => handleUserDelete(packager)} icon={<CloseIcon color={"red"} />}/>
 								</HStack>
 							)}
 						</React.Fragment>
