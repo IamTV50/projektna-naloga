@@ -79,7 +79,7 @@ function AdminGetRequest({ request, onRequestDeleted }) {
     return (
         <>
 			{!request.packager.owner && (
-				<Card variant={"elevated"} backgroundColor={"gray.300"} mb={5} p={5}>
+				<Card variant={"elevated"}  mb={5} p={5} >
 					<HStack>
 						<Text>Request by: {request.user ? request.user.username : "[deleted]"}</Text>
 						<Spacer/>

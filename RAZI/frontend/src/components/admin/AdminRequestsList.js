@@ -36,7 +36,7 @@ function AdminRequestsList() {
 
     return (
 
-        <Box flex={1} w="100%" h="100%" overflowY="auto">
+        <Box flex={1} w="100%" h="100%" overflowY="auto" >
             {isLoading ? (
                 <Center><Spinner/></Center>
             ) : requests.length === 0 ? (

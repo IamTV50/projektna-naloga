@@ -12,7 +12,7 @@ import {
 	Icon,
 	IconButton,
 	Input,
-	Text,
+	Text, useToast,
 	VStack
 } from "@chakra-ui/react";
 import {ChevronDownIcon, ChevronUpIcon} from "@chakra-ui/icons";
@@ -20,6 +20,7 @@ import AdminGetRequest from "./AdminGetRequest";
 import {useCollapse} from "react-collapsed";
 
 function AdminShowUsers({ onRequestDeleted }){
+	const toast = useToast()
 	const [users, setUsers] = useState({})
 	const [isLoading, setIsLoading] = useState(true);
 	const [deletedUser, setDeletedUser] = useState(null);
@@ -91,7 +92,12 @@ function AdminShowUsers({ onRequestDeleted }){
 		console.log(filteredUsers);
 		
 		if (filteredUsers.length === 0) {
-			alert("0 users have that name or email");
+			toast({
+				title: "No users found",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			})
 		}
 
 		setSearchedUsers(filteredUsers)
@@ -123,7 +129,7 @@ function AdminShowUsers({ onRequestDeleted }){
 						? ""
 						: searchedUsers.length > 0
 						? searchedUsers.map((user) => (
-							<Card key={user._id} mb={4} variant={"elevated"} backgroundColor={"gray.300"}>
+							<Card key={user._id} mb={4} variant={"elevated"}>
 								<CardBody>
 									<Text>{user.username}</Text>
 									<Text>{user.email}</Text>
@@ -136,7 +142,7 @@ function AdminShowUsers({ onRequestDeleted }){
 							</Card>
 						))
 						: users.map((user) => (
-							<Card key={user._id} mb={4} variant={"elevated"} backgroundColor={"gray.300"}>
+							<Card key={user._id} mb={4} variant={"elevated"}>
 								<CardBody>
 									<Text>{user.username}</Text>
 									<Text>{user.email}</Text>

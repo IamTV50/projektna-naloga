@@ -22,19 +22,19 @@ function AdminGetPackager({ packager, setPackagerToNotActive, setPackagerToActiv
     };
 
     return (
-        <Box as={"button"} w={"100%"} alignContent={"start"} alignItems={"start"} paddingY={4} onClick={handleClick}>
+        <Box w={"100%"} alignContent={"start"} alignItems={"start"} paddingY={4}>
             {/*<Card variant={"elevated"} backgroundColor={"gray.300"} mb={5} p={5}>*/}
             <HStack alignContent={"space-between"}>
                 <VStack align={"start"}>
-                    <Heading size={"md"}>Packager number: {packager.number}</Heading>
+                    <Heading as={"button"} onClick={handleClick} size={"md"}>Packager number: {packager.number}</Heading>
                     <HStack paddingY={2}>
                         {packager.active ? <Badge colorScheme={"green"}>Active</Badge> : <Badge colorScheme={"red"}>Inactive</Badge>}
                         {packager.public ? <Badge colorScheme={"orange"}>Public</Badge> : <Badge bgColor={colorMode === "light" ? "gray.300" : ""}>Private</Badge>}
                     </HStack>
                     {packager.active ?
-                        <Button colorScheme={"blackAlpha"} onClick={() => setPackagerToNotActive(packager._id)}>Deactivate</Button>
+                        <Button colorScheme={"gray"} onClick={() => setPackagerToNotActive(packager._id)}>Deactivate</Button>
                         :
-                        <Button colorScheme={"blackAlpha"} onClick={() => setPackagerToActive(packager._id)}>Activate</Button>
+                        <Button colorScheme={"gray"} onClick={() => setPackagerToActive(packager._id)}>Activate</Button>
                     }
                 </VStack>
                 <Spacer/>

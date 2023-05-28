@@ -15,7 +15,7 @@ import {
 	TabList,
 	Tabs,
 	useToast,
-	useDisclosure, TabPanel, TabPanels, useColorMode
+	useDisclosure, TabPanel, TabPanels, useColorMode, Heading, Input, Button
 } from "@chakra-ui/react";
 import AdminRequestsList from "./AdminRequestsList";
 import AdminUsersList from "./AdminUsersList";
@@ -88,17 +88,17 @@ function AdminPannel() {
 		}
 	};
 
-	const handleRequestAdd = (newRequest) => {
-		toast({
-			title: "Request added",
-			description: "Request added successfully",
-			status: "success",
-			duration: 3000,
-		})
-		// setRequests([...requests, newRequest]);
-
-		setRefreshKeyRequests(prevKey => prevKey + 1);
-	};
+	// const handleRequestAdd = (newRequest) => {
+	// 	toast({
+	// 		title: "Request added",
+	// 		description: "Request added successfully",
+	// 		status: "success",
+	// 		duration: 3000,
+	// 	})
+	// 	// setRequests([...requests, newRequest]);
+	//
+	// 	setRefreshKeyRequests(prevKey => prevKey + 1);
+	// };
 
 	return (
 		<Center flex={1}>
@@ -118,7 +118,7 @@ function AdminPannel() {
 						<TabList
 							position="sticky"
 							top="0"
-							// bgColor="gray.100"
+							bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
 							zIndex="sticky"
 							p={4}
 							minWidth="100%"
@@ -127,24 +127,29 @@ function AdminPannel() {
 							<Tab>Users</Tab>
 							<Tab>Packagers</Tab>
 							<Spacer/>
-							<Popover
-								isOpen={isOpenPopover}
-								initialFocusRef={firstFieldRef}
-								onOpen={onOpenPopover}
-								onClose={onClosePopover}
-								placement='bottom'
-								closeOnBlur={false}>
-								<PopoverTrigger>
-									<IconButton aria-label="Search database" position="relative" right={0} icon={<AddIcon />} />
-								</PopoverTrigger>
-								<PopoverContent>
-									<PopoverArrow/>
-									<PopoverCloseButton fontSize="md"/>
-									<PopoverBody>
-										<RequestPackager onRequestAdd={handleRequestAdd}/>
-									</PopoverBody>
-								</PopoverContent>
-							</Popover>
+							{/*<Popover*/}
+							{/*	isOpen={isOpenPopover}*/}
+							{/*	initialFocusRef={firstFieldRef}*/}
+							{/*	onOpen={onOpenPopover}*/}
+							{/*	onClose={onClosePopover}*/}
+							{/*	placement='bottom'*/}
+							{/*	closeOnBlur={false}>*/}
+							{/*	<PopoverTrigger>*/}
+							{/*		<IconButton aria-label="Search database" position="relative" right={0} icon={<AddIcon />} />*/}
+							{/*	</PopoverTrigger>*/}
+							{/*	<PopoverContent>*/}
+							{/*		<PopoverArrow/>*/}
+							{/*		<PopoverCloseButton fontSize="md"/>*/}
+							{/*		<PopoverBody>*/}
+							{/*			<form onSubmit={AddPackagerToUser}>*/}
+							{/*				<Heading my={2} size={"md"}>Add packager to user</Heading>*/}
+							{/*				<Input my={2} type="number" name="number" placeholder="Number"*/}
+							{/*					   value={packagerNumber} onChange={(e)=>(setPackagerNumber(e.target.value), setError(""))}/>*/}
+							{/*				<Button my={2} colorScheme={"green"} type="submit" name="submit">Add</Button>*/}
+							{/*			</form>*/}
+							{/*		</PopoverBody>*/}
+							{/*	</PopoverContent>*/}
+							{/*</Popover>*/}
 						</TabList>
 						<TabPanels paddingLeft={4} paddingTop={2}>
 							<TabPanel>
@@ -166,14 +171,14 @@ function AdminPannel() {
 
 					</Tabs>
 				</Box>
-				<Box marginLeft={"10px"}  w={isOpen ? "70%" : "0"} hidden={!isOpen} >
+				<Box marginLeft={"10px"}  w={isOpen ? "70%" : "0"} hidden={!isOpen} overflowY={"auto"}>
 					{/*<Collapse in={isOpen} animateOpacity>*/}
 					<Box
 						flex={1}
 						width="100%"
 						h="100%"
 						overflow="auto"
-						bgColor="gray.100"
+						bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
 						borderRadius={25}
 						padding={10}
 						boxShadow="10px 15px 20px rgba(0, 0, 0, 0.1)"

@@ -46,7 +46,7 @@ function Profile() {
     return (
         <Center flex={1}>
             {userContext.user ? "" : <Navigate replace to="/" />}
-            <Card alignItems={"center"} paddingX={"6%"} paddingTop={4} bgColor={"gray.100"} borderRadius={"25"} variant={"elevated"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
+            <Card alignItems={"center"} paddingX={"6%"} paddingTop={4} borderRadius={"25"} variant={"elevated"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
                 <CardHeader>
                     <Heading >My profile</Heading>
                 </CardHeader>

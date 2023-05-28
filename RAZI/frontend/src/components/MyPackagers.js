@@ -29,7 +29,7 @@ import {
     TabPanel,
     TabPanels,
     Tabs,
-    Text,
+    Text, useColorMode,
     useDisclosure,
     useToast,
     VStack,
@@ -56,6 +56,7 @@ function MyPackagers(){
     const { isOpen, onToggle } = useDisclosure()
     const [selectedPackager, setSelectedPackager] = useState(null);
     const [packagerUnlocks, setPackagerUnlocks] = useState([]);
+    const { colorMode, toggleColorMode } = useColorMode()
 
     // popover
     const { onOpenPopover, onClosePopover, isOpenPopover } = useDisclosure()
@@ -323,7 +324,7 @@ function MyPackagers(){
         <Center flex={1}>
             {userContext.user ? "" : <Navigate replace to="/" />}
             <Box w={isOpen ? "70%" : "50%"} h="70%" display="flex" flexDirection={"row"}>
-                <Box marginRight={"10px"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} width={"100%"} as={Card} height="100%" bgColor="gray.100" overflow="auto"
+                <Box marginRight={"10px"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} width={"100%"}  as={Card} height="100%" overflow="auto" bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
                      css={{
                     "&::-webkit-scrollbar": {
                         width: "0",
@@ -336,7 +337,7 @@ function MyPackagers(){
                         <TabList
                             position="sticky"
                             top="0"
-                            bgColor="gray.100"
+                            bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
                             zIndex="sticky"
                             p={4}
                             minWidth="100%"
