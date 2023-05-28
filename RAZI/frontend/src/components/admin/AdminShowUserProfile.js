@@ -173,7 +173,7 @@ function AdminShowUserProfile() {
 
 	return (
 		<Center flex={1}>
-			<Box w="70%" h="70%" display="flex" flexDirection={"row"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} as={Card} bgColor={colorMode === "light" ? "gray.100" : "blue.800"}>
+			<Box w="70%" h="70%" display="flex" flexDirection={"row"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} as={Card} bgColor={colorMode === "light" ? "gray.100" : "gray.700"}>
 				<Box w="30%" h="100%" display="flex" flexDirection={"column"} alignItems={"start"} padding={10}>
 					<Heading paddingBottom={10}>User info</Heading>
 					<Text>Username: {user.username}</Text>
@@ -192,7 +192,7 @@ function AdminShowUserProfile() {
 						<TabList position="sticky"
 								 top={0}
 								 pt={10}
-								 bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
+								 bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
 								 zIndex="sticky">
 							<Tab>User Packagers</Tab>
 							<Tab>User Unlocked Packagers</Tab>

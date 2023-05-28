@@ -5,11 +5,11 @@ import {
     Alert,
     AlertIcon,
     Button,
-    ButtonGroup, Center, Heading,
+    ButtonGroup, Card, Center, Heading,
     HStack,
     Input,
     InputGroup,
-    InputRightElement,
+    InputRightElement, useColorMode,
     VStack
 } from '@chakra-ui/react'
 
@@ -19,6 +19,7 @@ function Login() {
     const [error, setError] = useState("");
     const userContext = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(false);
+    const { colorMode, toggleColorMode } = useColorMode()
 
     const [show, setShow] = React.useState(false)
     const handleClick = () => setShow(!show)
@@ -53,7 +54,8 @@ function Login() {
 
     return (
         <Center flex={1}>
-            <VStack as="form" onSubmit={Login} width={{base: "100%", md: "70%", xl: "25%"}} bgColor={"gray.100"} borderRadius={"25"} padding={10} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
+            <Card alignItems={"center"} paddingX={"6%"} paddingTop={4} borderRadius={"25"} variant={"elevated"} bgColor={colorMode === "light" ? "gray.100" : "gray.700"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} p={12}>
+            <VStack as="form" onSubmit={Login}>
                 {userContext.user ? <Navigate replace to="/" /> : ""}
                 <Heading mb={4}>Login</Heading>
                 <Input type="text" name="username" placeholder="Username"
@@ -81,6 +83,7 @@ function Login() {
                     {error}
                 </Alert> : ""}
             </VStack>
+            </Card>
         </Center>
     );
 }

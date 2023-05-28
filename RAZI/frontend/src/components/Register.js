@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import {
     Alert,
     AlertIcon, Box,
-    Button,
+    Button, Card,
     Center, Heading,
     Input,
     InputGroup,
-    InputRightElement,
+    InputRightElement, useColorMode,
     VStack
 } from "@chakra-ui/react";
 
@@ -15,6 +15,7 @@ function Register() {
     const [password, setPassword] = useState([]);
     const [email, setEmail] = useState([]);
     const [error, setError] = useState("");
+    const { colorMode, toggleColorMode } = useColorMode()
 
     const [isLoading, setIsLoading] = useState(false);
     const [show, setShow] = React.useState(false)
@@ -55,8 +56,8 @@ function Register() {
 
     return(
         <Center flex={1}>
-
-            <VStack as="form" onSubmit={Register} width={{base: "100%", md: "70%", xl: "25%"}} bgColor={"gray.100"} borderRadius={"25"} padding={10} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
+            <Card alignItems={"center"} paddingX={"6%"} paddingTop={4} borderRadius={"25"} variant={"elevated"} bgColor={colorMode === "light" ? "gray.100" : "gray.700"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} p={12}>
+            <VStack as="form" onSubmit={Register} >
                 <Heading mb={4}>Register</Heading>
                 <Input type="text" name="email" placeholder="Email" value={email} onChange={(e)=>(setEmail(e.target.value))} />
                 <Box h={0}/>
@@ -82,6 +83,7 @@ function Register() {
                     {error}
                 </Alert> : ""}
             </VStack>
+            </Card>
         </Center>
         // <form onSubmit={Register}>
         //     <VStack width="40%" alignItems="flex-start">

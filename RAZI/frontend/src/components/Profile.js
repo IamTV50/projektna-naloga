@@ -10,7 +10,7 @@ import {
     AlertDialogOverlay,
     Button,
     Card,
-    CardBody, CardFooter, CardHeader, Center, Heading, Text, useDisclosure,
+    CardBody, CardFooter, CardHeader, Center, Heading, Text, useColorMode, useDisclosure,
     VStack
 } from "@chakra-ui/react";
 import {hover} from "@testing-library/user-event/dist/hover";
@@ -18,6 +18,7 @@ import {hover} from "@testing-library/user-event/dist/hover";
 function Profile() {
     const userContext = useContext(UserContext);
     const [profile, setProfile] = useState({});
+    const { colorMode, toggleColorMode } = useColorMode()
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = React.useRef()
@@ -46,7 +47,7 @@ function Profile() {
     return (
         <Center flex={1}>
             {userContext.user ? "" : <Navigate replace to="/" />}
-            <Card alignItems={"center"} paddingX={"6%"} paddingTop={4} borderRadius={"25"} variant={"elevated"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
+            <Card alignItems={"center"} paddingX={"6%"} paddingTop={4} borderRadius={"25"} variant={"elevated"} bgColor={colorMode === "light" ? "gray.100" : "gray.700"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
                 <CardHeader>
                     <Heading >My profile</Heading>
                 </CardHeader>

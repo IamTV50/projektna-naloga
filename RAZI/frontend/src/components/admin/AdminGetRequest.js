@@ -8,12 +8,13 @@ import {
 	Button,
 	Card,
 	HStack, Spacer,
-	Text,
+	Text, useColorMode,
 	useDisclosure
 } from "@chakra-ui/react";
 
 function AdminGetRequest({ request, onRequestDeleted }) {
     const [error, setError] = useState("");
+	const { colorMode, toggleColorMode } = useColorMode()
 
 	// Alert dialog
 	const { isOpen, onOpen, onClose } = useDisclosure()
@@ -79,7 +80,7 @@ function AdminGetRequest({ request, onRequestDeleted }) {
     return (
         <>
 			{!request.packager.owner && (
-				<Card variant={"elevated"}  mb={5} p={5} >
+				<Card variant={"elevated"} mb={5} p={5} bgColor={colorMode === "light" ? "gray.100" : "gray.800"}>
 					<HStack>
 						<Text>Request by: {request.user ? request.user.username : "[deleted]"}</Text>
 						<Spacer/>

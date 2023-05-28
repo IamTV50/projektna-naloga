@@ -105,7 +105,7 @@ function AdminPannel() {
 			{userContext.user ? "" : <Navigate replace to="/" />}
 			{userContext.user.admin === true ? "" : <Navigate replace to="/" />}
 			<Box w={isOpen ? "70%" : "50%"} h="70%" display="flex" flexDirection={"row"}>
-				<Box marginRight={"10px"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} width={"100%"} as={Card} height="100%" bgColor={colorMode === "light" ? "gray.100" : "blue.800"} overflow="auto"
+				<Box marginRight={"10px"} borderRadius={"25"} padding={0} bgColor={colorMode === "light" ? "gray.100" : "gray.700"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} width={"100%"} as={Card} height="100%" overflow="auto"
 					 css={{
 						 "&::-webkit-scrollbar": {
 							 width: "0",
@@ -118,7 +118,7 @@ function AdminPannel() {
 						<TabList
 							position="sticky"
 							top="0"
-							bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
+							bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
 							zIndex="sticky"
 							p={4}
 							minWidth="100%"
@@ -127,29 +127,30 @@ function AdminPannel() {
 							<Tab>Users</Tab>
 							<Tab>Packagers</Tab>
 							<Spacer/>
-							{/*<Popover*/}
-							{/*	isOpen={isOpenPopover}*/}
-							{/*	initialFocusRef={firstFieldRef}*/}
-							{/*	onOpen={onOpenPopover}*/}
-							{/*	onClose={onClosePopover}*/}
-							{/*	placement='bottom'*/}
-							{/*	closeOnBlur={false}>*/}
-							{/*	<PopoverTrigger>*/}
-							{/*		<IconButton aria-label="Search database" position="relative" right={0} icon={<AddIcon />} />*/}
-							{/*	</PopoverTrigger>*/}
-							{/*	<PopoverContent>*/}
-							{/*		<PopoverArrow/>*/}
-							{/*		<PopoverCloseButton fontSize="md"/>*/}
-							{/*		<PopoverBody>*/}
-							{/*			<form onSubmit={AddPackagerToUser}>*/}
-							{/*				<Heading my={2} size={"md"}>Add packager to user</Heading>*/}
-							{/*				<Input my={2} type="number" name="number" placeholder="Number"*/}
-							{/*					   value={packagerNumber} onChange={(e)=>(setPackagerNumber(e.target.value), setError(""))}/>*/}
-							{/*				<Button my={2} colorScheme={"green"} type="submit" name="submit">Add</Button>*/}
-							{/*			</form>*/}
-							{/*		</PopoverBody>*/}
-							{/*	</PopoverContent>*/}
-							{/*</Popover>*/}
+							<Popover
+								isOpen={isOpenPopover}
+								initialFocusRef={firstFieldRef}
+								onOpen={onOpenPopover}
+								onClose={onClosePopover}
+								placement='bottom'
+								closeOnBlur={false}>
+								<PopoverTrigger>
+									<IconButton aria-label="Search database" position="relative" right={0} icon={<AddIcon />} />
+								</PopoverTrigger>
+								<PopoverContent>
+									<PopoverArrow/>
+									<PopoverCloseButton fontSize="md"/>
+									<PopoverBody>
+										<AdminAddPackager />
+										{/*<form onSubmit={AddPackagerToUser}>*/}
+										{/*	<Heading my={2} size={"md"}>Add packager to user</Heading>*/}
+										{/*	<Input my={2} type="number" name="number" placeholder="Number"*/}
+										{/*		   value={packagerNumber} onChange={(e)=>(setPackagerNumber(e.target.value), setError(""))}/>*/}
+										{/*	<Button my={2} colorScheme={"green"} type="submit" name="submit">Add</Button>*/}
+										{/*</form>*/}
+									</PopoverBody>
+								</PopoverContent>
+							</Popover>
 						</TabList>
 						<TabPanels paddingLeft={4} paddingTop={2}>
 							<TabPanel>

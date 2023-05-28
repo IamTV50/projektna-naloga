@@ -324,7 +324,7 @@ function MyPackagers(){
         <Center flex={1}>
             {userContext.user ? "" : <Navigate replace to="/" />}
             <Box w={isOpen ? "70%" : "50%"} h="70%" display="flex" flexDirection={"row"}>
-                <Box marginRight={"10px"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} width={"100%"}  as={Card} height="100%" overflow="auto" bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
+                <Box marginRight={"10px"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} width={"100%"}  as={Card} height="100%" overflow="auto" bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
                      css={{
                     "&::-webkit-scrollbar": {
                         width: "0",
@@ -337,7 +337,7 @@ function MyPackagers(){
                         <TabList
                             position="sticky"
                             top="0"
-                            bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
+                            bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
                             zIndex="sticky"
                             p={4}
                             minWidth="100%"
@@ -457,7 +457,7 @@ function MyPackagers(){
                         width="100%"
                         h="100%"
                         overflow="auto"
-                        bgColor="gray.100"
+                        bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
                         borderRadius={25}
                         padding={10}
                         boxShadow="10px 15px 20px rgba(0, 0, 0, 0.1)"
