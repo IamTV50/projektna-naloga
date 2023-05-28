@@ -23,6 +23,10 @@ import {Navigate} from "react-router-dom";
 import {UserContext} from "../../userContext";
 import {AddIcon} from "@chakra-ui/icons";
 import RequestPackager from "../RequestPackager";
+import {motion} from "framer-motion";
+import UnlockHistory from "../UnlockHistory";
+import AdminUnlockHistory from "./AdminUnlockHistory";
+import unlockHistory from "../UnlockHistory";
 
 function AdminPannel() {
 	const toast = useToast()
@@ -32,11 +36,57 @@ function AdminPannel() {
 
 	// side panel
 	const { isOpen, onToggle } = useDisclosure()
+	const [selectedPackager, setSelectedPackager] = useState(null);
+	const [packagerUnlocks, setPackagerUnlocks] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
 	// add packager popover
 	const firstFieldRef = React.useRef(null)
 	const { onOpenPopover, onClosePopover, isOpenPopover } = useDisclosure()
 	// handle changes
 	const [refreshKeyRequests, setRefreshKeyRequests] = useState(0);
+
+
+	const transition = {
+		type: "spring",
+		duration: 0.3
+	};
+
+	const variants = {
+		open: { opacity: 1, scale: 1 },
+		closed: { opacity: 0, scale: 0 }
+	};
+
+	const handlePackagerClick = (packager) => {
+		const fetchUnlocks = async () => {
+			try {
+				const res = await fetch(`http://localhost:3001/unlocks/packagerUnlocks/${packager._id}`, {
+					credentials: "include"
+				})
+				const data = await res.json();
+				console.log("Unlock history:");
+				console.log(data);
+
+				if (!data.message) {
+					setPackagerUnlocks(data);
+				}
+				else {
+					setPackagerUnlocks([]);
+				}
+
+				setIsLoading(false);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		setSelectedPackager(packager);
+		fetchUnlocks();
+		if (!isOpen) {
+			onToggle();
+		}
+		if (packager === selectedPackager) {
+			onToggle();
+		}
+	};
 
 	const handleRequestAdd = (newRequest) => {
 		toast({
@@ -109,12 +159,40 @@ function AdminPannel() {
 							</TabPanel>
 							<TabPanel>
 								<Box flex={1} w="100%" h="100%" overflowY="auto">
-									<AdminShowPackagers/>
+									<AdminShowPackagers handlePackagerClick={handlePackagerClick}/>
 								</Box>
 							</TabPanel>
 						</TabPanels>
 
 					</Tabs>
+				</Box>
+				<Box marginLeft={"10px"}  w={isOpen ? "70%" : "0"} hidden={!isOpen} >
+					{/*<Collapse in={isOpen} animateOpacity>*/}
+					<Box
+						flex={1}
+						width="100%"
+						h="100%"
+						overflow="auto"
+						bgColor="gray.100"
+						borderRadius={25}
+						padding={10}
+						boxShadow="10px 15px 20px rgba(0, 0, 0, 0.1)"
+						as={motion.div}
+						initial="closed"
+						animate={isOpen ? "open" : "closed"}
+						variants={variants}
+						transition={transition}
+						css={{
+							"&::-webkit-scrollbar": {
+								width: "0",
+							},
+							"&::-webkit-scrollbar-thumb": {
+								backgroundColor: "#888",
+							},
+						}}>
+						{selectedPackager && <AdminUnlockHistory packager={selectedPackager} unlockHistory={packagerUnlocks}/>}
+					</Box>
+					{/*</Collapse>*/}
 				</Box>
 			</Box>
 		</Center>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {Box, Divider} from "@chakra-ui/react";
 import AdminGetPackager from "./AdminGetPackager";
 
-function AdminShowPackagers(){
+function AdminShowPackagers({ handlePackagerClick }){
 	const [packagers, setPackagers] = useState({})
 	const [isLoading, setIsLoading] = useState(true);
 	const [packagerChanged, setPackagerChanged] = useState(false)
@@ -73,7 +73,8 @@ function AdminShowPackagers(){
 							key={packager._id}
 							packager={packager}
 							setPackagerToNotActive={setPackagerToNotActive}
-							setPackagerToActive={setPackagerToActive}/>
+							setPackagerToActive={setPackagerToActive}
+							handlePackagerClick={handlePackagerClick}/>
 						<Divider />
 					</>
 				))}

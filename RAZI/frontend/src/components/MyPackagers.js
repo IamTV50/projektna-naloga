@@ -275,12 +275,12 @@ function MyPackagers(){
 
             setUserChanges(!userChanges);
 
-            toast({
-                title: "Packager deleted",
-                description: "Packager deleted successfully",
-                status: "success",
-                duration: 3000,
-            })
+            // toast({
+            //     title: "Packager deleted",
+            //     description: "Packager deleted successfully",
+            //     status: "success",
+            //     duration: 3000,
+            // })
         } catch (error) {
             toast({
                 title: "Packager not deleted",
