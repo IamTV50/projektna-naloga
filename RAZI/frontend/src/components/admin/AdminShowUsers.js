@@ -130,7 +130,7 @@ function AdminShowUsers({ onRequestDeleted }){
 						? ""
 						: searchedUsers.length > 0
 						? searchedUsers.map((user) => (
-							<Card key={user._id} mb={4} variant={"elevated"} bgColor={colorMode === "light" ? "gray.100" : "gray.800"}>
+							<Card key={user._id} mb={4} variant={"elevated"} bgColor={colorMode === "light" ? "gray.200" : "gray.800"}>
 								<CardBody>
 									<Text>{user.username}</Text>
 									<Text>{user.email}</Text>
@@ -143,7 +143,7 @@ function AdminShowUsers({ onRequestDeleted }){
 							</Card>
 						))
 						: users.map((user) => (
-							<Card key={user._id} mb={4} variant={"elevated"} bgColor={colorMode === "light" ? "gray.100" : "gray.800"}>
+							<Card key={user._id} mb={4} variant={"elevated"} bgColor={colorMode === "light" ? "gray.200" : "gray.800"}>
 								<CardBody>
 									<Text>{user.username}</Text>
 									<Text>{user.email}</Text>

@@ -319,6 +319,12 @@ function MyPackagers(){
         )
     }
 
+    const handleTabChange = (index) => {
+        if (isOpen) {
+            onToggle();
+        }
+    };
+
     // divider={<Divider/>} maxH={"80%"} alignItems={"flex-start"} minH={"70%"} width={{base: "100%", md: "70%", xl: "25%"}} bgColor={"gray.100"} borderRadius={"25"} padding={10} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}
     return(
         <Center flex={1}>
@@ -333,7 +339,7 @@ function MyPackagers(){
                         backgroundColor: "#888",
                     },
                     }}>
-                    <Tabs isLazy>
+                    <Tabs isLazy onChange={handleTabChange}>
                         <TabList
                             position="sticky"
                             top="0"
@@ -341,8 +347,7 @@ function MyPackagers(){
                             zIndex="sticky"
                             p={4}
                             minWidth="100%"
-                            width="fit-content"
-                        >
+                            width="fit-content" >
                             <Tab>My Packagers</Tab>
                             <Tab>My Requests</Tab>
 							<Tab>Approve Requests</Tab>
@@ -457,7 +462,7 @@ function MyPackagers(){
                         width="100%"
                         h="100%"
                         overflow="auto"
-                        bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
+                        bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
                         borderRadius={25}
                         padding={10}
                         boxShadow="10px 15px 20px rgba(0, 0, 0, 0.1)"

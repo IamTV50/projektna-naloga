@@ -99,6 +99,11 @@ function AdminPannel() {
 	//
 	// 	setRefreshKeyRequests(prevKey => prevKey + 1);
 	// };
+	const handleTabChange = (index) => {
+		if (isOpen) {
+			onToggle();
+		}
+	}
 
 	return (
 		<Center flex={1}>
@@ -114,7 +119,7 @@ function AdminPannel() {
 							 backgroundColor: "#888",
 						 },
 					 }}>
-					<Tabs isLazy colorScheme={"blue"}>
+					<Tabs isLazy colorScheme={"blue"} onChange={handleTabChange}>
 						<TabList
 							position="sticky"
 							top="0"
