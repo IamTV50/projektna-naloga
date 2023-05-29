@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">PJ</string>
 
-    <string name="usernameHint">username</string>
-    <string name="passwordHint">password</string>
+    <string name="usernameHint">Username</string>
+    <string name="passwordHint">Password</string>
     <string name="loginText">Login</string>
 
     <string name="scannerText">Scanner</string>

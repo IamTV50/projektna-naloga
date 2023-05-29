@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import njt.paketnik.databinding.ActivityLoginBinding
 import org.json.JSONArray
 import org.json.JSONException
@@ -44,33 +46,37 @@ class LoginActivity : AppCompatActivity() {
                     val response = app.sendPostRequest(apiUrl, jsonData)
 
                     try {
-                        resJson = JSONObject(response)
+                        withTimeout(3000) {
+                            resJson = JSONObject(response)
 
-                        if (resJson.has("error")) { //error
-                            Toast.makeText(applicationContext, resJson["error"].toString(), Toast.LENGTH_SHORT).show()
-                        } else {
-                            app.userInfo.edit().putString("userID", resJson["_id"].toString()).apply()
-                            app.userInfo.edit().putString("username", resJson["username"].toString()).apply()
-                            app.userInfo.edit().putString("email", resJson["email"].toString()).apply()
-                            app.userInfo.edit().putBoolean("admin", resJson["admin"].toString().toBoolean()).apply()
+                            if (resJson.has("error")) { //error
+                                Toast.makeText(applicationContext, resJson["error"].toString(), Toast.LENGTH_SHORT).show()
+                            } else {
+                                app.userInfo.edit().putString("userID", resJson["_id"].toString()).apply()
+                                app.userInfo.edit().putString("username", resJson["username"].toString()).apply()
+                                app.userInfo.edit().putString("email", resJson["email"].toString()).apply()
+                                app.userInfo.edit().putBoolean("admin", resJson["admin"].toString().toBoolean()).apply()
 
-                            val packagersArray: JSONArray = resJson.getJSONArray("packagers")
+                                val packagersArray: JSONArray = resJson.getJSONArray("packagers")
 
-                            val packagersSet = mutableSetOf<String>()
-                            for (i in 0 until packagersArray.length()) {
-                                packagersSet.add(packagersArray.getString(i))
+                                val packagersSet = mutableSetOf<String>()
+                                for (i in 0 until packagersArray.length()) {
+                                    packagersSet.add(packagersArray.getString(i))
+                                }
+
+                                app.userInfo.edit().putStringSet("packagers", packagersSet).apply()
+
+                                Toast.makeText(applicationContext, "login success", Toast.LENGTH_SHORT).show()
+
+                                val intent = Intent(applicationContext, MainActivity::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                                startActivity(intent)
                             }
-
-                            app.userInfo.edit().putStringSet("packagers", packagersSet).apply()
-
-                            Toast.makeText(applicationContext, "login success", Toast.LENGTH_SHORT).show()
-
-                            val intent = Intent(applicationContext, MainActivity::class.java)
-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                            startActivity(intent)
                         }
-                    }
-                    catch (e: JSONException){
+                    } catch (e: TimeoutCancellationException) {
+                        // Handle timeout exception here
+                        Toast.makeText(applicationContext, "Request timed out", Toast.LENGTH_SHORT).show()
+                    } catch (e: JSONException) {
                         if (response == ""){
                             Toast.makeText(applicationContext, "unexpected response", Toast.LENGTH_SHORT).show()
                         }
