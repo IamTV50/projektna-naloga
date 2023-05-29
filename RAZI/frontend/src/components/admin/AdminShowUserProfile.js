@@ -54,7 +54,7 @@ function AdminShowUserProfile() {
 	useEffect(() => {
 		const fetchUser = async () => {
 			try {
-				const res = await fetch(`http://localhost:3001/users/${user._id}`, {
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/users/${user._id}`, {
 					credentials: "include"
 				})
 				const data = await res.json();
@@ -70,7 +70,7 @@ function AdminShowUserProfile() {
 	useEffect(() => {
 		const fetchRequests = async () => {
 			try {
-				const res = await fetch(`http://localhost:3001/unlocks/userUnlocks/${user._id}`, {
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/unlocks/userUnlocks/${user._id}`, {
 					credentials: "include"
 				})
 				const data = await res.json();
@@ -86,7 +86,7 @@ function AdminShowUserProfile() {
 
 	async function AddPackagerToUser(e) {
         e.preventDefault();
-        const res = await fetch("http://localhost:3001/users/addPackager", {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/users/addPackager`, {
             method: "PUT",
             credentials: "include",
             headers: { 'Content-Type': 'application/json'},
@@ -124,7 +124,7 @@ function AdminShowUserProfile() {
         //         {
         //             label: 'Yes',
         //             onClick: () => {
-        //                 fetch(`http://localhost:3001/users/removePackager`, {
+        //                 fetch(`${process.env.REACT_APP_API_URL}/users/removePackager`, {
         //                     method: "PUT",
 		// 					credentials: "include",
 		// 					headers: { 'Content-Type': 'application/json'},
@@ -151,7 +151,7 @@ function AdminShowUserProfile() {
     };
 
 	const handleDeletePackager = () => {
-		fetch(`http://localhost:3001/users/removePackager`, {
+		fetch(`${process.env.REACT_APP_API_URL}/users/removePackager`, {
 			method: "PUT",
 			credentials: "include",
 			headers: { 'Content-Type': 'application/json'},

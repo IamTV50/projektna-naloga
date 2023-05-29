@@ -10,7 +10,7 @@ function AdminShowPackagers({ handlePackagerClick }){
 	useEffect(() => {
 		const fetchRequests = async () => {
 			try {
-				const res = await fetch(`http://localhost:3001/packagers`, {
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/packagers`, {
 					credentials: "include"
 				})
 				const data = await res.json();
@@ -25,7 +25,7 @@ function AdminShowPackagers({ handlePackagerClick }){
 	}, [packagerChanged]);
 
 	const setPackagerToActive = (pid) => {
-		fetch(`http://localhost:3001/packagers/${pid}`, {
+		fetch(`${process.env.REACT_APP_API_URL}/packagers/${pid}`, {
 			method: "PUT",
 			credentials: "include",
 			headers: { 'Content-Type': 'application/json'},
@@ -45,7 +45,7 @@ function AdminShowPackagers({ handlePackagerClick }){
 	};
 
 	const setPackagerToNotActive = (pid) => {
-		fetch(`http://localhost:3001/packagers/${pid}`, {
+		fetch(`${process.env.REACT_APP_API_URL}/packagers/${pid}`, {
 			method: "PUT",
 			credentials: "include",
 			headers: { 'Content-Type': 'application/json'},

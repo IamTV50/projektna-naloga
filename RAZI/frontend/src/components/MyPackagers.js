@@ -80,7 +80,7 @@ function MyPackagers(){
     const handlePackagerClick = (packager) => {
         const fetchUnlocks = async () => {
             try {
-                const res = await fetch(`http://localhost:3001/unlocks/packagerUnlocks/${packager._id}`, {
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/unlocks/packagerUnlocks/${packager._id}`, {
                     credentials: "include"
                 })
                 const data = await res.json();
@@ -112,13 +112,13 @@ function MyPackagers(){
     useEffect(function() {
         const getUserPackagers = async function() {
 			if (userContext.user.admin) {
-				const res = await fetch(`http://localhost:3001/packagers`);
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/packagers`);
 				const data = await res.json();
 				setIsLoading(false);
 				setPackagers(data);
 				console.log(data)
 			} else {
-				const res = await fetch(`http://localhost:3001/users/${userContext.user._id}`);
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/users/${userContext.user._id}`);
 				const data = await res.json();
 				setIsLoading(false);
 				setPackagers(data.packagers);
@@ -127,14 +127,14 @@ function MyPackagers(){
         }
 
         const getRequests = async function(){
-            const res = await fetch(`http://localhost:3001/requests/user/${userContext.user._id}`);
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/requests/user/${userContext.user._id}`);
             const data = await res.json();
             console.log(data)
             setRequests(data);
         }
 
 		const getMyPackagerRequests = async function(){
-            const res = await fetch(`http://localhost:3001/requests/`);
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/requests/`);
             const data = await res.json();
 
 			// Filter the requests based on the condition
@@ -153,7 +153,7 @@ function MyPackagers(){
 
 	useEffect(function() {
 		const getMyPackagerUsers = async function(){
-			const res = await fetch(`http://localhost:3001/users/myPackagers/`, {credentials: "include"});
+			const res = await fetch(`${process.env.REACT_APP_API_URL}/users/myPackagers/`, {credentials: "include"});
 			const data = await res.json();
 
 			console.log(data)
@@ -177,7 +177,7 @@ function MyPackagers(){
         console.log("Deleting request with id: " + requestId);
 
         try {
-            fetch(`http://localhost:3001/requests/${requestId}`, {
+            fetch(`${process.env.REACT_APP_API_URL}/requests/${requestId}`, {
                 method: "DELETE",
                 credentials: "include"
             });
@@ -204,7 +204,7 @@ function MyPackagers(){
         console.log("Deleting request with id: " + requestId);
 
         try {
-            fetch(`http://localhost:3001/requests/${requestId}`, {
+            fetch(`${process.env.REACT_APP_API_URL}/requests/${requestId}`, {
                 method: "DELETE",
                 credentials: "include"
             });
@@ -231,7 +231,7 @@ function MyPackagers(){
         console.log("Approving request with id: " + request._id);
 
         try {
-            fetch(`http://localhost:3001/users/addPackager`, {
+            fetch(`${process.env.REACT_APP_API_URL}/users/addPackager`, {
                 method: "PUT",
 				credentials: "include",
 				headers: { 'Content-Type': 'application/json'},
@@ -264,7 +264,7 @@ function MyPackagers(){
         console.log("Deleting packager with id: " + packager._id + " from user with id: " + user._id);
 
         try {
-            fetch(`http://localhost:3001/users/removePackager`, {
+            fetch(`${process.env.REACT_APP_API_URL}/users/removePackager`, {
                 method: "PUT",
 				credentials: "include",
 				headers: { 'Content-Type': 'application/json'},

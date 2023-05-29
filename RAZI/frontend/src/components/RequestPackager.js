@@ -42,7 +42,7 @@ function RequestPackager({ onRequestAdd }) {
     const submitRequest = ( reasonText, packagerNumber ) => {
         console.log("submitRequest")
         console.log(reasonText, packagerNumber);
-        fetch(`http://localhost:3001/requests/userRequestPackage`, {
+        fetch(`${process.env.REACT_APP_API_URL}/requests/userRequestPackage`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },

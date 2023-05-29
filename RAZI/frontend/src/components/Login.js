@@ -27,7 +27,7 @@ function Login() {
     async function Login(e) {
         e.preventDefault();
         setIsLoading(true)
-        const res = await fetch("http://localhost:3001/users/login", {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/users/login`, {
             method: "POST",
             credentials: "include",
             headers: { 'Content-Type': 'application/json'},

@@ -27,7 +27,7 @@ function AdminAddPackager() {
         // Fetch all users
         async function fetchUsers() {
             try {
-                const res = await fetch("http://localhost:3001/users");
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/users`);
                 const data = await res.json();
                 setUsers(data);
             } catch (error) {
@@ -40,7 +40,7 @@ function AdminAddPackager() {
 
     async function AddPackager(e) {
         e.preventDefault();
-        const res = await fetch("http://localhost:3001/packagers", {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/packagers`, {
             method: "POST",
             credentials: "include",
             headers: { 'Content-Type': 'application/json'},

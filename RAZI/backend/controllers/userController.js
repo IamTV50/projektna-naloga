@@ -313,7 +313,7 @@ module.exports = {
 						});
 					}
 
-					if (!packager.owner && !packager.public) {
+					if (!packager.owner && !packager.public && !user.admin) {
 						packager.owner = user._id
 
 						packager.save(function (err, packager) {

@@ -34,7 +34,7 @@ function AdminShowUsers({ onRequestDeleted }){
 	useEffect(() => {
 		const fetchRequests = async () => {
 			try {
-				const res = await fetch(`http://localhost:3001/users`, {
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
 					credentials: "include"
 				})
 				const data = await res.json();
@@ -56,7 +56,7 @@ function AdminShowUsers({ onRequestDeleted }){
                 {
                     label: 'Yes',
                     onClick: () => {
-                        fetch(`http://localhost:3001/users/${uid}`, {
+                        fetch(`${process.env.REACT_APP_API_URL}/users/${uid}`, {
                             method: "DELETE",
                             credentials: "include",
                         }).then((res) => {

@@ -24,7 +24,7 @@ function Register() {
     async function Register(e) {
         e.preventDefault();
         setIsLoading(true)
-        const res = await fetch("http://localhost:3001/users", {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },

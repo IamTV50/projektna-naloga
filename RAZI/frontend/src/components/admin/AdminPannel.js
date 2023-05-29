@@ -59,7 +59,7 @@ function AdminPannel() {
 	const handlePackagerClick = (packager) => {
 		const fetchUnlocks = async () => {
 			try {
-				const res = await fetch(`http://localhost:3001/unlocks/packagerUnlocks/${packager._id}`, {
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/unlocks/packagerUnlocks/${packager._id}`, {
 					credentials: "include"
 				})
 				const data = await res.json();

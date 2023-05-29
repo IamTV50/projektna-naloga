@@ -33,7 +33,7 @@ function AdminGetRequest({ request, onRequestDeleted }) {
 	}
 
 	const acceptRequest = () => {
-		fetch(`http://localhost:3001/users/addPackager`, {
+		fetch(`${process.env.REACT_APP_API_URL}/users/addPackager`, {
 			method: "PUT",
 			credentials: "include",
 			headers: { 'Content-Type': 'application/json'},
@@ -59,7 +59,7 @@ function AdminGetRequest({ request, onRequestDeleted }) {
 
 	const Delete = async () => {
 		try {
-			const response = await fetch(`http://localhost:3001/requests/${request._id}`, {
+			const response = await fetch(`${process.env.REACT_APP_API_URL}/requests/${request._id}`, {
 				method: "DELETE",
 				credentials: "include",
 			});

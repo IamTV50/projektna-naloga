@@ -25,7 +25,7 @@ function AdminUsersList() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const res = await fetch(`http://localhost:3001/requests`, {
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/requests`, {
                     credentials: "include"
                 })
                 const data = await res.json();

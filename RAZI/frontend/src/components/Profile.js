@@ -25,7 +25,7 @@ function Profile() {
 
     useEffect(function() {
         const getProfile = async function(){
-            const res = await fetch("http://localhost:3001/users/profile", {credentials: "include"});
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {credentials: "include"});
             const data = await res.json();
             setProfile(data);
         }
@@ -33,7 +33,7 @@ function Profile() {
     }, []);
 
     const deleteProfile = () => {
-        fetch(`http://localhost:3001/users`, {
+        fetch(`${process.env.REACT_APP_API_URL}/users`, {
             method: "DELETE",
             credentials: "include",
         }).then((res) => {
