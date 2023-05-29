@@ -159,3 +159,22 @@ def hog(slika, vel_celice = 8, vel_blok = 2, razdelki = 9):
             Hb = np.concatenate((Hb, Hk))
             
     return Hb
+
+
+def detect_and_crop_faces(img):
+	# Load the Haar cascade for face detection
+	face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+	#image = cv2.imread(image_path)
+	gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+	# Perform face detection
+	faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+	# Crop and return the detected face(s)
+	cropped_faces = []
+	for (x, y, w, h) in faces:
+		cropped_face = img[y:y+h, x:x+w]
+		cropped_faces.append(cropped_face)
+
+	return cropped_faces
