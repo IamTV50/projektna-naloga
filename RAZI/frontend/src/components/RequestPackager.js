@@ -6,11 +6,11 @@ import {
     Button, ButtonGroup,
     Card,
     CardBody,
-    Collapse, Input,
+    Collapse, FormControl, FormLabel, Heading, HStack, Input,
     NumberInput,
-    NumberInputField, Text,
+    NumberInputField, Select, Switch, Text,
     Textarea,
-    useToast
+    useToast, VStack
 } from "@chakra-ui/react";
 //import {UserContext} from "../userContext";
 
@@ -73,17 +73,52 @@ function RequestPackager({ onRequestAdd }) {
     return (
         // <Card variant="elevated" bg="gray.300" display="inline-block" my={2}>
         //     <CardBody>
-        <Box>
-            <form onSubmit={handleSubmit}>
-                <Text>Številka paketnika: </Text>
-                <Input border={"1px solid gray"} type={"number"} value={packagerNumber} onChange={handlePackagerNumberChange} name="packagerNumber"></Input>
-                <Text paddingTop={4}>Razlog:</Text>
-                <Textarea border={"1px solid gray"} value={reasonText} onChange={handleReasonChange} name="reason" />
-                <ButtonGroup mt={5}>
-                    <Button type="submit" colorScheme={"green"} name="submit" value="Submit">Submit</Button>
-                </ButtonGroup>
-            </form>
-        </Box>
+        <VStack alignItems="flex-start">
+            <HStack>
+                <Heading size="md">Request Packager:</Heading>
+            </HStack>
+            <FormControl>
+                <form onSubmit={handleSubmit}>
+                    <FormLabel htmlFor='packagerNumber' mb='0'>
+                        Packager number:
+                    </FormLabel>
+                    <NumberInput mt={2} value={packagerNumber} onChange={(valueString) => setPackagerNumber(Number(valueString))}>
+                        <NumberInputField border={"1px solid gray"} id='packagerNumber' type="text" name="packagerNumber" />
+                    </NumberInput>
+                    <FormLabel mb='0'>
+                        <Text paddingTop={4}>Note:</Text>
+                    </FormLabel>
+                    <Textarea mt={-2} border={"1px solid gray"} value={reasonText} onChange={handleReasonChange} name="reason" />
+
+                    <Button my={5} colorScheme={"blue"} type="submit" name="submit">Add</Button>
+                    {error !== "" && (
+                        <>
+                            <Alert status="error">
+                                <AlertIcon/>
+                                {error}
+                            </Alert>
+                            <Box h={4}/>
+                        </>
+                    )}
+                </form>
+            </FormControl>
+        </VStack>
+        // <Box>
+        //     <form onSubmit={handleSubmit}>
+        //         <FormLabel htmlFor='packagerNumber' mb='0'>
+        //             Packager number:
+        //         </FormLabel>
+        //         <NumberInput value={packagerNumber} onChange={(valueString) => setPackagerNumber(Number(valueString))}>
+        //             <NumberInputField id='packagerNumber' type="text" name="packagerNumber" />
+        //         </NumberInput>
+        //         {/*<Input border={"1px solid gray"} type={"number"} value={packagerNumber} onChange={handlePackagerNumberChange} name="packagerNumber"></Input>*/}
+        //         <Text paddingTop={4}>Razlog:</Text>
+        //         <Textarea border={"1px solid gray"} value={reasonText} onChange={handleReasonChange} name="reason" />
+        //         <ButtonGroup mt={5}>
+        //             <Button type="submit" colorScheme={"green"} name="submit" value="Submit">Submit</Button>
+        //         </ButtonGroup>
+        //     </form>
+        // </Box>
         //     </CardBody>
         //
         // </Card>

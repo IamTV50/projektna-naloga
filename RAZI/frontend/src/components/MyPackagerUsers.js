@@ -15,11 +15,7 @@ function MyPackagerUsers(props) {
 					{props.user.packagers.map((packager) => (
 						<React.Fragment key={packager._id}>
 							{packager.owner === props.owner && (
-								<HStack w="full">
-									<Text>Packager: {packager.number}</Text>
-									<Spacer />
-									<IconButton aria-label='Delete user packager' onClick={() => handleUserDelete(packager)} icon={<CloseIcon color={"red"} />}/>
-								</HStack>
+                                <Text pb={2}><IconButton mr={4} aria-label='Delete user packager' onClick={() => handleUserDelete(packager)} icon={<CloseIcon color={"red"} />}/> Packager: {packager.number} </Text>
 							)}
 						</React.Fragment>
 					))}

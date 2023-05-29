@@ -67,7 +67,10 @@ app.use(session({
   secret: 'work hard',
   resave: true,
   saveUninitialized: false,
-  store: MongoStore.create({mongoUrl: mongoDB})
+  store: MongoStore.create({mongoUrl: mongoDB}),
+  cookie: {
+    maxAge: 30 * 60 * 1000, // 30 minutes
+  },
 }));
 
 // Shranimo sejne spremenljivke v locals

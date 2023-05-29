@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Box, Divider} from "@chakra-ui/react";
+import {Box, Divider, Heading} from "@chakra-ui/react";
 import AdminGetPackager from "./AdminGetPackager";
 
 function AdminShowPackagers({ handlePackagerClick }){
@@ -67,7 +67,11 @@ function AdminShowPackagers({ handlePackagerClick }){
 	return (
 		<Box flex={1} w="100%" h="100%" overflowY="auto">
 			<div>
-				{isLoading ? "" : packagers.map(packager => (
+				{isLoading ? "" :
+					packagers.length === 0 ? (
+						<Heading size={"md"}>No packagers</Heading>
+					) : (
+					packagers.map(packager => (
 					<>
 						<AdminGetPackager
 							key={packager._id}
@@ -77,6 +81,7 @@ function AdminShowPackagers({ handlePackagerClick }){
 							handlePackagerClick={handlePackagerClick}/>
 						<Divider />
 					</>
+					)
 				))}
 			</div>
 		</Box>

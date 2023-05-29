@@ -31,7 +31,7 @@ function AdminUnlockHistory({ packager, unlockHistory }) {
     return (
         <Box alignItems={"start"} display="flex" flexDirection={"column"} flex={1} height={"100%"}>
             {packager != null ? <Heading mb={10} size={"md"}>Packager {packager.number} history:</Heading> : ""}
-            {unlockHistory.length === 0 ? <Text>No unlocks</Text>
+            {unlockHistory.length === 0 ? <Heading size={"md"}>No unlocks</Heading>
                 : <Stepper index={activeStep} orientation='vertical' overflow={"auto"} width={"100%"} height={"100%"} gap='0' >
                     {unlockHistory.map((unlock, index) => (
                         <Step key={index}>

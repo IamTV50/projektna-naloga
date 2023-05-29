@@ -156,8 +156,12 @@ function MyPackagers(){
 			const res = await fetch(`${process.env.REACT_APP_API_URL}/users/myPackagers/`, {credentials: "include"});
 			const data = await res.json();
 
-			console.log(data)
-			setMyPackagerUsers(data);
+            console.log("My packager users:");
+            console.log(data)
+
+            const filteredUsers = data.filter(user => user._id !== userContext.user._id);
+
+			setMyPackagerUsers(filteredUsers);
 		}
 
 		getMyPackagerUsers();
@@ -170,12 +174,11 @@ function MyPackagers(){
             status: "success",
             duration: 3000,
         })
+
         setRequests([...requests, newRequest]);
     };
 
     const handleRequestDelete = (requestId) => {
-        console.log("Deleting request with id: " + requestId);
-
         try {
             fetch(`${process.env.REACT_APP_API_URL}/requests/${requestId}`, {
                 method: "DELETE",
@@ -201,8 +204,6 @@ function MyPackagers(){
     }
 
 	const handleUserRequestDelete = (requestId) => {
-        console.log("Deleting request with id: " + requestId);
-
         try {
             fetch(`${process.env.REACT_APP_API_URL}/requests/${requestId}`, {
                 method: "DELETE",
@@ -210,6 +211,7 @@ function MyPackagers(){
             });
             const updatedRequests = myPackagerRequests.filter((request) => request._id !== requestId);
             setMyPackagerRequests(updatedRequests);
+
             toast({
                 title: "Request deleted",
                 description: "Request deleted successfully",
@@ -228,8 +230,6 @@ function MyPackagers(){
     }
 
 	const handleUserRequestApprove = (request) => {
-        console.log("Approving request with id: " + request._id);
-
         try {
             fetch(`${process.env.REACT_APP_API_URL}/users/addPackager`, {
                 method: "PUT",
@@ -242,6 +242,14 @@ function MyPackagers(){
             });
             
 			handleUserRequestDelete(request._id);
+            setMyPackagerUsers([...myPackagerUsers, request.user])
+
+            const delay = 300;
+            const timeoutId = setTimeout(() => {
+                setUserChanges(prev => !prev);
+            }, delay);
+
+
 
             toast({
                 title: "Request approved",
@@ -256,25 +264,31 @@ function MyPackagers(){
                 status: "error",
                 duration: 3000,
             })
-            console.log(error);
         }
     }
 
-	const handleUserPackagerDelete = (user, packager) => {
-        console.log("Deleting packager with id: " + packager._id + " from user with id: " + user._id);
-
+	const handleUserPackagerDelete = async (user, packager) => {
         try {
-            fetch(`${process.env.REACT_APP_API_URL}/users/removePackager`, {
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/users/removePackager`, {
                 method: "PUT",
-				credentials: "include",
-				headers: { 'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					username: user.username,
-					packagerNumber: packager.number
-				})
+                credentials: "include",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: user.username,
+                    packagerNumber: packager.number
+                })
             });
+            const data = await res.json();
 
             setUserChanges(!userChanges);
+
+            const userIndex = myPackagerUsers.findIndex((user) => user._id === data._id);
+
+            if (userIndex !== -1) {
+                const updatedUsers = [...myPackagerUsers];
+                updatedUsers[userIndex] = data; // Update the user in the updatedUsers array with the updated data
+                setMyPackagerUsers(updatedUsers);
+            }
 
             // toast({
             //     title: "Packager deleted",
@@ -289,7 +303,6 @@ function MyPackagers(){
                 status: "error",
                 duration: 3000,
             })
-            console.log(error);
         }
     }
 
@@ -365,7 +378,7 @@ function MyPackagers(){
                                 </PopoverTrigger>
                                 <PopoverContent>
                                     <PopoverArrow/>
-                                    <PopoverCloseButton fontSize="md"/>
+                                        <PopoverCloseButton fontSize="md"/>
                                     <PopoverBody>
                                         <RequestPackager onRequestAdd={handleRequestAdd}/>
                                     </PopoverBody>
@@ -383,7 +396,10 @@ function MyPackagers(){
                                                 <Spinner />
                                             </Center>
                                         ) : packagers.length === 0 ? (
-                                            "No packagers"
+                                            <Heading size={"md"}>
+                                                No packagers
+                                            </Heading>
+
                                         ) : (
                                             packagers.map((packager) => (
                                                 <>
@@ -405,7 +421,9 @@ function MyPackagers(){
                                                 <Spinner />
                                             </Center>
                                         ) : requests.length === 0 ? (
-                                            "No requests"
+                                            <Heading size={"md"}>
+                                                No requests
+                                            </Heading>
                                         ) : (
                                             requests.map((request) => (
                                                 <>
@@ -423,7 +441,9 @@ function MyPackagers(){
                                                 <Spinner />
                                             </Center>
                                         ) : myPackagerRequests.length === 0 ? (
-                                            "No requests from other users"
+                                            <Heading size={"md"}>
+                                                No requests from other users
+                                            </Heading>
                                         ) : (
                                             myPackagerRequests.map((request) => (
                                                 <>
@@ -441,7 +461,9 @@ function MyPackagers(){
                                                 <Spinner />
                                             </Center>
                                         ) : myPackagerUsers.length === 0 ? (
-                                            "No other user has access to your packager"
+                                            <Heading size={"md"}>
+                                                No other user has access to your packager
+                                            </Heading>
                                         ) : (
                                             myPackagerUsers.map((user) => (
                                                 <>

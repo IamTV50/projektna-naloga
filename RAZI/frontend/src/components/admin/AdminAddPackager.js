@@ -64,7 +64,7 @@ function AdminAddPackager() {
 	return (
         <VStack alignItems="flex-start">
         <HStack>
-        <Heading size="sl">Add Packager:</Heading>
+        <Heading size="md">Add Packager:</Heading>
         </HStack>
         <FormControl>
 		<form onSubmit={AddPackager}>

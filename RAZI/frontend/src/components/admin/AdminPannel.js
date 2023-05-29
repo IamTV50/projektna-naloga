@@ -88,17 +88,6 @@ function AdminPannel() {
 		}
 	};
 
-	// const handleRequestAdd = (newRequest) => {
-	// 	toast({
-	// 		title: "Request added",
-	// 		description: "Request added successfully",
-	// 		status: "success",
-	// 		duration: 3000,
-	// 	})
-	// 	// setRequests([...requests, newRequest]);
-	//
-	// 	setRefreshKeyRequests(prevKey => prevKey + 1);
-	// };
 	const handleTabChange = (index) => {
 		if (isOpen) {
 			onToggle();
@@ -147,12 +136,6 @@ function AdminPannel() {
 									<PopoverCloseButton fontSize="md"/>
 									<PopoverBody>
 										<AdminAddPackager />
-										{/*<form onSubmit={AddPackagerToUser}>*/}
-										{/*	<Heading my={2} size={"md"}>Add packager to user</Heading>*/}
-										{/*	<Input my={2} type="number" name="number" placeholder="Number"*/}
-										{/*		   value={packagerNumber} onChange={(e)=>(setPackagerNumber(e.target.value), setError(""))}/>*/}
-										{/*	<Button my={2} colorScheme={"green"} type="submit" name="submit">Add</Button>*/}
-										{/*</form>*/}
 									</PopoverBody>
 								</PopoverContent>
 							</Popover>
@@ -178,13 +161,12 @@ function AdminPannel() {
 					</Tabs>
 				</Box>
 				<Box marginLeft={"10px"}  w={isOpen ? "70%" : "0"} hidden={!isOpen} overflowY={"auto"}>
-					{/*<Collapse in={isOpen} animateOpacity>*/}
 					<Box
 						flex={1}
 						width="100%"
 						h="100%"
 						overflow="auto"
-						bgColor={colorMode === "light" ? "gray.100" : "blue.800"}
+						bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
 						borderRadius={25}
 						padding={10}
 						boxShadow="10px 15px 20px rgba(0, 0, 0, 0.1)"
@@ -203,34 +185,9 @@ function AdminPannel() {
 						}}>
 						{selectedPackager && <AdminUnlockHistory packager={selectedPackager} unlockHistory={packagerUnlocks}/>}
 					</Box>
-					{/*</Collapse>*/}
 				</Box>
 			</Box>
 		</Center>
-		// <div>
-		// 	<div>
-		// 		<AdminAddPackager></AdminAddPackager>
-		// 	</div>
-		// 	<Box h={4}/>
-		// 	<div>
-		// 		<AdminRequestsList requests={requests} onRequestDeleted={handleIdDelete}></AdminRequestsList>
-		//
-		// 		{/*<h3>Zahteve:</h3>*/}
-		// 		{/*<div>*/}
-		// 		{/*	<ul>*/}
-		// 		{/*		{isLoading ? "" : requests.map(request => (<AdminGetRequest request={request} key={request._id} onRequestDeleted={handleIdDelete}></AdminGetRequest>))}*/}
-		// 		{/*	</ul>*/}
-		// 		{/*</div>*/}
-		// 	</div>
-		// 	<Box h={4}/>
-		// 	<div>
-		// 		<AdminShowUsers onRequestDeleted={handleIdDelete}></AdminShowUsers>
-		// 	</div>
-		// 	<div>
-		// 		<h3>Packagers list:</h3>
-		// 		<AdminShowPackagers></AdminShowPackagers>
-		// 	</div>
-		// </div>
 	);
 }
  

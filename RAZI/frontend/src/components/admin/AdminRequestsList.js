@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {
     Box,
-    Center,
+    Center, Heading,
     Spinner,
     Text,
 } from "@chakra-ui/react";
@@ -41,7 +41,7 @@ function AdminRequestsList() {
                 <Center><Spinner/></Center>
             ) : requests.length === 0 ? (
                 <Center>
-                    <Text fontSize="xl">No requests</Text>
+                    <Heading size={"md"}>No requests</Heading>
                 </Center>
             ) : (
                 requests.map(request => (
