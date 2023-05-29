@@ -160,7 +160,6 @@ def hog(slika, vel_celice = 8, vel_blok = 2, razdelki = 9):
             
     return Hb
 
-
 def detect_and_crop_faces(img):
 	# Load the Haar cascade for face detection
 	face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -178,3 +177,31 @@ def detect_and_crop_faces(img):
 		cropped_faces.append(cropped_face)
 
 	return cropped_faces
+
+def prepare_false_faces():
+    train_features = []
+    train_labels = []
+
+    for image in os.listdir('images/false_imges'):
+        cropped_faces = detect_and_crop_faces(cv2.imread(f'images/false_imges/{image}'))
+        if len(cropped_faces) > 0:
+            face = cropped_faces[0]
+
+            # Perform LBP and HOG feature extraction on the face
+            lbp_features = lbp(face)
+            hog_features = hog(face)
+
+            # Combine the features and store them
+            features = np.concatenate((lbp_features, hog_features))
+            train_features.append(features)
+
+            # Set the label to 0 (frames NOT belong to the trained person)
+            train_labels.append(0)
+            
+    # Convert the lists to numpy arrays
+    train_features_array = np.array(train_features)
+    train_labels_array = np.array(train_labels)
+
+    # Save the arrays as npArray files
+    np.save('false_faces_train_features.npy', train_features_array)
+    np.save('false_faces_train_labels.npy', train_labels_array)

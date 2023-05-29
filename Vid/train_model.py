@@ -52,21 +52,16 @@ while True:
 # Release the video capture object
 cap.release()
 
-for image in os.listdir('images/false_imges'):
-	cropped_faces = detect_and_crop_faces(cv2.imread(f'images/false_imges/{image}'))
-	if len(cropped_faces) > 0:
-		face = cropped_faces[0]
+if (not os.path.isfile('false_faces_train_features.npy')) or (not os.path.isfile('false_faces_train_labels.npy')):
+	prepare_false_faces()
 
-		# Perform LBP and HOG feature extraction on the face
-		lbp_features = lbp(face)
-		hog_features = hog(face)
+# Load the false faces training features and labels
+false_faces_train_features = np.load('false_faces_train_features.npy')
+false_faces_train_labels = np.load('false_faces_train_labels.npy')
 
-		# Combine the features and store them
-		features = np.concatenate((lbp_features, hog_features))
-		train_features.append(features)
-
-		# Set the label to 0 (frames NOT belong to the trained person)
-		train_labels.append(0)
+# Extend the original training features and labels with the false faces data
+train_features.extend(false_faces_train_features)
+train_labels.extend(false_faces_train_labels)
 
 # Convert the training features and labels to numpy arrays
 train_features = np.array(train_features)
