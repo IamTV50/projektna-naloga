@@ -32,7 +32,9 @@ if ! [ -f .env ]; then
     echo "Please create the .env file and try running this script again"
     exit 1
 fi
-npm install
+
+if [ -d "node_modules" ]; then rm -r "node_modules"; fi
+#npm install
 cd ../../Administracija
 
 # Build backend image
