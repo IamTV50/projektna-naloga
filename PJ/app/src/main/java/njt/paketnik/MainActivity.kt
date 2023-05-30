@@ -125,23 +125,26 @@ class MainActivity : AppCompatActivity() {
                                 return@launch
                             }
 
-                            if (!resJson["public"].toString().toBoolean()) {
-                                val packagerSet = app.userInfo.getStringSet("packagers", emptySet())
+                            if (!resJson["active"].toString().toBoolean()) {
+                                binding.statusTxt.text = getString(R.string.packagerInactiveText, boxNumber.toString())
+                                return@launch
+                            }
 
-                                if (packagerSet.isNullOrEmpty()) {
-                                    binding.statusTxt.text = getString(R.string.emptyPackagerListText)
-                                    return@launch
-                                }
+                            val packagerSet = app.userInfo.getStringSet("packagers", emptySet())
 
-                                val packagerIds = packagerSet.map { packager ->
-                                    val jsonObject = JSONObject(packager)
-                                    jsonObject.optString("_id")
-                                }
+                            if (packagerSet.isNullOrEmpty()) {
+                                binding.statusTxt.text = getString(R.string.emptyPackagerListText)
+                                return@launch
+                            }
 
-                                if (!packagerIds.contains(resJson["_id"].toString())) {
-                                    binding.statusTxt.text = getString(R.string.notContainPackagerText, boxNumber.toString())
-                                    return@launch
-                                }
+                            val packagerIds = packagerSet.map { packager ->
+                                val jsonObject = JSONObject(packager)
+                                jsonObject.optString("_id")
+                            }
+
+                            if (!packagerIds.contains(resJson["_id"].toString())) {
+                                binding.statusTxt.text = getString(R.string.notContainPackagerText, boxNumber.toString())
+                                return@launch
                             }
                         }
 

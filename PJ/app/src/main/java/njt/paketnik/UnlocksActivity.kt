@@ -42,15 +42,21 @@ class UnlocksActivity : AppCompatActivity() {
                         Toast.makeText(applicationContext, resJson["error"].toString(), Toast.LENGTH_SHORT).show()
                     }
                 } else if (resJson is JSONArray) {
-                    val unlocksList = mutableListOf<String>()
+                    val unlocksList = mutableListOf<Unlock>()
 
                     for (i in 0 until resJson.length()) {
                         val unlockObject = resJson.optJSONObject(i)
                         val unlockId = unlockObject?.getString("_id")
-                        unlockId?.let { unlocksList.add(it) }
+                        unlockId?.let {
+                            val number = unlockObject.optJSONObject("packager")?.getInt("number") ?: 0
+                            val date = unlockObject.getString("openedOn") ?: ""
+                            val success = unlockObject.getBoolean("success")
+                            val reason = unlockObject.getString("status") ?: ""
+                            unlocksList.add(Unlock(number, date, success, reason))
+                        }
                     }
 
-                    binding.unlocksList.adapter = ArrayAdapter(this@UnlocksActivity, R.layout.simple_list_item_1, unlocksList)
+                    binding.unlocksList.adapter = UnlocksAdapter(this@UnlocksActivity, unlocksList)
                 } else {
                     Toast.makeText(applicationContext, "Unexpected response type", Toast.LENGTH_SHORT).show()
                 }
@@ -65,4 +71,6 @@ class UnlocksActivity : AppCompatActivity() {
             }
         }
     }
+
+    inner class Unlock(val number: Int, val date: String, val success: Boolean, val reason: String)
 }

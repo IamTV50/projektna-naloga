@@ -52,4 +52,10 @@
     <string name="parsingErrorText">Pasring error!</string>
     <string name="emptyPackagerListText">You can not open any private packager!</string>
     <string name="notContainPackagerText">You can not open this packager: %s!</string>
+    <string name="packagerInactiveText">This packager is inactive: %s!</string>
+
+    <string name="unlockNumber">Number: %s</string>
+    <string name="unlockDate">Date: %s</string>
+    <string name="unlockSuccess">Success: %s</string>
+    <string name="unlockReason">Reason: %s</string>
 </resources>
