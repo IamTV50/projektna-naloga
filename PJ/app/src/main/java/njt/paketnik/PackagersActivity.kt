@@ -36,6 +36,6 @@ class PackagersActivity : AppCompatActivity() {
             JSONObject(packager).getString("number")
         }?.toMutableList() ?: mutableListOf()
 
-        binding.packagerList.adapter = ArrayAdapter(this@PackagersActivity, android.R.layout.simple_list_item_1, packagerNumbers)
+        binding.packagerList.adapter = PackagersAdapter(this@PackagersActivity, packagerNumbers)
     }
 }

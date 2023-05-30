@@ -54,7 +54,7 @@
     <string name="notContainPackagerText">You can not open this packager: %s!</string>
     <string name="packagerInactiveText">This packager is inactive: %s!</string>
 
-    <string name="unlockNumber">Number: %s</string>
+    <string name="packagerNumber">Packager: %s</string>
     <string name="unlockDate">Date: %s</string>
     <string name="unlockSuccess">Success: %s</string>
     <string name="unlockReason">Reason: %s</string>
