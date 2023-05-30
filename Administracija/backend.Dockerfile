@@ -1,10 +1,12 @@
-FROM node:18.16.0
+#version of busybox
+FROM alpine
+
+RUN apk update \
+    && apk upgrade \
+    && apk add python3 nodejs npm 
 
 WORKDIR /app/backend
 
 COPY ../RAZI/backend .
 
-RUN npm config set registry https://registry.npm.taobao.org/
-RUN npm install
-
-CMD ["npm", "start"]
+CMD npm install && npm start
