@@ -1,6 +1,7 @@
 var UserModel = require('../models/userModel.js');
 var PackagerModel = require('../models/packagerModel.js');
 var RequestModel = require('../models/requestModel.js');
+const fs = require('fs');
 
 module.exports = {
 
@@ -193,6 +194,36 @@ module.exports = {
 		});
     },
 
+	// Save video as userId.mp4
+	registerFace: function (req, res) {
+		var id = req.body.id;
+		var video = req.file;
+
+		if (!video) {
+			return res.status(400).json({ error: 'No MP4 file uploaded.' });
+		}
+	  
+		fs.renameSync(video.path, 'public/python/tmp_videos/' + id + '.mp4');
+
+		// Call python file and create model for user named userId.h5
+		return res.status(200).json({ message: 'MP4 file uploaded successfully.' });
+    },
+
+	// Save image as userId.jpg
+	faceId: function (req, res) {
+		var id = req.body.id;
+		var image = req.file;
+
+		if (!image) {
+			return res.status(400).json({ error: 'No JPG file uploaded.' });
+		}
+	  
+		fs.renameSync(image.path, 'public/python/tmp_images/' + id + '.jpg');
+
+		// Call python file and check if image matches model
+		return res.status(200).json({ message: 'JPG file uploaded successfully.' });
+    },
+
     update: function (req, res) {
         var id = req.params.id;
 
@@ -282,7 +313,7 @@ module.exports = {
 						});
 					}
 
-					if (!packager.owner && !packager.public) {
+					if (!packager.owner && !packager.public && !user.admin) {
 						packager.owner = user._id
 
 						packager.save(function (err, packager) {

@@ -12,7 +12,7 @@ import {
 	Icon,
 	IconButton,
 	Input,
-	Text,
+	Text, useColorMode, useToast,
 	VStack
 } from "@chakra-ui/react";
 import {ChevronDownIcon, ChevronUpIcon} from "@chakra-ui/icons";
@@ -20,6 +20,7 @@ import AdminGetRequest from "./AdminGetRequest";
 import {useCollapse} from "react-collapsed";
 
 function AdminShowUsers({ onRequestDeleted }){
+	const toast = useToast()
 	const [users, setUsers] = useState({})
 	const [isLoading, setIsLoading] = useState(true);
 	const [deletedUser, setDeletedUser] = useState(null);
@@ -28,11 +29,12 @@ function AdminShowUsers({ onRequestDeleted }){
 	const [searchedUsers, setSearchedUsers] = useState([]);
 	const [isExpanded, setExpanded] = useState(false)
 	const { getCollapseProps, getToggleProps } = useCollapse({ isExpanded })
+	const { colorMode, toggleColorMode } = useColorMode()
 
 	useEffect(() => {
 		const fetchRequests = async () => {
 			try {
-				const res = await fetch(`http://localhost:3001/users`, {
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
 					credentials: "include"
 				})
 				const data = await res.json();
@@ -54,7 +56,7 @@ function AdminShowUsers({ onRequestDeleted }){
                 {
                     label: 'Yes',
                     onClick: () => {
-                        fetch(`http://localhost:3001/users/${uid}`, {
+                        fetch(`${process.env.REACT_APP_API_URL}/users/${uid}`, {
                             method: "DELETE",
                             credentials: "include",
                         }).then((res) => {
@@ -91,7 +93,12 @@ function AdminShowUsers({ onRequestDeleted }){
 		console.log(filteredUsers);
 		
 		if (filteredUsers.length === 0) {
-			alert("0 users have that name or email");
+			toast({
+				title: "No users found",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			})
 		}
 
 		setSearchedUsers(filteredUsers)
@@ -103,94 +110,53 @@ function AdminShowUsers({ onRequestDeleted }){
 		setSearchedUsers([]);
 	}
 
-	const handleNameInputChange = (e) => { setSearchName(e.target.value); }
+	const handleNameInputChange = (e) => {
+		setSearchName(e.target.value);
+		if (e.target.value === "") handleResetSearch();
+	}
 	const handleEmailInputChange = (e) => { setSearchEmail(e.target.value); }
 
 	return (
-		<VStack alignItems="flex-start">
-			<HStack>
-				<Heading size="sl">Uporabniki</Heading>
-				<IconButton variant="blue"
-							icon={<Icon as={isExpanded ? ChevronUpIcon : ChevronDownIcon} boxSize={6} />}
-							{...getToggleProps({
-								onClick: () => setExpanded((prevExpanded) => !prevExpanded),
-							})}>
-				</IconButton>
-			</HStack>
-
-			<Collapse in={isExpanded}>
+		<Box flex={1} w="100%" h="100%" overflowY="auto">
 				<div>
-
-					<Input type="text" placeholder="Search by name" value={searchName} onChange={handleNameInputChange} mb={4}/>
-					<Input type="text" placeholder="Search by email" value={searchEmail} onChange={handleEmailInputChange} mb={4}/>
-					<Button variant="blue" onClick={() => searchUsers()}>Search</Button>
+					<form onSubmit={searchUsers} onSubmitCapture={(e) => e.preventDefault()}>
+						<Input type="text" placeholder="Search by name" value={searchName} onChange={handleNameInputChange} mb={4}/>
+						<Input type="text" placeholder="Search by email" value={searchEmail} onChange={handleEmailInputChange} mb={4}/>
+						<Button colorScheme={"blue"} type={"submit"} onClick={() => searchUsers()}>Search</Button>
+					</form>
 					{/*{ searchedUsers.length > 0 ? <Button variant="blue" mx={2} onClick={() => handleResetSearch()}>Reset</Button> : "" }*/}
 					<Box h={4}/>
 					{isLoading
 						? ""
 						: searchedUsers.length > 0
 						? searchedUsers.map((user) => (
-								<Card key={user._id} mb={4} variant={"elevated"} backgroundColor={"gray.300"}>
-									<CardBody>
-										<Text>{user.username}</Text>
-										<Text>{user.email}</Text>
-										{user.admin === true ? <Badge colorScheme="green">Admin</Badge> : <Badge colorScheme="red">User</Badge>}
-										<HStack my={6}>
-											<Button variant="blue" as={Link} to='/admin/userInfo' state={ user }>Prikaži profil</Button>
-											<Button variant="red" onClick={() => deleteUser(user._id)}>Delete</Button>
-										</HStack>
-									</CardBody>
-								</Card>
-						))
-						: users.map((user) => (
-							<Card key={user._id} mb={4} variant={"elevated"} backgroundColor={"gray.300"}>
+							<Card key={user._id} mb={4} variant={"elevated"} bgColor={colorMode === "light" ? "gray.200" : "gray.800"}>
 								<CardBody>
 									<Text>{user.username}</Text>
 									<Text>{user.email}</Text>
 									{user.admin === true ? <Badge colorScheme="green">Admin</Badge> : <Badge colorScheme="red">User</Badge>}
 									<HStack my={6}>
-										<Button variant="blue" as={Link} to='/admin/userInfo' state={ user }>Prikaži profil</Button>
-										<Button variant="red" onClick={() => deleteUser(user._id)}>Delete</Button>
+										<Button colorScheme={"blue"} as={Link} to='/admin/userInfo' state={ user }>Prikaži profil</Button>
+										<Button colorScheme={"red"} onClick={() => deleteUser(user._id)}>Delete</Button>
+									</HStack>
+								</CardBody>
+							</Card>
+						))
+						: users.map((user) => (
+							<Card key={user._id} mb={4} variant={"elevated"} bgColor={colorMode === "light" ? "gray.200" : "gray.800"}>
+								<CardBody>
+									<Text>{user.username}</Text>
+									<Text>{user.email}</Text>
+									{user.admin === true ? <Badge colorScheme="green">Admin</Badge> : <Badge colorScheme="red">User</Badge>}
+									<HStack my={6}>
+										<Button colorScheme={"blue"} as={Link} to='/admin/userInfo' state={ user }>Prikaži profil</Button>
+										<Button colorScheme={"red"} onClick={() => deleteUser(user._id)}>Delete</Button>
 									</HStack>
 								</CardBody>
 							</Card>
 						))}
 				</div>
-			</Collapse>
-		</VStack>
-		// <div>
-		//
-		// 	<input type='text' id='userNameSearch_input' placeholder='search by name' onChange={handleNameInputChange}/> <br/>
-		// 	<input type='text' id='userEmailSearch_input' placeholder='search by email' onChange={handleEmailInputChange}/> <br/>
-		// 	<button onClick={() => searchUsers()}>search</button>
-		// 	{ searchedUsers.length > 0 ? <button onClick={() => handleResetSearch()}>reset</button> : "" }
-		// 	<br/>
-		// 	<ul>
-		// 		{isLoading
-		// 			? ""
-		// 			: searchedUsers.length > 0
-		// 			? searchedUsers.map((user) => (
-		// 				<li key={user._id}>
-		// 				<span>{user.username} </span>
-		// 				<span> {user.email}</span>
-		// 				<button onClick={() => deleteUser(user._id)}>delete user</button>
-		// 				<Link to='/admin/userInfo' state={ user }>
-		// 					<button>show user profile</button>
-		// 				</Link>
-		// 				</li>
-		// 			))
-		// 			: users.map((user) => (
-		// 				<li key={user._id}>
-		// 				<span>{user.username} </span>
-		// 				<span> {user.email}</span>
-		// 				<button onClick={() => deleteUser(user._id)}>delete user</button>
-		// 				<Link to='/admin/userInfo' state={ user }>
-		// 					<button>show user profile</button>
-		// 				</Link>
-		// 				</li>
-		// 			))}
-		// 	</ul>
-		// </div>
+		</Box>
 	 );
 }
  
