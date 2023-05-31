@@ -1,11 +1,18 @@
 package njt.paketnik
 
 import android.R
+import android.content.Intent
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.Toolbar
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.launch
 import njt.paketnik.databinding.ActivityPackagersBinding
 import njt.paketnik.databinding.ActivityUnlocksBinding
@@ -18,6 +25,11 @@ class UnlocksActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUnlocksBinding
     lateinit var app: MyApp
 
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navView: NavigationView
+    private lateinit var toolbar: Toolbar
+    private lateinit var toggle: ActionBarDrawerToggle
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUnlocksBinding.inflate(layoutInflater)
@@ -25,7 +37,65 @@ class UnlocksActivity : AppCompatActivity() {
         app = application as MyApp
         setContentView(view)
 
+        drawerLayout = binding.drawerLayout
+        navView = binding.navView
+        toolbar = binding.toolbar
+
         fetchUnlocks()
+
+        // drawer
+        setSupportActionBar(toolbar)
+
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar,
+            njt.paketnik.R.string.navigation_drawer_open,
+            njt.paketnik.R.string.navigation_drawer_close
+        )
+
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            // Handle navigation view item clicks here.
+            when (menuItem.itemId) {
+                njt.paketnik.R.id.openScannerBtn -> {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                }
+
+                njt.paketnik.R.id.openPackagersBtn -> {
+                    val intent = Intent(this, PackagersActivity::class.java)
+                    startActivity(intent)
+                }
+
+                njt.paketnik.R.id.openUnlocksBtn -> {
+                    val intent = Intent(this, UnlocksActivity::class.java)
+                    startActivity(intent)
+                }
+
+                njt.paketnik.R.id.openSettingsBtn -> {
+                    val intent = Intent(this, SettingsActivity::class.java)
+                    startActivity(intent)
+                }
+
+                njt.paketnik.R.id.logoutBtn -> {
+                    app.unsetUser()
+                }
+            }
+
+            drawerLayout.closeDrawers()
+            true
+        }
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onPostCreate(savedInstanceState, persistentState)
+        toggle.syncState()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        toggle.onConfigurationChanged(newConfig)
     }
 
     private fun fetchUnlocks() {

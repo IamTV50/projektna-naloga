@@ -3,17 +3,23 @@ package njt.paketnik
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Base64
 import android.media.MediaPlayer
+import android.os.PersistableBundle
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.navigation.NavigationView
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import njt.paketnik.databinding.ActivityMainBinding
@@ -34,6 +40,11 @@ class MainActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
     private lateinit var app: MyApp
 
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navView: NavigationView
+    private lateinit var toolbar: Toolbar
+    private lateinit var toggle: ActionBarDrawerToggle
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +52,10 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         app = application as MyApp
         setContentView(view)
+
+        drawerLayout = binding.drawerLayout
+        navView = binding.navView
+        toolbar = binding.toolbar
 
         if (app.settings.contains("Theme")) {
             when (app.settings.getInt("Theme", 0)) {
@@ -67,11 +82,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.openScannerBtn.setOnClickListener {
-            startQRScanner()
-        }
 
-        binding.logoutBtn.setOnClickListener{
-            app.unsetUser()
         }
 
         binding.openPackagersList.setOnClickListener {
@@ -88,6 +99,59 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
+
+        // drawer
+        setSupportActionBar(toolbar)
+
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            // Handle navigation view item clicks here.
+            when (menuItem.itemId) {
+                R.id.openScannerBtn -> {
+                    startQRScanner()
+                }
+
+                R.id.openPackagersBtn -> {
+                    val intent = Intent(this, PackagersActivity::class.java)
+                    startActivity(intent)
+                }
+
+                R.id.openUnlocksBtn -> {
+                    val intent = Intent(this, UnlocksActivity::class.java)
+                    startActivity(intent)
+                }
+
+                R.id.openSettingsBtn -> {
+                    val intent = Intent(this, SettingsActivity::class.java)
+                    startActivity(intent)
+                }
+
+                R.id.logoutBtn -> {
+                    app.unsetUser()
+                }
+            }
+
+            drawerLayout.closeDrawers()
+            true
+        }
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onPostCreate(savedInstanceState, persistentState)
+        toggle.syncState()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        toggle.onConfigurationChanged(newConfig)
     }
 
     private val qrScannerActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
