@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
     Alert, AlertIcon, Box,
     Button, Collapse,
@@ -7,7 +7,7 @@ import {
     Heading,
     HStack, Icon, IconButton,
     NumberInput,
-    NumberInputField,
+    NumberInputField, Select,
     Switch,
     VStack
 } from "@chakra-ui/react";
@@ -15,21 +15,39 @@ import {useCollapse} from "react-collapsed";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 
 function AdminAddPackager() {
-	const [number, setNumber] = useState(0);
+	const [number, setNumber] = useState("");
 	const [publicPackager, setPublicPackager] = useState(true);
     const [error, setError] = useState("");
     const [isExpanded, setExpanded] = useState(false)
     const { getCollapseProps, getToggleProps } = useCollapse({ isExpanded })
+    const [users, setUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState("");
+
+    useEffect(() => {
+        // Fetch all users
+        async function fetchUsers() {
+            try {
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/users`);
+                const data = await res.json();
+                setUsers(data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        fetchUsers();
+    }, []);
 
     async function AddPackager(e) {
         e.preventDefault();
-        const res = await fetch("http://localhost:3001/packagers", {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/packagers`, {
             method: "POST",
             credentials: "include",
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify({
                 number: number,
-                public: publicPackager
+                public: publicPackager,
+                owner: publicPackager ? null : selectedUser
             })
         });
         const data = await res.json();
@@ -46,33 +64,34 @@ function AdminAddPackager() {
 	return (
         <VStack alignItems="flex-start">
         <HStack>
-        <Heading size="sl">Dodaj paketnik</Heading>
-        <IconButton variant="blue"
-                    icon={<Icon as={isExpanded ? ChevronUpIcon : ChevronDownIcon} boxSize={6} />}
-                {...getToggleProps({
-                    onClick: () => setExpanded((prevExpanded) => !prevExpanded),
-                })}>
-        </IconButton>
+        <Heading size="md">Add Packager:</Heading>
         </HStack>
-        <Collapse in={isExpanded}>
         <FormControl>
 		<form onSubmit={AddPackager}>
-            <HStack>
-                <FormLabel htmlFor='packagerNumber' mb='0'>
-                    Številka paketnika:
-                </FormLabel>
-                <NumberInput value={number} onChange={(valueString) => setNumber(Number(valueString))}>
-                    <NumberInputField id='packagerNumber' border="2px solid gray" _hover={{ border: "2px solid blue"}} type="text" name="packagerNumber" />
-                </NumberInput>
-            </HStack>
+
+            <FormLabel htmlFor='packagerNumber' mb='0'>
+                Packager number:
+            </FormLabel>
+            <NumberInput value={number} onChange={(valueString) => setNumber(Number(valueString))}>
+                <NumberInputField id='packagerNumber' type="text" name="packagerNumber" />
+            </NumberInput>
             <HStack py={4}>
             <FormLabel htmlFor='publicPackager' mb='0'>
                 Public:
             </FormLabel>
             <Switch id='publicPackager' isChecked={publicPackager} onChange={(e) => setPublicPackager(e.target.checked)} />
             </HStack>
-            <Button variant="blue" type="submit" name="submit">Dodaj</Button>
-            <Box h={4}/>
+            {!publicPackager && (
+                <Select placeholder="Select user"
+                        onChange={(e) => setSelectedUser(e.target.value)}
+                        value={selectedUser}>
+                    {users.map((user) => (
+                        <option key={user._id} value={user._id}>{user.username}</option>
+                    ))}
+
+                </Select>
+            )}
+            <Button my={4} colorScheme={"blue"} type="submit" name="submit">Add</Button>
             {error !== "" && (
                 <>
                 <Alert status="error">
@@ -85,9 +104,8 @@ function AdminAddPackager() {
             )}
         </form>
         </FormControl>
-        </Collapse>
         </VStack>
 	);
 }
- 
+
 export default AdminAddPackager;

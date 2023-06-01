@@ -5,11 +5,11 @@ import {
     Alert,
     AlertIcon,
     Button,
-    ButtonGroup, Center, Heading,
+    ButtonGroup, Card, Center, Heading,
     HStack,
     Input,
     InputGroup,
-    InputRightElement,
+    InputRightElement, useColorMode,
     VStack
 } from '@chakra-ui/react'
 
@@ -19,6 +19,7 @@ function Login() {
     const [error, setError] = useState("");
     const userContext = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(false);
+    const { colorMode, toggleColorMode } = useColorMode()
 
     const [show, setShow] = React.useState(false)
     const handleClick = () => setShow(!show)
@@ -26,7 +27,7 @@ function Login() {
     async function Login(e) {
         e.preventDefault();
         setIsLoading(true)
-        const res = await fetch("http://localhost:3001/users/login", {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/users/login`, {
             method: "POST",
             credentials: "include",
             headers: { 'Content-Type': 'application/json'},
@@ -36,14 +37,11 @@ function Login() {
             })
         });
         const data = await res.json();
-        console.log(data);
 
         if (data._id !== undefined) {
-            // console.log("setting user context")
             userContext.setUserContext(data);
             setIsLoading(false)
         } else {
-            console.log("invalid username or password")
             setUsername("");
             setPassword("");
             setError("Invalid username or password");
@@ -53,9 +51,10 @@ function Login() {
 
     return (
         <Center flex={1}>
-            <VStack as="form" onSubmit={Login} width={{base: "100%", md: "70%", xl: "25%"}} bgColor={"gray.100"} borderRadius={"25"} padding={10} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
+            <Card alignItems={"center"} paddingX={"4%"} paddingBottom={"2%"} pt={"3%"} borderRadius={"25"} variant={"elevated"} bgColor={colorMode === "light" ? "gray.100" : "gray.700"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
+            <VStack as="form" onSubmit={Login}>
                 {userContext.user ? <Navigate replace to="/" /> : ""}
-                <Heading mb={4}>Login</Heading>
+                <Heading mb={8}>Login</Heading>
                 <Input type="text" name="username" placeholder="Username"
                           value={username} onChange={(e)=>(setUsername(e.target.value))}/>
                 <InputGroup size='md' py={2}>
@@ -72,15 +71,15 @@ function Login() {
                         </Button>
                     </InputRightElement>
                 </InputGroup>
-                <ButtonGroup size='md' py={2}>
+                <ButtonGroup size='md' pt={4}>
                     <Button type="submit" colorScheme={"green"} isLoading={isLoading} loadingText="Logging in..." onClick={Login}>Login</Button>
-                    {/*<Button as={Link} to='/register'>Register</Button>*/}
                 </ButtonGroup>
                 {error ? <Alert status="error">
                     <AlertIcon />
                     {error}
                 </Alert> : ""}
             </VStack>
+            </Card>
         </Center>
     );
 }

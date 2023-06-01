@@ -10,7 +10,7 @@ import {
     AlertDialogOverlay,
     Button,
     Card,
-    CardBody, useDisclosure,
+    CardBody, CardFooter, CardHeader, Center, Heading, Text, useColorMode, useDisclosure,
     VStack
 } from "@chakra-ui/react";
 import {hover} from "@testing-library/user-event/dist/hover";
@@ -18,13 +18,14 @@ import {hover} from "@testing-library/user-event/dist/hover";
 function Profile() {
     const userContext = useContext(UserContext);
     const [profile, setProfile] = useState({});
+    const { colorMode, toggleColorMode } = useColorMode()
 
     const { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = React.useRef()
 
     useEffect(function() {
         const getProfile = async function(){
-            const res = await fetch("http://localhost:3001/users/profile", {credentials: "include"});
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/users/profile`, {credentials: "include"});
             const data = await res.json();
             setProfile(data);
         }
@@ -32,7 +33,7 @@ function Profile() {
     }, []);
 
     const deleteProfile = () => {
-        fetch(`http://localhost:3001/users`, {
+        fetch(`${process.env.REACT_APP_API_URL}/users`, {
             method: "DELETE",
             credentials: "include",
         }).then((res) => {
@@ -44,18 +45,21 @@ function Profile() {
     };
 
     return (
-        <>
-            <VStack alignItems={"self-start"}>
-                {!userContext.user ? <Navigate replace to="/login" /> : ""}
-                <h1>Uporabniški račun</h1>
-                <Card variant="elevated" bgColor="gray.300" display="inline-block" my={2} padding={4} paddingBottom={0}>
-                    <CardBody >
-                        <p>Username: {profile.username}</p>
-                        <p>Email: {profile.email}</p>
-                    </CardBody>
-                </Card>
-                <Button variant="red" onClick={onOpen}>Delete Profile</Button>
-            </VStack>
+        <Center flex={1}>
+            {userContext.user ? "" : <Navigate replace to="/" />}
+            <Card alignItems={"center"} paddingX={"6%"} paddingTop={4} borderRadius={"25"} variant={"elevated"} bgColor={colorMode === "light" ? "gray.100" : "gray.700"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
+                <CardHeader>
+                    <Heading >My profile</Heading>
+                </CardHeader>
+                <CardBody>
+                    <Text>Username: {profile.username}</Text>
+                    <Text>Email: {profile.email}</Text>
+                </CardBody>
+                <CardFooter>
+                    <Button colorScheme="red" onClick={onOpen}>Delete Profile</Button>
+                </CardFooter>
+
+            </Card>
             <AlertDialog
                 isOpen={isOpen}
                 leastDestructiveRef={cancelRef}
@@ -64,7 +68,7 @@ function Profile() {
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                            Delete Customer
+                            Delete Profile
                         </AlertDialogHeader>
 
                         <AlertDialogBody>
@@ -72,18 +76,17 @@ function Profile() {
                         </AlertDialogBody>
 
                         <AlertDialogFooter>
-                            <Button variant="blue" ref={cancelRef} onClick={onClose}>
+                            <Button colorScheme={"blue"} ref={cancelRef} onClick={onClose}>
                                 Cancel
                             </Button>
-                            <Button variant='red' onClick={deleteProfile} ml={3}>
+                            <Button colorScheme={"red"} onClick={deleteProfile} ml={3}>
                                 Delete
                             </Button>
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialogOverlay>
             </AlertDialog>
-
-        </>
+        </Center>
     );
 }
 
