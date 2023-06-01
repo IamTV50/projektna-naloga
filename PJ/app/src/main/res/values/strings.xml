@@ -44,6 +44,7 @@
         <item>MP3 HF</item>
     </string-array>
     <string name="confirmText">Confirm</string>
+    <string name="registerFaceIdText">Face ID</string>
     <string name="exitText">Exit</string>
 
     <string name="successText">Success</string>
