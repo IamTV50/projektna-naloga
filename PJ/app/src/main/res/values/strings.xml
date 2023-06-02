@@ -1,14 +1,52 @@
 <resources>
     <string name="app_name">PJ</string>
 
-    <string name="usernameHint">username</string>
-    <string name="passwordHint">password</string>
+    <string name="usernameHint">Username</string>
+    <string name="passwordHint">Password</string>
     <string name="loginText">Login</string>
 
     <string name="scannerText">Scanner</string>
     <string name="resultText">Result</string>
     <string name="statusText">Status</string>
+    <string name="packagersText">Packagers</string>
+    <string name="unlocksText">Unlocks</string>
+    <string name="settingsText">Settings</string>
     <string name="logoutText">Logout</string>
+    <string-array name="addUnlockTrue">
+        <item>Picked up package</item>
+        <item>Delivered package</item>
+        <item>Box full</item>
+        <item>Other/Maintenance</item>
+    </string-array>
+    <string-array name="addUnlockFalse">
+        <item>No sound</item>
+        <item>Wrong packager</item>
+        <item>Lock failiure</item>
+        <item>Low battery</item>
+        <item>Other</item>
+    </string-array>
+
+    <string name="textViewTheme">Theme:</string>
+    <string name="textViewFormat">Format:</string>
+    <string name="spinnerTheme">Theme</string>
+    <string name="spinnerFormat">Format</string>
+    <string-array name="themesArray">
+        <item>System</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="formatArray">
+        <item>WAV GZIP</item>
+        <item>WAV ZIP</item>
+        <item>WAV GZIP HF</item>
+        <item>WAV ZIP HF</item>
+        <item>MP3</item>
+        <item>MP3 HF</item>
+    </string-array>
+    <string name="confirmText">Confirm</string>
+    <string name="registerFaceIdText">Register Face</string>
+    <string name="confirmFaceIdText">Confirm Face</string>
+    <string name="exitText">Exit</string>
 
     <string name="successText">Success</string>
     <string name="responseErrorText">Response error!</string>
@@ -16,4 +54,13 @@
     <string name="parsingErrorText">Pasring error!</string>
     <string name="emptyPackagerListText">You can not open any private packager!</string>
     <string name="notContainPackagerText">You can not open this packager: %s!</string>
+    <string name="packagerInactiveText">This packager is inactive: %s!</string>
+
+    <string name="packagerNumber">Packager: %s</string>
+    <string name="unlockDate">Date: %s</string>
+    <string name="unlockSuccess">Success: %s</string>
+    <string name="unlockReason">Reason: %s</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

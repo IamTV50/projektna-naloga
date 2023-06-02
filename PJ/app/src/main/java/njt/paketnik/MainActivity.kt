@@ -3,15 +3,23 @@ package njt.paketnik
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Base64
 import android.media.MediaPlayer
+import android.os.PersistableBundle
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.navigation.NavigationView
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import njt.paketnik.databinding.ActivityMainBinding
@@ -32,6 +40,11 @@ class MainActivity : AppCompatActivity() {
     private var mediaPlayer: MediaPlayer? = null
     private lateinit var app: MyApp
 
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navView: NavigationView
+    private lateinit var toolbar: Toolbar
+    private lateinit var toggle: ActionBarDrawerToggle
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,6 +52,24 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         app = application as MyApp
         setContentView(view)
+
+        drawerLayout = binding.drawerLayout
+        navView = binding.navView
+        toolbar = binding.toolbar
+
+        if (app.settings.contains("Theme")) {
+            when (app.settings.getInt("Theme", 0)) {
+                0 -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                }
+                1 -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                }
+                2 -> {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                }
+            }
+        }
 
         if (app.userInfo.getString("userID", "") == "") {
             val intent = Intent(this, LoginActivity::class.java)
@@ -51,17 +82,76 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.openScannerBtn.setOnClickListener {
-            startQRScanner()
-        }
 
-        binding.logoutBtn.setOnClickListener{
-            app.unsetUser()
         }
 
         binding.openPackagersList.setOnClickListener {
-            val intent = Intent(this, Packagers::class.java)
+            val intent = Intent(this, PackagersActivity::class.java)
             startActivity(intent)
         }
+
+        binding.openUnlocksList.setOnClickListener {
+            val intent = Intent(this, UnlocksActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.openSettings.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
+        }
+
+        // drawer
+        setSupportActionBar(toolbar)
+
+        val toggle = ActionBarDrawerToggle(
+            this, drawerLayout, toolbar,
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
+        )
+
+        drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+
+        navView.setNavigationItemSelectedListener { menuItem ->
+            // Handle navigation view item clicks here.
+            when (menuItem.itemId) {
+                R.id.openScannerBtn -> {
+                    startQRScanner()
+                }
+
+                R.id.openPackagersBtn -> {
+                    val intent = Intent(this, PackagersActivity::class.java)
+                    startActivity(intent)
+                }
+
+                R.id.openUnlocksBtn -> {
+                    val intent = Intent(this, UnlocksActivity::class.java)
+                    startActivity(intent)
+                }
+
+                R.id.openSettingsBtn -> {
+                    val intent = Intent(this, SettingsActivity::class.java)
+                    startActivity(intent)
+                }
+
+                R.id.logoutBtn -> {
+                    app.unsetUser()
+                }
+            }
+
+            drawerLayout.closeDrawers()
+            true
+        }
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onPostCreate(savedInstanceState, persistentState)
+        toggle.syncState()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        toggle.onConfigurationChanged(newConfig)
     }
 
     private val qrScannerActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -70,17 +160,17 @@ class MainActivity : AppCompatActivity() {
             if (intentResult.contents.isNullOrEmpty()) {
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show()
             } else {
-                val boxId = getNumberFromUrl(intentResult.contents)
-                binding.resultTxt.text = boxId?.toString() ?: "Invalid URL"
+                val boxNumber = getNumberFromUrl(intentResult.contents)
+                binding.resultTxt.text = boxNumber?.toString() ?: "Invalid URL"
 
-                if (boxId != null) {
+                if (boxNumber != null) {
                     var apiUrl: String
                     var resJson: JSONObject
                     var response: String
 
                     lifecycleScope.launch {
                         if (!app.userInfo.getBoolean("admin", false)) {
-                            apiUrl = "${app.backend}/packagers/byNumber/$boxId"
+                            apiUrl = "${app.backend}/packagers/byNumber/$boxNumber"
                             response = app.sendGetRequest(apiUrl)
 
                             try {
@@ -99,23 +189,32 @@ class MainActivity : AppCompatActivity() {
                                 return@launch
                             }
 
-                            if (!resJson["public"].toString().toBoolean()) {
-                                val packagerSet = app.userInfo.getStringSet("packagers", emptySet())
+                            if (!resJson["active"].toString().toBoolean()) {
+                                binding.statusTxt.text = getString(R.string.packagerInactiveText, boxNumber.toString())
+                                return@launch
+                            }
 
-                                if (packagerSet.isNullOrEmpty()) {
-                                    binding.statusTxt.text = getString(R.string.emptyPackagerListText)
-                                    return@launch
-                                }
+                            val packagerSet = app.userInfo.getStringSet("packagers", emptySet())
 
-                                if (!packagerSet.contains(resJson["_id"].toString())) {
-                                    binding.statusTxt.text = getString(R.string.notContainPackagerText, boxId.toString())
-                                    return@launch
-                                }
+                            if (packagerSet.isNullOrEmpty()) {
+                                binding.statusTxt.text = getString(R.string.emptyPackagerListText)
+                                return@launch
+                            }
+
+                            val packagerIds = packagerSet.map { packager ->
+                                val jsonObject = JSONObject(packager)
+                                jsonObject.optString("_id")
+                            }
+
+                            if (!packagerIds.contains(resJson["_id"].toString())) {
+                                binding.statusTxt.text = getString(R.string.notContainPackagerText, boxNumber.toString())
+                                return@launch
                             }
                         }
 
+                        val format = app.settings.getInt("Format", 1) + 1
                         apiUrl = "https://api-d4me-stage.direct4.me/sandbox/v1/Access/openbox"
-                        val jsonData = "{\"deliveryId\":0,\"boxId\":$boxId,\"tokenFormat\":${app.format},\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
+                        val jsonData = "{\"deliveryId\":0,\"boxId\":$boxNumber,\"tokenFormat\":${format},\"terminalSeed\":0,\"isMultibox\":false,\"addAccessLog\":false}"
 
                         response = app.sendPostRequest(apiUrl, jsonData)
 
@@ -126,7 +225,7 @@ class MainActivity : AppCompatActivity() {
                                 binding.statusTxt.text = getString(R.string.responseErrorText)
                             } else {
                                 binding.statusTxt.text = getString(R.string.successText)
-                                convertB64ToSound(resJson["data"].toString(), app.format)
+                                convertB64ToSound(resJson["data"].toString(), format, boxNumber)
                             }
                         } catch (e: JSONException) {
                             if (response == "") {
@@ -159,7 +258,7 @@ class MainActivity : AppCompatActivity() {
         qrScannerActivityResultLauncher.launch(integrator.createScanIntent())
     }
 
-    private fun convertB64ToSound(base64String: String, format: Int) {
+    private fun convertB64ToSound(base64String: String, format: Int, boxNumber: Int) {
         try {
             val byteArray = Base64.decode(base64String, Base64.DEFAULT)
 
@@ -175,7 +274,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     val soundBytes = outputStream.toByteArray()
-                    playSoundFile(soundBytes, format)
+                    playSoundFile(soundBytes, format, boxNumber)
                     gzipInputStream.close()
                 }
 
@@ -194,7 +293,7 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             val soundBytes = outputStream.toByteArray()
-                            playSoundFile(soundBytes, format)
+                            playSoundFile(soundBytes, format, boxNumber)
 
                             break
                         }
@@ -204,7 +303,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 5, 6 -> {
-                    playSoundFile(byteArray, format)
+                    playSoundFile(byteArray, format, boxNumber)
                 }
 
                 else -> throw IllegalArgumentException("Wrong format given: $format")
@@ -237,7 +336,7 @@ class MainActivity : AppCompatActivity() {
         return tempFile
     }
 
-    private fun playSoundFile(soundBytes: ByteArray, format: Int) {
+    private fun playSoundFile(soundBytes: ByteArray, format: Int, boxNumber: Int) {
         releaseMediaPlayer()
 
         try {
@@ -251,9 +350,96 @@ class MainActivity : AppCompatActivity() {
             )
             mediaPlayer?.setDataSource(soundFile.path)
             mediaPlayer?.prepare()
+            mediaPlayer?.setOnCompletionListener {
+                showUnlockConfirmationDialog(boxNumber)
+            }
             mediaPlayer?.start()
         } catch (e: IOException) {
             e.printStackTrace()
+        }
+    }
+
+    private fun showUnlockConfirmationDialog(boxNumber: Int) {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Unlock Confirmation")
+            .setMessage("Was the unlock successful?")
+            .setPositiveButton("Yes") { _, _ ->
+                showSpinnerDialog(true, boxNumber)
+            }
+            .setNegativeButton("No") { _, _ ->
+                showSpinnerDialog(false, boxNumber)
+            }
+            .setCancelable(false)
+            .create()
+        dialog.show()
+    }
+
+    private fun showSpinnerDialog(success: Boolean, boxNumber: Int) {
+        val items = if (success) {
+            resources.getStringArray(R.array.addUnlockTrue)
+        } else {
+            resources.getStringArray(R.array.addUnlockFalse)
+        }
+
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("Select Option")
+            .setItems(items) { _, which ->
+                val selectedOption = items[which]
+                addUnlock(success, selectedOption, boxNumber)
+            }
+            .setCancelable(false)
+            .create()
+        dialog.show()
+    }
+
+    private fun addUnlock(success: Boolean, reason: String, boxNumber: Int) {
+        var apiUrl: String
+        var resJson: JSONObject
+        var response: String
+        var boxId: String
+
+        lifecycleScope.launch {
+            apiUrl = "${app.backend}/packagers/byNumber/$boxNumber"
+            response = app.sendGetRequest(apiUrl)
+
+            try {
+                resJson = JSONObject(response)
+
+                if (resJson.has("message")) {
+                    binding.statusTxt.text = getString(R.string.responseErrorText)
+                    return@launch
+                } else {
+                    boxId = resJson["_id"].toString()
+                }
+            } catch (e: JSONException) {
+                if (response == "") {
+                    binding.statusTxt.text = getString(R.string.unexpectedResponseText)
+                } else {
+                    binding.statusTxt.text = getString(R.string.parsingErrorText)
+                }
+                return@launch
+            }
+
+            apiUrl = "${app.backend}/unlocks"
+            val jsonData = "{\"packager\":\"$boxId\",\"user\":\"${app.userInfo.getString("userID", "")}\",\"success\":$success,\"status\":\"$reason\"}"
+
+            response = app.sendPostRequest(apiUrl, jsonData)
+
+            try {
+                resJson = JSONObject(response)
+
+                if (resJson.has("error")) {
+                    binding.statusTxt.text = getString(R.string.responseErrorText)
+                } else {
+                    binding.statusTxt.text = getString(R.string.successText)
+                }
+            } catch (e: JSONException) {
+                if (response == "") {
+                    binding.statusTxt.text = getString(R.string.unexpectedResponseText)
+                } else {
+                    binding.statusTxt.text = getString(R.string.parsingErrorText)
+                }
+            }
         }
     }
 

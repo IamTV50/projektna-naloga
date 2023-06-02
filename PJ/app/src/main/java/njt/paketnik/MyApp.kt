@@ -5,13 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -22,12 +19,13 @@ import java.io.IOException
 
 class MyApp : Application() {
     lateinit var userInfo: SharedPreferences
-    val backend = "http://164.8.113.38:3001"
-    val format = 2
+    lateinit var settings: SharedPreferences
+    val backend = "http://192.168.1.8:3001"
 
     override fun onCreate() {
         super.onCreate()
         userInfo = getSharedPreferences("userInfo", Context.MODE_PRIVATE)
+        settings = getSharedPreferences("settings", Context.MODE_PRIVATE)
     }
 
     fun unsetUser() {
@@ -36,6 +34,8 @@ class MyApp : Application() {
         userInfo.edit().putString("email", "").apply()
         userInfo.edit().putBoolean("admin", false).apply()
         userInfo.edit().putStringSet("packagers", emptySet()).apply()
+        userInfo.edit().putBoolean("faceIsRegistered", false).apply()
+        userInfo.edit().putBoolean("confirmedFaceID", false).apply()
         val intent = Intent(applicationContext, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
@@ -49,17 +49,9 @@ class MyApp : Application() {
             val resJson = JSONObject(response)
 
             if (resJson.has("error")) {
-                Toast.makeText(
-                    applicationContext,
-                    resJson["error"].toString(),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(applicationContext, resJson["error"].toString(), Toast.LENGTH_SHORT).show()
             } else if (resJson.has("message")) {
-                Toast.makeText(
-                    applicationContext,
-                    resJson["error"].toString(),
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(applicationContext, resJson["message"].toString(), Toast.LENGTH_SHORT).show()
                 unsetUser()
             } else {
                 userInfo.edit().putString("username", resJson["username"].toString()).apply()
@@ -101,6 +93,25 @@ class MyApp : Application() {
             try {
                 val response = client.newCall(request).execute()
                 return@withContext response.body?.string() ?: ""
+            } catch (e: IOException) {
+                e.printStackTrace()
+                return@withContext ""
+            }
+        }
+    }
+
+    suspend fun sendPostRequestMultipart(apiUrl: String, requestBody: MultipartBody): String {
+        val request = Request.Builder()
+            .url(apiUrl)
+            .post(requestBody)
+            .build()
+        val client = OkHttpClient()
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = client.newCall(request).execute()
+                val responseBody = response.body?.string() ?: ""
+                response.close()
+                return@withContext responseBody
             } catch (e: IOException) {
                 e.printStackTrace()
                 return@withContext ""
