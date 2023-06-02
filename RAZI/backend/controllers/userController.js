@@ -2,6 +2,8 @@ var UserModel = require('../models/userModel.js');
 var PackagerModel = require('../models/packagerModel.js');
 var RequestModel = require('../models/requestModel.js');
 const fs = require('fs');
+const { spawn } = require('child_process');
+const path = require('path');
 
 module.exports = {
 
@@ -196,17 +198,44 @@ module.exports = {
 
 	// Save video as userId.mp4
 	registerFace: function (req, res) {
+		const scriptPath = path.join(__dirname, '../public/python/train_model.py');
+		var dataToSend = "";
+
 		var id = req.body.id;
 		var video = req.file;
 
 		if (!video) {
 			return res.status(400).json({ error: 'No MP4 file uploaded.' });
 		}
-	  
+
 		fs.renameSync(video.path, 'public/python/tmp_videos/' + id + '.mp4');
 
-		// Call python file and create model for user named userId.h5
-		return res.status(200).json({ message: 'MP4 file uploaded successfully.' });
+		const pythonProcess = spawn('python3', [scriptPath, id]);
+
+		pythonProcess.stdout.on('data', function (data) {
+			console.log('Pipe data from python script ...');
+			dataToSend += data.toString();
+			console.log(dataToSend);
+		});
+
+		pythonProcess.stderr.on("data", (data) => {
+			console.error(`stderr: ${data}`);
+		});
+
+		pythonProcess.on('error', (error) => {
+			console.error(`error: ${error.message}`);
+		});
+
+		pythonProcess.on('close', (code) => {
+			console.log(`child process close all stdio with code ${code}`);
+			if (code === 0) {
+				return res.status(200).json({ message: 'MP4 file uploaded and processed successfully.' });
+			}
+			return res.status(500).json({
+				message: 'Error when running python script.',
+				error: "Python script returned error code " + code
+			});
+		});
     },
 
 	// Save image as userId.jpg
