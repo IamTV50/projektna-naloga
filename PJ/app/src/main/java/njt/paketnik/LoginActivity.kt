@@ -56,7 +56,8 @@ class LoginActivity : AppCompatActivity() {
                                 app.userInfo.edit().putString("username", resJson["username"].toString()).apply()
                                 app.userInfo.edit().putString("email", resJson["email"].toString()).apply()
                                 app.userInfo.edit().putBoolean("admin", resJson["admin"].toString().toBoolean()).apply()
-
+                                app.userInfo.edit().putBoolean("faceIsRegistered", false).apply()
+                                app.userInfo.edit().putBoolean("confirmedFaceID", false).apply()
                                 val packagersArray: JSONArray = resJson.getJSONArray("packagers")
 
                                 val packagersSet = mutableSetOf<String>()

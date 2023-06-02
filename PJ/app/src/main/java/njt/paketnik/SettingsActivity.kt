@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -60,6 +62,22 @@ class SettingsActivity : AppCompatActivity() {
             binding.spinnerFormat.setSelection(app.settings.getInt("Format", 1))
         }
 
+        val isFaceRegistered = app.userInfo.getBoolean("faceIsRegistered", false)
+        val isFaceConfirmed = app.userInfo.getBoolean("confirmedFaceID", false)
+
+        if (isFaceRegistered && isFaceConfirmed){
+            binding.buttonRegisterFaceId.visibility = INVISIBLE
+            binding.buttonConfirmFaceId.visibility = INVISIBLE
+        }
+        else if (!isFaceRegistered){
+            binding.buttonRegisterFaceId.visibility = VISIBLE
+            binding.buttonConfirmFaceId.visibility = INVISIBLE
+        }
+        else{
+            binding.buttonRegisterFaceId.visibility = INVISIBLE
+            binding.buttonConfirmFaceId.visibility = VISIBLE
+        }
+
         binding.buttonConfirm.setOnClickListener {
             val selectedThemePosition = binding.spinnerTheme.selectedItemPosition
 
@@ -79,12 +97,13 @@ class SettingsActivity : AppCompatActivity() {
             app.settings.edit().putInt("Format", binding.spinnerFormat.selectedItemPosition).apply()
         }
 
-        activityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result: ActivityResult? ->
+        val takeRegisterFaceVideo = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result: ActivityResult? ->
             if (result!!.resultCode == Activity.RESULT_OK) {
                 val videoUri: Uri? = result.data?.data
 
                 if (videoUri != null) {
                     registerFaceId(videoUri)
+                    app.userInfo.edit().putBoolean("faceIsRegistered", true).apply()
                 } else {
                     Toast.makeText(applicationContext, "Failed to get video", Toast.LENGTH_SHORT).show()
                 }
@@ -95,7 +114,27 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.buttonRegisterFaceId.setOnClickListener {
             val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
-            activityResultLauncher.launch(intent)
+            takeRegisterFaceVideo.launch(intent)
+        }
+
+        val takeConfirmFacePic = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
+            if (result!!.resultCode == Activity.RESULT_OK) {
+                val imgUri: Uri? = result.data?.data
+
+                if (imgUri != null) {
+                    confirmFaceId(imgUri)
+                    app.userInfo.edit().putBoolean("confirmedFaceID", true).apply()
+                } else {
+                    Toast.makeText(applicationContext, "Failed to get picture", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(applicationContext, "Canceled", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        binding.buttonConfirmFaceId.setOnClickListener {
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            takeConfirmFacePic.launch(intent)
         }
 
         setSupportActionBar(toolbar)
@@ -195,6 +234,54 @@ class SettingsActivity : AppCompatActivity() {
         cursor?.use {
             if (it.moveToFirst()) {
                 val columnIndex = it.getColumnIndexOrThrow(MediaStore.Video.Media.DATA)
+                return it.getString(columnIndex)
+            }
+        }
+        return null
+    }
+
+    private fun confirmFaceId(imageUri: Uri) {
+        val apiUrl = "${app.backend}/users/faceId"
+
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("id", app.userInfo.getString("userID", "").toString())
+            .addFormDataPart("image", "photo.jpg", createImageRequestBody(imageUri))
+            .build()
+
+        lifecycleScope.launch {
+            val response = app.sendPostRequestMultipart(apiUrl, requestBody)
+
+            try {
+                val resJson = JSONObject(response)
+
+                if (resJson.has("error")) {
+                    Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: JSONException) {
+                if (response == "") {
+                    Toast.makeText(applicationContext, getString(R.string.unexpectedResponseText), Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, getString(R.string.parsingErrorText), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun createImageRequestBody(imageUri: Uri): RequestBody {
+        val imageFile = File(getImagePathFromUri(imageUri).toString())
+        val requestBody = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        return requestBody
+    }
+
+    private fun getImagePathFromUri(uri: Uri): String? {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
                 return it.getString(columnIndex)
             }
         }

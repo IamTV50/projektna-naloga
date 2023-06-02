@@ -20,7 +20,7 @@ import java.io.IOException
 class MyApp : Application() {
     lateinit var userInfo: SharedPreferences
     lateinit var settings: SharedPreferences
-    val backend = "http://192.168.0.14:3001"
+    val backend = "http://192.168.1.8:3001"
 
     override fun onCreate() {
         super.onCreate()
@@ -34,6 +34,8 @@ class MyApp : Application() {
         userInfo.edit().putString("email", "").apply()
         userInfo.edit().putBoolean("admin", false).apply()
         userInfo.edit().putStringSet("packagers", emptySet()).apply()
+        userInfo.edit().putBoolean("faceIsRegistered", false).apply()
+        userInfo.edit().putBoolean("confirmedFaceID", false).apply()
         val intent = Intent(applicationContext, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
