@@ -33,6 +33,7 @@ class MyApp : Application() {
         userInfo.edit().putString("username", "").apply()
         userInfo.edit().putString("email", "").apply()
         userInfo.edit().putBoolean("admin", false).apply()
+        userInfo.edit().putBoolean("hasModel", false).apply()
         userInfo.edit().putStringSet("packagers", emptySet()).apply()
         userInfo.edit().putBoolean("faceIsRegistered", false).apply()
         userInfo.edit().putBoolean("confirmedFaceID", false).apply()
@@ -56,8 +57,8 @@ class MyApp : Application() {
             } else {
                 userInfo.edit().putString("username", resJson["username"].toString()).apply()
                 userInfo.edit().putString("email", resJson["email"].toString()).apply()
-                userInfo.edit().putBoolean("admin", resJson["admin"].toString().toBoolean())
-                    .apply()
+                userInfo.edit().putBoolean("admin", resJson["admin"].toString().toBoolean()).apply()
+                userInfo.edit().putBoolean("hasModel", resJson["hasModel"].toString().toBoolean()).apply()
 
                 val packagersArray: JSONArray = resJson.getJSONArray("packagers")
 

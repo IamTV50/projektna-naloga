@@ -45,9 +45,21 @@ module.exports = {
                 });
             }
 
-			// Exclude the password field from the user object
-			const { password, ...userWithoutPassword } = user.toObject();
-			return res.json(userWithoutPassword);
+			// Get the file path
+			const filePath = `public/python/models/${id}.h5`;
+
+			// Check if the file exists
+			fs.access(filePath, fs.constants.F_OK, (err) => {
+				if (err) {
+					// The file does not exist
+					const { password, ...userWithoutPassword } = user.toObject();
+					return res.json({ ...userWithoutPassword, hasModel: false });
+				} else {
+					// The file exists
+					const { password, ...userWithoutPassword } = user.toObject();
+					return res.json({ ...userWithoutPassword, hasModel: true });
+				}
+			});
         });
     },
 
