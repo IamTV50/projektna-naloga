@@ -280,7 +280,7 @@ module.exports = {
 		pythonProcess.on('close', (code) => {
 			console.log(`child process close all stdio with code ${code}`);
 			if (code === 10) {
-				return res.status(200).json({ message: 'Image uploaded and processed successfully.' });
+				return res.status(200).json();
 			} else if (code === 20) {
 				return res.status(401).json({ message: 'Image does not match model.' });
 			}

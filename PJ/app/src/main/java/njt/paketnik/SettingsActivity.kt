@@ -3,6 +3,7 @@ package njt.paketnik
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -12,7 +13,6 @@ import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatDelegate
@@ -31,11 +31,12 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     lateinit var app: MyApp
 
     private lateinit var drawerLayout: DrawerLayout
@@ -119,11 +120,10 @@ class SettingsActivity : AppCompatActivity() {
 
         val takeConfirmFacePic = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
             if (result!!.resultCode == Activity.RESULT_OK) {
-                val imgUri: Uri? = result.data?.data
+                val imgBitmap: Bitmap? = result.data?.extras?.get("data") as? Bitmap
 
-                if (imgUri != null) {
-                    confirmFaceId(imgUri)
-                    app.userInfo.edit().putBoolean("confirmedFaceID", true).apply()
+                if (imgBitmap != null) {
+                    confirmFaceId(imgBitmap)
                 } else {
                     Toast.makeText(applicationContext, "Failed to get picture", Toast.LENGTH_SHORT).show()
                 }
@@ -240,13 +240,14 @@ class SettingsActivity : AppCompatActivity() {
         return null
     }
 
-    private fun confirmFaceId(imageUri: Uri) {
+    private fun confirmFaceId(imgBitmap: Bitmap) {
         val apiUrl = "${app.backend}/users/faceId"
+        val imgFile = bitmapToFile(imgBitmap)
 
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("id", app.userInfo.getString("userID", "").toString())
-            .addFormDataPart("image", "photo.jpg", createImageRequestBody(imageUri))
+            .addFormDataPart("image", "photo.jpg", imgFile.asRequestBody("image/jpeg".toMediaTypeOrNull()))
             .build()
 
         lifecycleScope.launch {
@@ -257,8 +258,11 @@ class SettingsActivity : AppCompatActivity() {
 
                 if (resJson.has("error")) {
                     Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
+                } else if (resJson.has("message")) {
+                    Toast.makeText(applicationContext, resJson["message"].toString(), Toast.LENGTH_SHORT).show()
                 } else {
                     Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
+                    app.userInfo.edit().putBoolean("confirmedFaceID", true).apply()
                 }
             } catch (e: JSONException) {
                 if (response == "") {
@@ -270,21 +274,19 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun createImageRequestBody(imageUri: Uri): RequestBody {
-        val imageFile = File(getImagePathFromUri(imageUri).toString())
-        val requestBody = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
-        return requestBody
-    }
+    private fun bitmapToFile(bitmap: Bitmap): File {
+        val file = File(applicationContext.cacheDir, "photo.jpg")
+        file.createNewFile()
 
-    private fun getImagePathFromUri(uri: Uri): String? {
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                return it.getString(columnIndex)
-            }
-        }
-        return null
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+
+        val fileOutputStream = FileOutputStream(file)
+        fileOutputStream.write(byteArray)
+        fileOutputStream.flush()
+        fileOutputStream.close()
+
+        return file
     }
 }
