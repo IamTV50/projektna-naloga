@@ -13,6 +13,7 @@ import android.util.Base64
 import android.media.MediaPlayer
 import android.os.PersistableBundle
 import android.provider.MediaStore
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.appcompat.widget.Toolbar
@@ -91,7 +92,11 @@ class MainActivity : AppCompatActivity() {
                                 val imgBitmap: Bitmap? = result.data?.extras?.get("data") as? Bitmap
 
                                 if (imgBitmap != null) {
-                                    confirmFaceId(imgBitmap)
+                                    window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+
+                                    lifecycleScope.launch {
+                                        confirmFaceId(imgBitmap)
+                                    }
                                 } else {
                                     Toast.makeText(
                                         applicationContext,
@@ -190,7 +195,7 @@ class MainActivity : AppCompatActivity() {
         toggle.onConfigurationChanged(newConfig)
     }
 
-    private fun confirmFaceId(imgBitmap: Bitmap) {
+    private suspend fun confirmFaceId(imgBitmap: Bitmap) {
         val apiUrl = "${app.backend}/users/faceId"
         val imgFile = bitmapToFile(imgBitmap)
 
@@ -200,30 +205,30 @@ class MainActivity : AppCompatActivity() {
             .addFormDataPart("image", "photo.jpg", imgFile.asRequestBody("image/jpeg".toMediaTypeOrNull()))
             .build()
 
-        lifecycleScope.launch {
-            val response = app.sendPostRequestMultipart(apiUrl, requestBody)
+        val response = app.sendPostRequestMultipart(apiUrl, requestBody)
 
-            try {
-                val resJson = JSONObject(response)
+        try {
+            val resJson = JSONObject(response)
 
-                if (resJson.has("error")) {
-                    if (resJson.has("message")) {
-                        Toast.makeText(applicationContext, resJson["message"].toString(), Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
-                    }
-
-                    app.unsetUser()
+            if (resJson.has("error")) {
+                if (resJson.has("message")) {
+                    Toast.makeText(applicationContext, resJson["message"].toString(), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
-                    app.getUserInfo()
+                    Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
                 }
-            } catch (e: JSONException) {
-                if (response == "") {
-                    Toast.makeText(applicationContext, getString(R.string.unexpectedResponseText), Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(applicationContext, getString(R.string.parsingErrorText), Toast.LENGTH_SHORT).show()
-                }
+
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                app.unsetUser()
+            } else {
+                Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
+                window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                app.getUserInfo()
+            }
+        } catch (e: JSONException) {
+            if (response == "") {
+                Toast.makeText(applicationContext, getString(R.string.unexpectedResponseText), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(applicationContext, getString(R.string.parsingErrorText), Toast.LENGTH_SHORT).show()
             }
         }
     }

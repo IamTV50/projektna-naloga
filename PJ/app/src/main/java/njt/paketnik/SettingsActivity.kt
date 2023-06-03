@@ -240,8 +240,6 @@ class SettingsActivity : AppCompatActivity() {
                     } else {
                         Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
                     }
-
-                    app.unsetUser()
                 } else {
                     Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
                     app.getUserInfo()
