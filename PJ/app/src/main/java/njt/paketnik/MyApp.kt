@@ -35,8 +35,6 @@ class MyApp : Application() {
         userInfo.edit().putBoolean("admin", false).apply()
         userInfo.edit().putBoolean("hasModel", false).apply()
         userInfo.edit().putStringSet("packagers", emptySet()).apply()
-        userInfo.edit().putBoolean("faceIsRegistered", false).apply()
-        userInfo.edit().putBoolean("confirmedFaceID", false).apply()
         val intent = Intent(applicationContext, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)

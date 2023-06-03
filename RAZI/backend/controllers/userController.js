@@ -154,9 +154,21 @@ module.exports = {
             }
             req.session.userId = user._id;
 			
-			// Exclude the password field from the user object
-			const { password, ...userWithoutPassword } = user.toObject();
-			return res.json(userWithoutPassword);
+			// Get the file path
+			const filePath = `public/python/models/${user._id}.h5`;
+
+			// Check if the file exists
+			fs.access(filePath, fs.constants.F_OK, (err) => {
+				if (err) {
+					// The file does not exist
+					const { password, ...userWithoutPassword } = user.toObject();
+					return res.json({ ...userWithoutPassword, hasModel: false });
+				} else {
+					// The file exists
+					const { password, ...userWithoutPassword } = user.toObject();
+					return res.json({ ...userWithoutPassword, hasModel: true });
+				}
+			});
         });
     },
 
@@ -292,9 +304,12 @@ module.exports = {
 		pythonProcess.on('close', (code) => {
 			console.log(`child process close all stdio with code ${code}`);
 			if (code === 10) {
-				return res.status(200).json();
+				return res.status(200).json({ message: 'Image uploaded and processed successfully.' });
 			} else if (code === 20) {
-				return res.status(401).json({ message: 'Image does not match model.' });
+				return res.status(401).json({
+					message: 'Image does not match model.',
+					error: 401
+				});
 			}
 			return res.status(500).json({
 				message: 'Error when running python script.',

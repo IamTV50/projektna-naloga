@@ -9,8 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -63,22 +61,6 @@ class SettingsActivity : AppCompatActivity() {
             binding.spinnerFormat.setSelection(app.settings.getInt("Format", 1))
         }
 
-        val isFaceRegistered = app.userInfo.getBoolean("faceIsRegistered", false)
-        val isFaceConfirmed = app.userInfo.getBoolean("confirmedFaceID", false)
-
-        if (isFaceRegistered && isFaceConfirmed){
-            binding.buttonRegisterFaceId.visibility = INVISIBLE
-            binding.buttonConfirmFaceId.visibility = INVISIBLE
-        }
-        else if (!isFaceRegistered){
-            binding.buttonRegisterFaceId.visibility = VISIBLE
-            binding.buttonConfirmFaceId.visibility = INVISIBLE
-        }
-        else{
-            binding.buttonRegisterFaceId.visibility = INVISIBLE
-            binding.buttonConfirmFaceId.visibility = VISIBLE
-        }
-
         binding.buttonConfirm.setOnClickListener {
             val selectedThemePosition = binding.spinnerTheme.selectedItemPosition
 
@@ -96,6 +78,7 @@ class SettingsActivity : AppCompatActivity() {
 
             app.settings.edit().putInt("Theme", selectedThemePosition).apply()
             app.settings.edit().putInt("Format", binding.spinnerFormat.selectedItemPosition).apply()
+            app.settings.edit().putBoolean("Reload", false).apply()
         }
 
         val takeRegisterFaceVideo = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result: ActivityResult? ->
@@ -104,7 +87,6 @@ class SettingsActivity : AppCompatActivity() {
 
                 if (videoUri != null) {
                     registerFaceId(videoUri)
-                    app.userInfo.edit().putBoolean("faceIsRegistered", true).apply()
                 } else {
                     Toast.makeText(applicationContext, "Failed to get video", Toast.LENGTH_SHORT).show()
                 }
@@ -157,13 +139,13 @@ class SettingsActivity : AppCompatActivity() {
 
                 R.id.openPackagersBtn -> {
                     val intent = Intent(this, PackagersActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                 }
 
                 R.id.openUnlocksBtn -> {
                     val intent = Intent(this, UnlocksActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                 }
 
@@ -253,12 +235,16 @@ class SettingsActivity : AppCompatActivity() {
                 val resJson = JSONObject(response)
 
                 if (resJson.has("error")) {
-                    Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
-                } else if (resJson.has("message")) {
-                    Toast.makeText(applicationContext, resJson["message"].toString(), Toast.LENGTH_SHORT).show()
+                    if (resJson.has("message")) {
+                        Toast.makeText(applicationContext, resJson["message"].toString(), Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
+                    }
+
+                    app.unsetUser()
                 } else {
                     Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
-                    app.userInfo.edit().putBoolean("confirmedFaceID", true).apply()
+                    app.getUserInfo()
                 }
             } catch (e: JSONException) {
                 if (response == "") {
