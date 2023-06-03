@@ -198,6 +198,9 @@ module.exports = {
 
 	// Save video as userId.mp4
 	registerFace: function (req, res) {
+
+		console.log("Called registerFace");
+
 		const scriptPath = path.join(__dirname, '../public/python/train_model.py');
 		var dataToSend = "";
 
@@ -209,6 +212,8 @@ module.exports = {
 		}
 
 		fs.renameSync(video.path, 'public/python/tmp_videos/' + id + '.mp4');
+
+		console.log("Started python script");
 
 		const pythonProcess = spawn('python3', [scriptPath, id]);
 
@@ -240,6 +245,11 @@ module.exports = {
 
 	// Save image as userId.jpg
 	faceId: function (req, res) {
+
+		console.log("Called faceId");
+
+		const scriptPath = path.join(__dirname, '../public/python/test_img_on_model.py');
+
 		var id = req.body.id;
 		var image = req.file;
 
@@ -249,8 +259,36 @@ module.exports = {
 	  
 		fs.renameSync(image.path, 'public/python/tmp_images/' + id + '.jpg');
 
+		console.log("Started python script");
 		// Call python file and check if image matches model
-		return res.status(200).json({ message: 'JPG file uploaded successfully.' });
+		// return res.status(200).json({ message: 'JPG file uploaded successfully.' });
+		const pythonProcess = spawn('python3', [scriptPath, id]);
+
+		pythonProcess.stdout.on('data', function (data) {
+			console.log('Pipe data from python script ...');
+			console.log(data.toString());
+		});
+
+		pythonProcess.stderr.on("data", (data) => {
+			console.error(`stderr: ${data}`);
+		});
+
+		pythonProcess.on('error', (error) => {
+			console.error(`error: ${error.message}`);
+		});
+
+		pythonProcess.on('close', (code) => {
+			console.log(`child process close all stdio with code ${code}`);
+			if (code === 10) {
+				return res.status(200).json({ message: 'Image uploaded and processed successfully.' });
+			} else if (code === 20) {
+				return res.status(401).json({ message: 'Image does not match model.' });
+			}
+			return res.status(500).json({
+				message: 'Error when running python script.',
+				error: "Python script returned error code " + code
+			});
+		});
     },
 
     update: function (req, res) {
