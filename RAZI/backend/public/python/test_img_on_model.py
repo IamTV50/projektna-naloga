@@ -5,13 +5,16 @@ from functions import *
 import numpy as np
 import sys
 
+print("starting")
+sys.stdout.flush()
+
 # Exits if no arguments are given
 if len(sys.argv) <= 1:
     sys.exit(1)
 
 arg_userId = sys.argv[1]
-imgPath = f'images/tmp_images/{arg_userId}.jpg'
-modelPath = f'models/{arg_userId}.h5'
+imgPath = f'public/python/tmp_images/{arg_userId}.jpg'
+modelPath = f'public/python/models/{arg_userId}.h5'
 
 # Check if the model file exists
 if not os.path.isfile(modelPath):
@@ -44,14 +47,19 @@ prediction = model.predict(features)
 # Convert the prediction to a boolean value
 is_person = bool(prediction[0])
 
+print("is_person: " + str(is_person))
+sys.stdout.flush()
+
 os.remove(imgPath)
 
 # Print the result
 if is_person:
 	print(True) #print("The person in the image matches the trained person.")
+	sys.stdout.flush()
 	sys.exit(10)
 else:
 	print(False) #print("The person in the image does not match the trained person.")
+	sys.stdout.flush()
 	sys.exit(20)
 
 

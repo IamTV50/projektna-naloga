@@ -5,6 +5,9 @@ from functions import *
 import os
 import sys
 
+print("starting")
+sys.stdout.flush()
+
 # Exits if no arguments are given
 if len(sys.argv) <= 1:
     sys.exit(1)
@@ -20,6 +23,9 @@ if not os.path.isfile(videoPath): # Check if the video file exists
 cap = cv2.VideoCapture(videoPath)
 train_features = []
 train_labels = []
+
+print("entering loop")
+sys.stdout.flush()
 
 i = 0
 while True:
@@ -56,6 +62,9 @@ cap.release()
 if (not os.path.isfile('public/python/false_faces_train_features.npy')) or (not os.path.isfile('public/python/false_faces_train_labels.npy')):
 	prepare_false_faces()
 
+print("loading false faces")
+sys.stdout.flush()
+
 # Load the false faces training features and labels
 false_faces_train_features = np.load('public/python/false_faces_train_features.npy')
 false_faces_train_labels = np.load('public/python/false_faces_train_labels.npy')
@@ -71,12 +80,18 @@ train_labels = np.array(train_labels)
 # Get the number of features
 num_features = train_features.shape[1]
 
+print("training model")
+sys.stdout.flush()
+
 # Train the model
 model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(64, activation='relu', input_shape=(num_features,)),
     tf.keras.layers.Dense(32, activation='relu'),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
+
+print("compiling model")
+sys.stdout.flush()
 
 # Compile the model
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
