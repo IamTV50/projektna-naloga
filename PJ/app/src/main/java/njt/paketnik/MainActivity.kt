@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.openScannerBtn.setOnClickListener {
-
+            startQRScanner()
         }
 
         binding.openPackagersList.setOnClickListener {
