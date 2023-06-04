@@ -198,7 +198,6 @@ module.exports = {
 
 	// Save video as userId.mp4
 	registerFace: function (req, res) {
-
 		console.log("Called registerFace");
 
 		const scriptPath = path.join(__dirname, '../public/python/train_model.py');
@@ -245,11 +244,10 @@ module.exports = {
 
 	// Save image as userId.jpg
 	faceId: function (req, res) {
-
 		console.log("Called faceId");
 
 		const scriptPath = path.join(__dirname, '../public/python/test_img_on_model.py');
-
+    
 		var id = req.body.id;
 		var image = req.file;
 
