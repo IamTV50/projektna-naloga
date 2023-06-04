@@ -94,7 +94,7 @@ module.exports = {
 				number : number,
 				public : req.body.public,
 				active : true,
-				owner : null
+				owner : req.body.owner ?? null
 			});
 
 			packager.save(function (err, packager) {
@@ -104,8 +104,16 @@ module.exports = {
 						error: err
 					});
 				}
+				UserModel.updateOne({ _id: req.body.owner }, { $push: { packagers: packager._id } }, function (err, user) {
+					if (err) {
+						return res.status(500).json({
+							message: 'Error when updating user',
+							error: err
+						});
+					}
+					return res.status(201).json(packager);
+				});
 
-				return res.status(201).json(packager);
 			});
 		});
     },

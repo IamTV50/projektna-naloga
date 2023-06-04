@@ -29,7 +29,7 @@ import {
     TabPanel,
     TabPanels,
     Tabs,
-    Text,
+    Text, useColorMode,
     useDisclosure,
     useToast,
     VStack,
@@ -56,6 +56,7 @@ function MyPackagers(){
     const { isOpen, onToggle } = useDisclosure()
     const [selectedPackager, setSelectedPackager] = useState(null);
     const [packagerUnlocks, setPackagerUnlocks] = useState([]);
+    const { colorMode, toggleColorMode } = useColorMode()
 
     // popover
     const { onOpenPopover, onClosePopover, isOpenPopover } = useDisclosure()
@@ -79,7 +80,7 @@ function MyPackagers(){
     const handlePackagerClick = (packager) => {
         const fetchUnlocks = async () => {
             try {
-                const res = await fetch(`http://localhost:3001/unlocks/packagerUnlocks/${packager._id}`, {
+                const res = await fetch(`${process.env.REACT_APP_API_URL}/unlocks/packagerUnlocks/${packager._id}`, {
                     credentials: "include"
                 })
                 const data = await res.json();
@@ -111,13 +112,13 @@ function MyPackagers(){
     useEffect(function() {
         const getUserPackagers = async function() {
 			if (userContext.user.admin) {
-				const res = await fetch(`http://localhost:3001/packagers`);
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/packagers`);
 				const data = await res.json();
 				setIsLoading(false);
 				setPackagers(data);
 				console.log(data)
 			} else {
-				const res = await fetch(`http://localhost:3001/users/${userContext.user._id}`);
+				const res = await fetch(`${process.env.REACT_APP_API_URL}/users/${userContext.user._id}`);
 				const data = await res.json();
 				setIsLoading(false);
 				setPackagers(data.packagers);
@@ -126,14 +127,14 @@ function MyPackagers(){
         }
 
         const getRequests = async function(){
-            const res = await fetch(`http://localhost:3001/requests/user/${userContext.user._id}`);
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/requests/user/${userContext.user._id}`);
             const data = await res.json();
             console.log(data)
             setRequests(data);
         }
 
 		const getMyPackagerRequests = async function(){
-            const res = await fetch(`http://localhost:3001/requests/`);
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/requests/`);
             const data = await res.json();
 
 			// Filter the requests based on the condition
@@ -152,11 +153,15 @@ function MyPackagers(){
 
 	useEffect(function() {
 		const getMyPackagerUsers = async function(){
-			const res = await fetch(`http://localhost:3001/users/myPackagers/`, {credentials: "include"});
+			const res = await fetch(`${process.env.REACT_APP_API_URL}/users/myPackagers/`, {credentials: "include"});
 			const data = await res.json();
 
-			console.log(data)
-			setMyPackagerUsers(data);
+            console.log("My packager users:");
+            console.log(data)
+
+            const filteredUsers = data.filter(user => user._id !== userContext.user._id);
+
+			setMyPackagerUsers(filteredUsers);
 		}
 
 		getMyPackagerUsers();
@@ -169,14 +174,13 @@ function MyPackagers(){
             status: "success",
             duration: 3000,
         })
+
         setRequests([...requests, newRequest]);
     };
 
     const handleRequestDelete = (requestId) => {
-        console.log("Deleting request with id: " + requestId);
-
         try {
-            fetch(`http://localhost:3001/requests/${requestId}`, {
+            fetch(`${process.env.REACT_APP_API_URL}/requests/${requestId}`, {
                 method: "DELETE",
                 credentials: "include"
             });
@@ -200,15 +204,14 @@ function MyPackagers(){
     }
 
 	const handleUserRequestDelete = (requestId) => {
-        console.log("Deleting request with id: " + requestId);
-
         try {
-            fetch(`http://localhost:3001/requests/${requestId}`, {
+            fetch(`${process.env.REACT_APP_API_URL}/requests/${requestId}`, {
                 method: "DELETE",
                 credentials: "include"
             });
             const updatedRequests = myPackagerRequests.filter((request) => request._id !== requestId);
             setMyPackagerRequests(updatedRequests);
+
             toast({
                 title: "Request deleted",
                 description: "Request deleted successfully",
@@ -227,10 +230,8 @@ function MyPackagers(){
     }
 
 	const handleUserRequestApprove = (request) => {
-        console.log("Approving request with id: " + request._id);
-
         try {
-            fetch(`http://localhost:3001/users/addPackager`, {
+            fetch(`${process.env.REACT_APP_API_URL}/users/addPackager`, {
                 method: "PUT",
 				credentials: "include",
 				headers: { 'Content-Type': 'application/json'},
@@ -241,6 +242,14 @@ function MyPackagers(){
             });
             
 			handleUserRequestDelete(request._id);
+            setMyPackagerUsers([...myPackagerUsers, request.user])
+
+            const delay = 300;
+            const timeoutId = setTimeout(() => {
+                setUserChanges(prev => !prev);
+            }, delay);
+
+
 
             toast({
                 title: "Request approved",
@@ -255,32 +264,38 @@ function MyPackagers(){
                 status: "error",
                 duration: 3000,
             })
-            console.log(error);
         }
     }
 
-	const handleUserPackagerDelete = (user, packager) => {
-        console.log("Deleting packager with id: " + packager._id + " from user with id: " + user._id);
-
+	const handleUserPackagerDelete = async (user, packager) => {
         try {
-            fetch(`http://localhost:3001/users/removePackager`, {
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/users/removePackager`, {
                 method: "PUT",
-				credentials: "include",
-				headers: { 'Content-Type': 'application/json'},
-				body: JSON.stringify({
-					username: user.username,
-					packagerNumber: packager.number
-				})
+                credentials: "include",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: user.username,
+                    packagerNumber: packager.number
+                })
             });
+            const data = await res.json();
 
             setUserChanges(!userChanges);
 
-            toast({
-                title: "Packager deleted",
-                description: "Packager deleted successfully",
-                status: "success",
-                duration: 3000,
-            })
+            const userIndex = myPackagerUsers.findIndex((user) => user._id === data._id);
+
+            if (userIndex !== -1) {
+                const updatedUsers = [...myPackagerUsers];
+                updatedUsers[userIndex] = data; // Update the user in the updatedUsers array with the updated data
+                setMyPackagerUsers(updatedUsers);
+            }
+
+            // toast({
+            //     title: "Packager deleted",
+            //     description: "Packager deleted successfully",
+            //     status: "success",
+            //     duration: 3000,
+            // })
         } catch (error) {
             toast({
                 title: "Packager not deleted",
@@ -288,7 +303,6 @@ function MyPackagers(){
                 status: "error",
                 duration: 3000,
             })
-            console.log(error);
         }
     }
 
@@ -318,12 +332,18 @@ function MyPackagers(){
         )
     }
 
+    const handleTabChange = (index) => {
+        if (isOpen) {
+            onToggle();
+        }
+    };
+
     // divider={<Divider/>} maxH={"80%"} alignItems={"flex-start"} minH={"70%"} width={{base: "100%", md: "70%", xl: "25%"}} bgColor={"gray.100"} borderRadius={"25"} padding={10} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}
     return(
         <Center flex={1}>
             {userContext.user ? "" : <Navigate replace to="/" />}
             <Box w={isOpen ? "70%" : "50%"} h="70%" display="flex" flexDirection={"row"}>
-                <Box marginRight={"10px"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} width={"100%"} as={Card} height="100%" bgColor="gray.100" overflow="auto"
+                <Box marginRight={"10px"} borderRadius={"25"} padding={0} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"} width={"100%"}  as={Card} height="100%" overflow="auto" bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
                      css={{
                     "&::-webkit-scrollbar": {
                         width: "0",
@@ -332,16 +352,15 @@ function MyPackagers(){
                         backgroundColor: "#888",
                     },
                     }}>
-                    <Tabs isLazy>
+                    <Tabs isLazy onChange={handleTabChange}>
                         <TabList
                             position="sticky"
                             top="0"
-                            bgColor="gray.100"
+                            bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
                             zIndex="sticky"
                             p={4}
                             minWidth="100%"
-                            width="fit-content"
-                        >
+                            width="fit-content" >
                             <Tab>My Packagers</Tab>
                             <Tab>My Requests</Tab>
 							<Tab>Approve Requests</Tab>
@@ -359,7 +378,7 @@ function MyPackagers(){
                                 </PopoverTrigger>
                                 <PopoverContent>
                                     <PopoverArrow/>
-                                    <PopoverCloseButton fontSize="md"/>
+                                        <PopoverCloseButton fontSize="md"/>
                                     <PopoverBody>
                                         <RequestPackager onRequestAdd={handleRequestAdd}/>
                                     </PopoverBody>
@@ -369,7 +388,7 @@ function MyPackagers(){
                             </Popover>
                             {/*<IconButton aria-label="Search database" position="relative" right={0} icon={<AddIcon />} />*/}
                         </TabList>
-                        <TabPanels>
+                        <TabPanels paddingLeft={4} paddingTop={2}>
                             <TabPanel>
                                     <Box flex={1} w="100%" h="100%" overflowY="auto">
                                         {isLoading ? (
@@ -377,7 +396,10 @@ function MyPackagers(){
                                                 <Spinner />
                                             </Center>
                                         ) : packagers.length === 0 ? (
-                                            "No packagers"
+                                            <Heading size={"md"}>
+                                                No packagers
+                                            </Heading>
+
                                         ) : (
                                             packagers.map((packager) => (
                                                 <>
@@ -399,7 +421,9 @@ function MyPackagers(){
                                                 <Spinner />
                                             </Center>
                                         ) : requests.length === 0 ? (
-                                            "No requests"
+                                            <Heading size={"md"}>
+                                                No requests
+                                            </Heading>
                                         ) : (
                                             requests.map((request) => (
                                                 <>
@@ -417,7 +441,9 @@ function MyPackagers(){
                                                 <Spinner />
                                             </Center>
                                         ) : myPackagerRequests.length === 0 ? (
-                                            "No requests from other users"
+                                            <Heading size={"md"}>
+                                                No requests from other users
+                                            </Heading>
                                         ) : (
                                             myPackagerRequests.map((request) => (
                                                 <>
@@ -435,7 +461,9 @@ function MyPackagers(){
                                                 <Spinner />
                                             </Center>
                                         ) : myPackagerUsers.length === 0 ? (
-                                            "No other user has access to your packager"
+                                            <Heading size={"md"}>
+                                                No other user has access to your packager
+                                            </Heading>
                                         ) : (
                                             myPackagerUsers.map((user) => (
                                                 <>
@@ -456,7 +484,7 @@ function MyPackagers(){
                         width="100%"
                         h="100%"
                         overflow="auto"
-                        bgColor="gray.100"
+                        bgColor={colorMode === "light" ? "gray.100" : "gray.700"}
                         borderRadius={25}
                         padding={10}
                         boxShadow="10px 15px 20px rgba(0, 0, 0, 0.1)"

@@ -30,7 +30,7 @@ function UnlockHistory({ packager, unlockHistory }) {
 	// 	console.log(packager);
 	// 	const fetchUnlocks = async () => {
 	// 		try {
-	// 			const res = await fetch(`http://localhost:3001/unlocks/packagerUnlocks/${packager._id}`, {
+	// 			const res = await fetch(`${process.env.REACT_APP_API_URL}/unlocks/packagerUnlocks/${packager._id}`, {
 	// 				credentials: "include"
 	// 			})
 	// 			const data = await res.json();
@@ -57,7 +57,7 @@ function UnlockHistory({ packager, unlockHistory }) {
 	return (
 		<Box alignItems={"start"} display="flex" flexDirection={"column"} flex={1} height={"100%"}>
 			<Heading mb={10} size={"md"}>Packager {packager.number} history:</Heading>
-			{unlockHistory.length === 0 ? <Text>No unlocks</Text>
+			{unlockHistory.length === 0 ? <Heading size={"md"}>No unlocks</Heading>
 			: <Stepper index={activeStep} orientation='vertical' overflow={"auto"} width={"100%"} height={"100%"} gap='0'>
 				{unlockHistory.map((unlock, index) => (
 					<Step key={index}>

@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import {
     Alert,
     AlertIcon, Box,
-    Button,
+    Button, ButtonGroup, Card,
     Center, Heading,
     Input,
     InputGroup,
-    InputRightElement,
+    InputRightElement, useColorMode,
     VStack
 } from "@chakra-ui/react";
 
@@ -15,6 +15,7 @@ function Register() {
     const [password, setPassword] = useState([]);
     const [email, setEmail] = useState([]);
     const [error, setError] = useState("");
+    const { colorMode, toggleColorMode } = useColorMode()
 
     const [isLoading, setIsLoading] = useState(false);
     const [show, setShow] = React.useState(false)
@@ -23,7 +24,7 @@ function Register() {
     async function Register(e) {
         e.preventDefault();
         setIsLoading(true)
-        const res = await fetch("http://localhost:3001/users", {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/users`, {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
@@ -34,7 +35,6 @@ function Register() {
             })
         });
         const data = await res.json();
-        console.log(data);
 
         if (data._id !== undefined) {
             window.location.href="/login";
@@ -55,9 +55,9 @@ function Register() {
 
     return(
         <Center flex={1}>
-
-            <VStack as="form" onSubmit={Register} width={{base: "100%", md: "70%", xl: "25%"}} bgColor={"gray.100"} borderRadius={"25"} padding={10} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
-                <Heading mb={4}>Register</Heading>
+            <Card alignItems={"center"} paddingX={"4%"} paddingBottom={"2%"} pt={"3%"} borderRadius={"25"} variant={"elevated"} bgColor={colorMode === "light" ? "gray.100" : "gray.700"} boxShadow={"10px 15px 20px rgba(0, 0, 0, 0.1)"}>
+            <VStack as="form" onSubmit={Register} >
+                <Heading mb={8}>Register</Heading>
                 <Input type="text" name="email" placeholder="Email" value={email} onChange={(e)=>(setEmail(e.target.value))} />
                 <Box h={0}/>
                 <Input type="text" name="username" placeholder="Username" value={username} onChange={(e)=>(setUsername(e.target.value))}/>
@@ -75,42 +75,17 @@ function Register() {
                         </Button>
                     </InputRightElement>
                 </InputGroup>
-                <Button type="submit" colorScheme={"blue"} isLoading={isLoading} loadingText="Registering..." onClick={Register}>Register</Button>
+                <ButtonGroup pt={4}>
+                    <Button type="submit" colorScheme={"blue"} isLoading={isLoading} loadingText="Registering..." onClick={Register}>Register</Button>
+                </ButtonGroup>
 
                 {error ? <Alert status="error">
                     <AlertIcon />
                     {error}
                 </Alert> : ""}
             </VStack>
+            </Card>
         </Center>
-        // <form onSubmit={Register}>
-        //     <VStack width="40%" alignItems="flex-start">
-        //         <InputGroup py={2}><Input type="text" name="email" placeholder="Email" value={email} onChange={(e)=>(setEmail(e.target.value))} /></InputGroup>
-        //         <Input type="text" name="username" placeholder="Username" value={username} onChange={(e)=>(setUsername(e.target.value))}/>
-        //         <InputGroup size='md' py={2}>
-        //             <Input
-        //                 value={password}
-        //                 onChange={(e)=>(setPassword(e.target.value))}
-        //                 pr='4.5rem'
-        //                 type={show ? 'text' : 'password'}
-        //                 placeholder='Enter password'
-        //             />
-        //             <InputRightElement width='4.5rem'>
-        //                 <Button variant={"solid"} color={"white"} bgColor={"gray.400"} _hover={{bgColor: "gray.500"}} h='1.75rem' right={1} top={2} onClick={handleClick}>
-        //                     {show ? 'Hide' : 'Show'}
-        //                 </Button>
-        //             </InputRightElement>
-        //         </InputGroup>
-        //         <Button variant='blue' isLoading={isLoading} type='submit'>Register</Button>
-        //         {error !== "" && (
-        //             <Alert status="error">
-        //                 <AlertIcon/>
-        //                 {error}
-        //             </Alert>
-        //         )}
-        //
-        //     </VStack>
-        // </form>
     );
 }
 
