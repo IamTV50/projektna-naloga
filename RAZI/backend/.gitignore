@@ -2,4 +2,7 @@ node_modules
 public/images
 public/python/tmp_videos
 public/python/tmp_images
+public/python/models/*
+public/python/false_faces_train_labels.npy
+public/python/false_faces_train_features.npy
 .env
