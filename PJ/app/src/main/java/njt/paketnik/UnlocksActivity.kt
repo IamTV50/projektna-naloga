@@ -60,21 +60,19 @@ class UnlocksActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 njt.paketnik.R.id.openScannerBtn -> {
                     val intent = Intent(this, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent)
                 }
 
                 njt.paketnik.R.id.openPackagersBtn -> {
                     val intent = Intent(this, PackagersActivity::class.java)
-                    startActivity(intent)
-                }
-
-                njt.paketnik.R.id.openUnlocksBtn -> {
-                    val intent = Intent(this, UnlocksActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent)
                 }
 
                 njt.paketnik.R.id.openSettingsBtn -> {
                     val intent = Intent(this, SettingsActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent)
                 }
 

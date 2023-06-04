@@ -1,16 +1,21 @@
 package njt.paketnik
 
+import android.app.Activity
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Base64
 import android.media.MediaPlayer
 import android.os.PersistableBundle
+import android.provider.MediaStore
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,6 +29,9 @@ import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentResult
 import njt.paketnik.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.IOException
 import org.json.JSONException
 import org.json.JSONObject
@@ -57,32 +65,9 @@ class MainActivity : AppCompatActivity() {
         navView = binding.navView
         toolbar = binding.toolbar
 
-        if (app.settings.contains("Theme")) {
-            when (app.settings.getInt("Theme", 0)) {
-                0 -> {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                }
-                1 -> {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                }
-                2 -> {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                }
-            }
-        }
-
-        if (app.userInfo.getString("userID", "") == "") {
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-        } else {
-            lifecycleScope.launch {
-                app.getUserInfo()
-            }
-        }
 
         binding.openScannerBtn.setOnClickListener {
-
+            startQRScanner()
         }
 
         binding.openPackagersList.setOnClickListener {

@@ -61,21 +61,19 @@ class PackagersActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.openScannerBtn -> {
                     val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                }
-
-                R.id.openPackagersBtn -> {
-                    val intent = Intent(this, PackagersActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent)
                 }
 
                 R.id.openUnlocksBtn -> {
                     val intent = Intent(this, UnlocksActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent)
                 }
 
                 R.id.openSettingsBtn -> {
                     val intent = Intent(this, SettingsActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent)
                 }
 

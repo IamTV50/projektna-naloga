@@ -3,16 +3,14 @@ package njt.paketnik
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatDelegate
@@ -31,11 +29,12 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONException
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var activityResultLauncher: ActivityResultLauncher<Intent>
     lateinit var app: MyApp
 
     private lateinit var drawerLayout: DrawerLayout
@@ -62,22 +61,6 @@ class SettingsActivity : AppCompatActivity() {
             binding.spinnerFormat.setSelection(app.settings.getInt("Format", 1))
         }
 
-        val isFaceRegistered = app.userInfo.getBoolean("faceIsRegistered", false)
-        val isFaceConfirmed = app.userInfo.getBoolean("confirmedFaceID", false)
-
-        if (isFaceRegistered && isFaceConfirmed){
-            binding.buttonRegisterFaceId.visibility = INVISIBLE
-            binding.buttonConfirmFaceId.visibility = INVISIBLE
-        }
-        else if (!isFaceRegistered){
-            binding.buttonRegisterFaceId.visibility = VISIBLE
-            binding.buttonConfirmFaceId.visibility = INVISIBLE
-        }
-        else{
-            binding.buttonRegisterFaceId.visibility = INVISIBLE
-            binding.buttonConfirmFaceId.visibility = VISIBLE
-        }
-
         binding.buttonConfirm.setOnClickListener {
             val selectedThemePosition = binding.spinnerTheme.selectedItemPosition
 
@@ -95,6 +78,7 @@ class SettingsActivity : AppCompatActivity() {
 
             app.settings.edit().putInt("Theme", selectedThemePosition).apply()
             app.settings.edit().putInt("Format", binding.spinnerFormat.selectedItemPosition).apply()
+            app.settings.edit().putBoolean("Reload", false).apply()
         }
 
         val takeRegisterFaceVideo = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {result: ActivityResult? ->
@@ -103,7 +87,6 @@ class SettingsActivity : AppCompatActivity() {
 
                 if (videoUri != null) {
                     registerFaceId(videoUri)
-                    app.userInfo.edit().putBoolean("faceIsRegistered", true).apply()
                 } else {
                     Toast.makeText(applicationContext, "Failed to get video", Toast.LENGTH_SHORT).show()
                 }
@@ -119,11 +102,10 @@ class SettingsActivity : AppCompatActivity() {
 
         val takeConfirmFacePic = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
             if (result!!.resultCode == Activity.RESULT_OK) {
-                val imgUri: Uri? = result.data?.data
+                val imgBitmap: Bitmap? = result.data?.extras?.get("data") as? Bitmap
 
-                if (imgUri != null) {
-                    confirmFaceId(imgUri)
-                    app.userInfo.edit().putBoolean("confirmedFaceID", true).apply()
+                if (imgBitmap != null) {
+                    confirmFaceId(imgBitmap)
                 } else {
                     Toast.makeText(applicationContext, "Failed to get picture", Toast.LENGTH_SHORT).show()
                 }
@@ -153,21 +135,19 @@ class SettingsActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.openScannerBtn -> {
                     val intent = Intent(this, MainActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent)
                 }
 
                 R.id.openPackagersBtn -> {
                     val intent = Intent(this, PackagersActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                 }
 
                 R.id.openUnlocksBtn -> {
                     val intent = Intent(this, UnlocksActivity::class.java)
-                    startActivity(intent)
-                }
-
-                R.id.openSettingsBtn -> {
-                    val intent = Intent(this, SettingsActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                 }
 
@@ -240,13 +220,14 @@ class SettingsActivity : AppCompatActivity() {
         return null
     }
 
-    private fun confirmFaceId(imageUri: Uri) {
+    private fun confirmFaceId(imgBitmap: Bitmap) {
         val apiUrl = "${app.backend}/users/faceId"
+        val imgFile = bitmapToFile(imgBitmap)
 
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("id", app.userInfo.getString("userID", "").toString())
-            .addFormDataPart("image", "photo.jpg", createImageRequestBody(imageUri))
+            .addFormDataPart("image", "photo.jpg", imgFile.asRequestBody("image/jpeg".toMediaTypeOrNull()))
             .build()
 
         lifecycleScope.launch {
@@ -256,9 +237,14 @@ class SettingsActivity : AppCompatActivity() {
                 val resJson = JSONObject(response)
 
                 if (resJson.has("error")) {
-                    Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
+                    if (resJson.has("message")) {
+                        Toast.makeText(applicationContext, resJson["message"].toString(), Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
+                    app.getUserInfo()
                 }
             } catch (e: JSONException) {
                 if (response == "") {
@@ -270,21 +256,19 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
-    private fun createImageRequestBody(imageUri: Uri): RequestBody {
-        val imageFile = File(getImagePathFromUri(imageUri).toString())
-        val requestBody = imageFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
-        return requestBody
-    }
+    private fun bitmapToFile(bitmap: Bitmap): File {
+        val file = File(applicationContext.cacheDir, "photo.jpg")
+        file.createNewFile()
 
-    private fun getImagePathFromUri(uri: Uri): String? {
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = contentResolver.query(uri, projection, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-                return it.getString(columnIndex)
-            }
-        }
-        return null
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+
+        val fileOutputStream = FileOutputStream(file)
+        fileOutputStream.write(byteArray)
+        fileOutputStream.flush()
+        fileOutputStream.close()
+
+        return file
     }
 }
