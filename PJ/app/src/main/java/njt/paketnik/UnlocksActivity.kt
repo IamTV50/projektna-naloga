@@ -1,11 +1,11 @@
 package njt.paketnik
 
-import android.R
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -107,7 +107,11 @@ class UnlocksActivity : AppCompatActivity() {
 
                 if (resJson is JSONObject) {
                     if (resJson.has("error")) { //error
-                        Toast.makeText(applicationContext, resJson["error"].toString(), Toast.LENGTH_SHORT).show()
+
+                    } else if (resJson.has("message") && resJson.getString("message") == "No unlocks found for the user.") {
+                        val noUnlocksTextView = binding.noUnlocksTextView
+                        noUnlocksTextView.visibility = View.VISIBLE
+                        binding.unlocksList.visibility = View.GONE
                     }
                 } else if (resJson is JSONArray) {
                     val unlocksList = mutableListOf<Unlock>()
@@ -125,6 +129,7 @@ class UnlocksActivity : AppCompatActivity() {
                     }
 
                     binding.unlocksList.adapter = UnlocksAdapter(this@UnlocksActivity, unlocksList)
+
                 } else {
                     Toast.makeText(applicationContext, "Unexpected response type", Toast.LENGTH_SHORT).show()
                 }

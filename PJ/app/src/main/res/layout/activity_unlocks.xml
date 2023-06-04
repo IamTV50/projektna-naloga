@@ -30,10 +30,27 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <ListView
-            android:id="@+id/unlocksList"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="8dp">
+
+            <ListView
+                android:id="@+id/unlocksList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/noUnlocksTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="No unlocks"
+                android:textSize="18sp"
+                android:paddingTop="18dp"
+                android:visibility="gone" />
+        </LinearLayout>
 
     </LinearLayout>
     <com.google.android.material.navigation.NavigationView

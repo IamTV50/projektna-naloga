@@ -30,10 +30,27 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <ListView
-            android:id="@+id/packagerList"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ListView
+                android:id="@+id/packagerList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/noPackagersTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="No packagers"
+                android:textSize="18sp"
+                android:paddingTop="18dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

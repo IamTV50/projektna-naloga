@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.ProgressBar
@@ -57,8 +58,9 @@ class RedirectActivity : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         } else {
-            if (app.settings.getBoolean("Reload", true)) {
+//            if (app.settings.getBoolean("Reload", true)) {
                 if (app.userInfo.getBoolean("hasModel", false)) {
+                    Toast.makeText(this, "Has model", Toast.LENGTH_SHORT).show()
                     val takeConfirmFacePic =
                         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
                             if (result!!.resultCode == Activity.RESULT_OK) {
@@ -88,11 +90,15 @@ class RedirectActivity : AppCompatActivity() {
                     lifecycleScope.launch {
                         app.getUserInfo()
                     }
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
                 }
-            } else {
-                app.settings.edit().putBoolean("Reload", true).apply()
             }
-        }
+//        else {
+//                app.settings.edit().putBoolean("Reload", true).apply()
+//            }
+
     }
 
     private suspend fun confirmFaceId(imgBitmap: Bitmap) {

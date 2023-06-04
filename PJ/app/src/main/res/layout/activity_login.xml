@@ -61,6 +61,7 @@
                 android:minHeight="48dp"
                 android:padding="8dp"
                 android:textColorHint="#8D6E63"
+                android:textColor="#171717"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/loginNameInput" />
@@ -81,6 +82,7 @@
                 android:minHeight="48dp"
                 android:padding="8dp"
                 android:textColorHint="#8D6E63"
+                android:textColor="#171717"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

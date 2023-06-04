@@ -6,8 +6,10 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
@@ -43,6 +45,10 @@ class PackagersActivity : AppCompatActivity() {
         toolbar = binding.toolbar
 
         fetchPackagres()
+
+//        lifecycleScope.launch {
+//            fetchPackagres()
+//        }
 
         // drawer
         setSupportActionBar(toolbar)
@@ -100,9 +106,20 @@ class PackagersActivity : AppCompatActivity() {
     private fun fetchPackagres() {
         val packagerSet = app.userInfo.getStringSet("packagers", emptySet())
         val packagerNumbers = packagerSet?.map { packager ->
-            JSONObject(packager).getString("number")
+            val jsonObject = JSONObject(packager)
+            jsonObject.getString("number")
         }?.toMutableList() ?: mutableListOf()
 
-        binding.packagerList.adapter = PackagersAdapter(this@PackagersActivity, packagerNumbers)
+        val packagersAdapter = PackagersAdapter(this@PackagersActivity, packagerNumbers)
+        binding.packagerList.adapter = packagersAdapter
+
+        val noPackagersTextView = binding.noPackagersTextView
+        if (packagerNumbers.isEmpty()) {
+            noPackagersTextView.visibility = View.VISIBLE
+        } else {
+            noPackagersTextView.visibility = View.GONE
+        }
     }
+
+
 }

@@ -7,4 +7,16 @@
     <color name="app_theme_light">#f6fbff</color>
     <color name="edit_text_border">#03A9F4</color>
     <color name="edit_text_background">#EAEAEA</color>
+
+
+    <color name="badge_success_text_dark">#7FBD99</color>
+    <color name="badge_failed_text_dark">#F2AAAC</color>
+    <color name="badge_success_background_dark">#40575B</color>
+    <color name="badge_failed_background_dark">#534D5A</color>
+
+    <color name="badge_success_text_light">#22543D</color>
+    <color name="badge_failed_text_light">#822727</color>
+    <color name="badge_success_background_light">#C6F6D5</color>
+    <color name="badge_failed_background_light">#FED7D7</color>
+
 </resources>
