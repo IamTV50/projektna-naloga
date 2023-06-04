@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:paddingBottom="20dp"/>
+            android:paddingBottom="17dp"/>
 
         <!-- Unlock date -->
         <TextView

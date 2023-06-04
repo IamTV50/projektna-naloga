@@ -21,6 +21,8 @@ class PackagersAdapter(context: Context, private val packagerList: List<String>)
             view = inflater.inflate(R.layout.packager_item, parent, false)
             holder = ViewHolder()
             holder.packagerNumber = view.findViewById(R.id.packagerNumber)
+            holder.packagerVisibility = view.findViewById(R.id.packagerVisibility)
+            holder.packagerStatus = view.findViewById(R.id.packagerStatus)
             view.tag = holder
         } else {
             holder = view.tag as ViewHolder
@@ -34,5 +36,7 @@ class PackagersAdapter(context: Context, private val packagerList: List<String>)
 
     private class ViewHolder {
         var packagerNumber: TextView? = null
+        var packagerVisibility: TextView? = null
+        var packagerStatus: TextView? = null
     }
 }
