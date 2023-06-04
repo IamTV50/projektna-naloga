@@ -49,7 +49,7 @@ class UnlocksAdapter(context: Context, private val unlocksList: List<UnlocksActi
             holder.unlockSuccess?.setTextColor(context.resources.getColor(R.color.badge_failed_text_light, null))
         }
 //        holder.unlockSuccess?.text = resources.getString(R.string.unlockSuccess, if (unlock.success) "Successfully" else "Unsuccessfully")
-        holder.unlockReason?.text = resources.getString(R.string.unlockReason, unlock.reason)
+        holder.unlockReason?.text = unlock.reason
 
         return view!!
     }

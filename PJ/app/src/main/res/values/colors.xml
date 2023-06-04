@@ -19,4 +19,9 @@
     <color name="badge_success_background_light">#C6F6D5</color>
     <color name="badge_failed_background_light">#FED7D7</color>
 
+    <color name="badge_neutral_text_dark">#F2AAAC</color>
+    <color name="badge_neutral_text_light">#7B341F</color>
+    <color name="badge_neutral_background_dark">#534D5A</color>
+    <color name="badge_neutral_background_light">#FEEBC8</color>
+
 </resources>

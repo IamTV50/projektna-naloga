@@ -39,7 +39,8 @@
             <ListView
                 android:id="@+id/unlocksList"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:divider="@android:color/transparent" />
 
             <TextView
                 android:id="@+id/noUnlocksTextView"

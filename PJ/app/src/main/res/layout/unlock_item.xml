@@ -4,31 +4,45 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="0dp">
 
     <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:textAlignment="center"
-        android:layout_centerInParent="true">
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="22dp">
 
         <View
-            android:id="@+id/dotCenter"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="@color/app_theme"
-            android:background="@drawable/stepper_dot" />
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="#7E7E7E"
+            android:layout_gravity="center" />
 
-        <TextView
-            android:id="@+id/counter"
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textSize="18sp"
+            android:layout_centerInParent="true">
 
-            android:textColor="@android:color/black" />
+            <View
+                android:id="@+id/dotCenter"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="@color/app_theme"
+                android:background="@drawable/stepper_dot" />
+
+            <TextView
+                android:id="@+id/counter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:textColor="@android:color/black" />
+
+        </FrameLayout>
+
     </FrameLayout>
 
     <LinearLayout
@@ -51,22 +65,26 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:paddingBottom="5dp"/>
+            android:textColor="#BABABA"
+            android:paddingBottom="7dp"/>
 
         <!-- Unlock success -->
         <TextView
             android:id="@+id/unlockSuccess"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_marginBottom="2dp"/>
 
-        <!-- Unlock reason -->
         <TextView
             android:id="@+id/unlockReason"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
-            android:paddingTop="5dp"/>
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/badge_neutral"
+            android:textColor="@color/badge_neutral_text_light"/>
 
     </LinearLayout>
 
