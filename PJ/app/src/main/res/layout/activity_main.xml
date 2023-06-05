@@ -38,11 +38,14 @@
                 android:layout_height="match_parent"
                 tools:context=".MainActivity">
 
-                <Button
+                <ImageButton
                     android:id="@+id/openScannerBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="128dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="90dp"
+                    android:background="@drawable/circle_button"
+                    android:scaleType="fitEnd"
+                    android:src="@drawable/baseline_qr_code_scanner_24"
                     android:text="@string/scannerText"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
@@ -59,7 +62,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/openScannerBtn" />
+                    app:layout_constraintTop_toBottomOf="@+id/openScannerBtn"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:id="@+id/statusTxt"
@@ -71,28 +75,30 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/resultTxt" />
+                    app:layout_constraintTop_toBottomOf="@+id/resultTxt"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/openPackagersList"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="18dp"
                     android:text="@string/packagersText"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/statusTxt" />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <Button
                     android:id="@+id/openUnlocksList"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="18dp"
                     android:text="@string/unlocksText"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/openPackagersList" />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/openSettings"
+                    app:layout_constraintStart_toEndOf="@+id/openPackagersList" />
 
                 <ImageButton
                     android:id="@+id/openSettings"
@@ -100,9 +106,9 @@
                     android:layout_height="48dp"
                     android:layout_marginEnd="20dp"
                     android:layout_marginBottom="20dp"
+                    android:background="@drawable/icon_button"
                     android:backgroundTint="@color/app_theme"
                     android:src="@drawable/baseline_settings_24"
-                    android:background="@drawable/icon_button"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 

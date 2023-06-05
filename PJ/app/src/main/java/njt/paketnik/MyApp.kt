@@ -22,7 +22,7 @@ import java.io.IOException
 class MyApp : Application() {
     lateinit var userInfo: SharedPreferences
     lateinit var settings: SharedPreferences
-    val backend = "http://192.168.15.173:3001"
+    val backend = "http://192.168.1.8:3001"
 
     override fun onCreate() {
         super.onCreate()
@@ -51,9 +51,15 @@ class MyApp : Application() {
 
             if (resJson.has("error")) {
                 Toast.makeText(applicationContext, resJson["error"].toString(), Toast.LENGTH_SHORT).show()
+                val intent = Intent(applicationContext, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
             } else if (resJson.has("message")) {
                 Toast.makeText(applicationContext, resJson["message"].toString(), Toast.LENGTH_SHORT).show()
                 unsetUser()
+                val intent = Intent(applicationContext, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
             } else {
                 userInfo.edit().putString("username", resJson["username"].toString()).apply()
                 userInfo.edit().putString("email", resJson["email"].toString()).apply()
@@ -75,8 +81,14 @@ class MyApp : Application() {
             if (response == "") {
                 Toast.makeText(applicationContext, "unexpected response", Toast.LENGTH_SHORT)
                     .show()
+                val intent = Intent(applicationContext, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
             } else {
                 Toast.makeText(applicationContext, "pasring error", Toast.LENGTH_SHORT).show()
+                val intent = Intent(applicationContext, LoginActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
             }
         }
     }

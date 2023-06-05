@@ -13,6 +13,8 @@ import android.util.Base64
 import android.media.MediaPlayer
 import android.os.PersistableBundle
 import android.provider.MediaStore
+import android.view.View
+import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
@@ -22,6 +24,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
@@ -64,6 +68,30 @@ class MainActivity : AppCompatActivity() {
         drawerLayout = binding.drawerLayout
         navView = binding.navView
         toolbar = binding.toolbar
+
+        val openScannerBtn = binding.openScannerBtn
+        val parentView = openScannerBtn.parent as View
+
+        parentView.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                // Remove the listener to prevent multiple calls
+                parentView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                // Get the parent width
+                val parentWidth = parentView.width
+
+                // Calculate the desired width and height as 75% of the parent width
+                val desiredWidth = (parentWidth * 0.75).toInt()
+                val desiredHeight = (parentWidth * 0.75).toInt()
+
+                // Set the width and height of the button
+                openScannerBtn.layoutParams.width = desiredWidth
+                openScannerBtn.layoutParams.height = desiredHeight
+
+                // Request a layout update to reflect the new dimensions
+                openScannerBtn.requestLayout()
+            }
+        })
 
 
         binding.openScannerBtn.setOnClickListener {
@@ -163,25 +191,35 @@ class MainActivity : AppCompatActivity() {
 
                                 if (resJson.has("message")) {
                                     binding.statusTxt.text = getString(R.string.responseErrorText)
+                                    binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                                    binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
                                     return@launch
                                 }
                             } catch (e: JSONException) {
                                 if (response == "") {
                                     binding.statusTxt.text = getString(R.string.unexpectedResponseText)
+                                    binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                                    binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
                                 } else {
                                     binding.statusTxt.text = getString(R.string.parsingErrorText)
+                                    binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                                    binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
                                 }
                                 return@launch
                             }
 
                             if (!resJson["active"].toString().toBoolean()) {
                                 binding.statusTxt.text = getString(R.string.packagerInactiveText, boxNumber.toString())
+                                binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                                binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
                                 return@launch
                             }
 
                             val packagerSet = app.userInfo.getStringSet("packagers", emptySet())
 
                             if (packagerSet.isNullOrEmpty()) {
+                                binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                                binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
                                 binding.statusTxt.text = getString(R.string.emptyPackagerListText)
                                 return@launch
                             }
@@ -192,6 +230,8 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             if (!packagerIds.contains(resJson["_id"].toString())) {
+                                binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                                binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
                                 binding.statusTxt.text = getString(R.string.notContainPackagerText, boxNumber.toString())
                                 return@launch
                             }
@@ -207,22 +247,35 @@ class MainActivity : AppCompatActivity() {
                             resJson = JSONObject(response)
 
                             if (resJson["errorNumber"] != 0) {
+                                binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                                binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
                                 binding.statusTxt.text = getString(R.string.responseErrorText)
                             } else {
-                                binding.statusTxt.text = getString(R.string.successText)
                                 convertB64ToSound(resJson["data"].toString(), format, boxNumber)
+                                binding.statusTxt.setBackgroundResource(R.drawable.badge_success)
+                                binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_success_text_light, null))
+                                binding.statusTxt.text = getString(R.string.successText)
                             }
                         } catch (e: JSONException) {
                             if (response == "") {
                                 binding.statusTxt.text = getString(R.string.unexpectedResponseText)
+                                binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                                binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
                             } else {
                                 binding.statusTxt.text = getString(R.string.parsingErrorText)
+                                binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                                binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
                             }
                         }
                     }
                 } else {
                     binding.statusTxt.text = getString(R.string.parsingErrorText)
+                    binding.statusTxt.setBackgroundResource(R.drawable.badge_failed)
+                    binding.statusTxt.setTextColor(binding.root.context.resources.getColor(R.color.badge_failed_text_light, null))
+
                 }
+                binding.resultTxt.visibility = View.VISIBLE
+                binding.statusTxt.visibility = View.VISIBLE
             }
         }
     }
