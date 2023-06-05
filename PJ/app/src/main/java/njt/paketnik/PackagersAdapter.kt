@@ -30,8 +30,33 @@ class PackagersAdapter(context: Context, private val packagerList: List<Packager
 
         val packager = packagerList[position]
         holder.packagerNumber?.text = resources.getString(R.string.packagerNumber, packager.number.toString())
-        holder.packagerVisibility?.text = resources.getString(R.string.packagerVisibility, packager.public.toString())
-        holder.packagerStatus?.text = resources.getString(R.string.packagerStatus, packager.active.toString())
+
+        if (packager.public) {
+            holder.packagerVisibility?.setBackgroundResource(R.drawable.badge_success)
+            holder.packagerVisibility?.text = resources.getString(R.string.packagerPublic)
+            holder.packagerVisibility?.visibility = View.VISIBLE
+            holder.packagerVisibility?.setTextColor(context.resources.getColor(R.color.badge_success_text_light, null))
+        } else {
+            holder.packagerVisibility?.setBackgroundResource(R.drawable.badge_neutral)
+            holder.packagerVisibility?.text = resources.getString(R.string.packagerPrivate)
+            holder.packagerVisibility?.visibility = View.VISIBLE
+            holder.packagerVisibility?.setTextColor(context.resources.getColor(R.color.badge_neutral_text_light, null))
+        }
+
+        if (packager.active) {
+            holder.packagerStatus?.setBackgroundResource(R.drawable.badge_success)
+            holder.packagerStatus?.text = resources.getString(R.string.packagerActive)
+            holder.packagerStatus?.visibility = View.VISIBLE
+            holder.packagerStatus?.setTextColor(context.resources.getColor(R.color.badge_success_text_light, null))
+        } else {
+            holder.packagerStatus?.setBackgroundResource(R.drawable.badge_failed)
+            holder.packagerStatus?.text = resources.getString(R.string.packagerInactive)
+            holder.packagerStatus?.visibility = View.VISIBLE
+            holder.packagerStatus?.setTextColor(context.resources.getColor(R.color.badge_failed_text_light, null))
+        }
+
+        //holder.packagerVisibility?.text = resources.getString(R.string.packagerVisibility, packager.public.toString())
+        //holder.packagerStatus?.text = resources.getString(R.string.packagerStatus, packager.active.toString())
 
         return view!!
     }
