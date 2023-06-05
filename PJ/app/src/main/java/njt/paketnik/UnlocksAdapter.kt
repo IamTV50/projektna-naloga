@@ -20,6 +20,7 @@ class UnlocksAdapter(context: Context, private val unlocksList: List<UnlocksActi
         if (view == null) {
             view = inflater.inflate(R.layout.unlock_item, parent, false)
             holder = ViewHolder()
+            holder.counter = view.findViewById(R.id.counter)
             holder.unlockNumber = view.findViewById(R.id.unlockNumber)
             holder.unlockDate = view.findViewById(R.id.unlockDate)
             holder.unlockSuccess = view.findViewById(R.id.unlockSuccess)
@@ -33,15 +34,28 @@ class UnlocksAdapter(context: Context, private val unlocksList: List<UnlocksActi
         val inputDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)
         val outputDateFormat = SimpleDateFormat("dd.MM.yyyy hh:mm:ss", Locale.ENGLISH)
 
+        holder.counter?.text = (position + 1).toString()
         holder.unlockNumber?.text = resources.getString(R.string.packagerNumber, unlock.number.toString())
         holder.unlockDate?.text = resources.getString(R.string.unlockDate, inputDateFormat.parse(unlock.date)?.let { outputDateFormat.format(it) } ?: "")
-        holder.unlockSuccess?.text = resources.getString(R.string.unlockSuccess, if (unlock.success) "Successfully" else "Unsuccessfully")
-        holder.unlockReason?.text = resources.getString(R.string.unlockReason, unlock.reason)
+        if (unlock.success) {
+            holder.unlockSuccess?.setBackgroundResource(R.drawable.badge_success)
+            holder.unlockSuccess?.text = resources.getString(R.string.unlockOpened)
+            holder.unlockSuccess?.visibility = View.VISIBLE
+            holder.unlockSuccess?.setTextColor(context.resources.getColor(R.color.badge_success_text_light, null))
+        } else {
+            holder.unlockSuccess?.setBackgroundResource(R.drawable.badge_failed)
+            holder.unlockSuccess?.text = resources.getString(R.string.unlockFailed)
+            holder.unlockSuccess?.visibility = View.VISIBLE
+            holder.unlockSuccess?.setTextColor(context.resources.getColor(R.color.badge_failed_text_light, null))
+        }
+//        holder.unlockSuccess?.text = resources.getString(R.string.unlockSuccess, if (unlock.success) "Successfully" else "Unsuccessfully")
+        holder.unlockReason?.text = unlock.reason
 
         return view!!
     }
 
     private class ViewHolder {
+        var counter: TextView? = null
         var unlockNumber: TextView? = null
         var unlockDate: TextView? = null
         var unlockSuccess: TextView? = null

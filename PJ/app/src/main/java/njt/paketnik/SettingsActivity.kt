@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,7 +22,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import njt.paketnik.databinding.ActivitySettingsBinding
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -52,6 +55,12 @@ class SettingsActivity : AppCompatActivity() {
         drawerLayout = binding.drawerLayout
         navView = binding.navView
         toolbar = binding.toolbar
+
+        if (app.userInfo.getBoolean("hasModel", false)) {
+            binding.buttonConfirmFaceId.visibility = View.VISIBLE
+        } else {
+            binding.buttonConfirmFaceId.visibility = View.GONE
+        }
 
         if (app.settings.contains("Theme")) {
             binding.spinnerTheme.setSelection(app.settings.getInt("Theme", 0))
@@ -135,7 +144,7 @@ class SettingsActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.openScannerBtn -> {
                     val intent = Intent(this, MainActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                 }
 
@@ -184,13 +193,17 @@ class SettingsActivity : AppCompatActivity() {
             val response = app.sendPostRequestMultipart(apiUrl, requestBody)
 
             try {
-                val resJson = JSONObject(response)
+                withTimeout(300000) {
+                    val resJson = JSONObject(response)
 
-                if (resJson.has("error")) {
-                    Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
+                    if (resJson.has("error")) {
+                        Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
+                    }
                 }
+            } catch (e: TimeoutCancellationException) {
+                Toast.makeText(applicationContext, "Register timed out", Toast.LENGTH_SHORT).show()
             } catch (e: JSONException) {
                 if (response == "") {
                     Toast.makeText(applicationContext, getString(R.string.unexpectedResponseText), Toast.LENGTH_SHORT).show()

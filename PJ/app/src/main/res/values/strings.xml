@@ -57,9 +57,18 @@
     <string name="packagerInactiveText">This packager is inactive: %s!</string>
 
     <string name="packagerNumber">Packager: %s</string>
+    <string name="packagerVisibility">Public: %s</string>
+    <string name="packagerStatus">Active: %s</string>
+    <string name="packagerPublic">Public</string>
+    <string name="packagerPrivate">Private</string>
+    <string name="packagerActive">Active</string>
+    <string name="packagerInactive">Inactive</string>
+
     <string name="unlockDate">Date: %s</string>
     <string name="unlockSuccess">Success: %s</string>
     <string name="unlockReason">Reason: %s</string>
+    <string name="unlockOpened">Opened</string>
+    <string name="unlockFailed">Failed</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

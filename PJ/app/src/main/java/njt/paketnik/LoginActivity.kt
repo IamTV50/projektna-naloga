@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
@@ -50,7 +51,14 @@ class LoginActivity : AppCompatActivity() {
                             resJson = JSONObject(response)
 
                             if (resJson.has("error")) { //error
-                                Toast.makeText(applicationContext, resJson["error"].toString(), Toast.LENGTH_SHORT).show()
+                                val errorMessage = resJson["message"].toString()
+                                val dialog = AlertDialog.Builder(this@LoginActivity)
+                                    .setTitle("Error")
+                                    .setMessage(errorMessage)
+                                    .setPositiveButton("OK", null)
+                                    .create()
+                                dialog.show()
+
                             } else {
                                 app.userInfo.edit().putString("userID", resJson["_id"].toString()).apply()
                                 app.userInfo.edit().putString("username", resJson["username"].toString()).apply()
@@ -69,7 +77,9 @@ class LoginActivity : AppCompatActivity() {
 
                                 app.settings.edit().putBoolean("Reload", false).apply()
 
-                                Toast.makeText(applicationContext, "login success", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(applicationContext, "Successful Login", Toast.LENGTH_SHORT).show()
+
+                                app.getUserInfo()
 
                                 val intent = Intent(applicationContext, MainActivity::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
@@ -78,13 +88,31 @@ class LoginActivity : AppCompatActivity() {
                         }
                     } catch (e: TimeoutCancellationException) {
                         // Handle timeout exception here
-                        Toast.makeText(applicationContext, "Request timed out", Toast.LENGTH_SHORT).show()
+                        val errorMessage = "Request timed out"
+                        val dialog = AlertDialog.Builder(this@LoginActivity)
+                            .setTitle("Error")
+                            .setMessage(errorMessage)
+                            .setPositiveButton("OK", null)
+                            .create()
+                        dialog.show()
                     } catch (e: JSONException) {
                         if (response == ""){
-                            Toast.makeText(applicationContext, "unexpected response", Toast.LENGTH_SHORT).show()
+                            val errorMessage = "Unexpected response"
+                            val dialog = AlertDialog.Builder(this@LoginActivity)
+                                .setTitle("Error")
+                                .setMessage(errorMessage)
+                                .setPositiveButton("OK", null)
+                                .create()
+                            dialog.show()
                         }
                         else{
-                            Toast.makeText(applicationContext, "pasring error", Toast.LENGTH_SHORT).show()
+                            val errorMessage = "Pasring error"
+                            val dialog = AlertDialog.Builder(this@LoginActivity)
+                                .setTitle("Error")
+                                .setMessage(errorMessage)
+                                .setPositiveButton("OK", null)
+                                .create()
+                            dialog.show()
                         }
                     }
                 }
