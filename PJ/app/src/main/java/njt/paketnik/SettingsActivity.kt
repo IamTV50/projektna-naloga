@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.provider.MediaStore
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -54,6 +55,12 @@ class SettingsActivity : AppCompatActivity() {
         drawerLayout = binding.drawerLayout
         navView = binding.navView
         toolbar = binding.toolbar
+
+        if (app.userInfo.getBoolean("hasModel", false)) {
+            binding.buttonConfirmFaceId.visibility = View.VISIBLE
+        } else {
+            binding.buttonConfirmFaceId.visibility = View.GONE
+        }
 
         if (app.settings.contains("Theme")) {
             binding.spinnerTheme.setSelection(app.settings.getInt("Theme", 0))
@@ -137,7 +144,7 @@ class SettingsActivity : AppCompatActivity() {
             when (menuItem.itemId) {
                 R.id.openScannerBtn -> {
                     val intent = Intent(this, MainActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                 }
 

@@ -9,7 +9,7 @@ import android.widget.TextView
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PackagersAdapter(context: Context, private val packagerList: List<String>) : ArrayAdapter<String>(context, R.layout.packager_item, packagerList) {
+class PackagersAdapter(context: Context, private val packagerList: List<PackagersActivity.Packager>) : ArrayAdapter<PackagersActivity.Packager>(context, R.layout.packager_item, packagerList) {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private val resources = context.resources
 
@@ -29,7 +29,9 @@ class PackagersAdapter(context: Context, private val packagerList: List<String>)
         }
 
         val packager = packagerList[position]
-        holder.packagerNumber?.text = resources.getString(R.string.packagerNumber, packager)
+        holder.packagerNumber?.text = resources.getString(R.string.packagerNumber, packager.number.toString())
+        holder.packagerVisibility?.text = resources.getString(R.string.packagerVisibility, packager.public.toString())
+        holder.packagerStatus?.text = resources.getString(R.string.packagerStatus, packager.active.toString())
 
         return view!!
     }

@@ -104,22 +104,28 @@ class PackagersActivity : AppCompatActivity() {
     }
 
     private fun fetchPackagres() {
-        val packagerSet = app.userInfo.getStringSet("packagers", emptySet())
-        val packagerNumbers = packagerSet?.map { packager ->
-            val jsonObject = JSONObject(packager)
-            jsonObject.getString("number")
-        }?.toMutableList() ?: mutableListOf()
+        val packagerList = mutableListOf<Packager>()
 
-        val packagersAdapter = PackagersAdapter(this@PackagersActivity, packagerNumbers)
+        val packagerSet = app.userInfo.getStringSet("packagers", emptySet())
+
+        packagerSet?.map { packager ->
+            val jsonObject = JSONObject(packager)
+            val number = jsonObject.getInt("number")
+            val public = jsonObject.getBoolean("public")
+            val active = jsonObject.getBoolean("active")
+            packagerList.add(Packager(number, public, active))
+        }
+
+        val packagersAdapter = PackagersAdapter(this@PackagersActivity, packagerList)
         binding.packagerList.adapter = packagersAdapter
 
         val noPackagersTextView = binding.noPackagersTextView
-        if (packagerNumbers.isEmpty()) {
+        if (packagerList.isEmpty()) {
             noPackagersTextView.visibility = View.VISIBLE
         } else {
             noPackagersTextView.visibility = View.GONE
         }
     }
 
-
+    inner class Packager(val number: Int, val public: Boolean, val active: Boolean)
 }

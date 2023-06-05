@@ -34,17 +34,17 @@ class UnlocksAdapter(context: Context, private val unlocksList: List<UnlocksActi
         val inputDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)
         val outputDateFormat = SimpleDateFormat("dd.MM.yyyy hh:mm:ss", Locale.ENGLISH)
 
-        holder.counter?.text =  (position + 1).toString()
+        holder.counter?.text = (position + 1).toString()
         holder.unlockNumber?.text = resources.getString(R.string.packagerNumber, unlock.number.toString())
         holder.unlockDate?.text = resources.getString(R.string.unlockDate, inputDateFormat.parse(unlock.date)?.let { outputDateFormat.format(it) } ?: "")
         if (unlock.success) {
             holder.unlockSuccess?.setBackgroundResource(R.drawable.badge_success)
-            holder.unlockSuccess?.text = "Opened"
+            holder.unlockSuccess?.text = resources.getString(R.string.unlockOpened)
             holder.unlockSuccess?.visibility = View.VISIBLE
             holder.unlockSuccess?.setTextColor(context.resources.getColor(R.color.badge_success_text_light, null))
         } else {
             holder.unlockSuccess?.setBackgroundResource(R.drawable.badge_failed)
-            holder.unlockSuccess?.text = "Failed"
+            holder.unlockSuccess?.text = resources.getString(R.string.unlockFailed)
             holder.unlockSuccess?.visibility = View.VISIBLE
             holder.unlockSuccess?.setTextColor(context.resources.getColor(R.color.badge_failed_text_light, null))
         }
