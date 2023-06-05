@@ -45,9 +45,6 @@
             android:name=".SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".PackagersAdapter"
-            android:exported="false" />
-        <activity
             android:name=".PackagersActivity"
             android:exported="false" />
         <activity

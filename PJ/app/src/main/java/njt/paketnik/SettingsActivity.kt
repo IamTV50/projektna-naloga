@@ -21,7 +21,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.navigation.NavigationView
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import njt.paketnik.databinding.ActivitySettingsBinding
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -184,13 +186,17 @@ class SettingsActivity : AppCompatActivity() {
             val response = app.sendPostRequestMultipart(apiUrl, requestBody)
 
             try {
-                val resJson = JSONObject(response)
+                withTimeout(300000) {
+                    val resJson = JSONObject(response)
 
-                if (resJson.has("error")) {
-                    Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
+                    if (resJson.has("error")) {
+                        Toast.makeText(applicationContext, getString(R.string.responseErrorText), Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(applicationContext, getString(R.string.successText), Toast.LENGTH_SHORT).show()
+                    }
                 }
+            } catch (e: TimeoutCancellationException) {
+                Toast.makeText(applicationContext, "Register timed out", Toast.LENGTH_SHORT).show()
             } catch (e: JSONException) {
                 if (response == "") {
                     Toast.makeText(applicationContext, getString(R.string.unexpectedResponseText), Toast.LENGTH_SHORT).show()
